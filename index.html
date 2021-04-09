@@ -1,0 +1,2825 @@
+<!DOCTYPE html>
+<html>
+
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <title>TFT Helper Adventure Web Tool</title>
+    </head>
+
+    <script>
+    // How to spell check finished HTML
+    // document.body.contentEditable = true;
+    // document.designMode = 'on';
+
+//        Establish Variables
+
+        function initializeApp() {
+
+            document.getElementById("tab1").className += " active";
+            testMode = 0;
+
+            setCurrentTime();
+
+            setInterval( setCurrentTime, 60000 );
+
+            comparators = [
+              "<",
+              ">",
+              "<=",
+              "=<",
+              ">=",
+              "=>",
+              "=",
+              "==",
+              "===",
+              "vs"
+            ];
+
+            armorTypes = [
+              "none",
+              "cloth",
+              "leather",
+              "chainmail",
+              "half plate",
+              "plate armor",
+              "fine plate",
+            ];
+
+            nitty = 0;
+            nittyParagraphs = document.getElementsByClassName('nitty');
+
+            successDestination="";
+            failureDestination="";
+
+            document.getElementById("userInputTextArea").value = localStorage.getItem( "userAdventure" );
+
+            reviewUserInput();
+
+        }
+
+        function toggleNitty() {
+
+          if ( nitty ) {
+            nitty = 0;
+//            for ( i in nittyParagraphs ) nittyParagraphs[i].style.display='none';
+              for ( i=0; i<nittyParagraphs.length; i++ ) {
+              nittyParagraphs[i].style.display='none';
+            }
+            document.getElementById("nittyButton").innerHTML = "Show Nitty Gritty";
+          } else {
+            nitty = 1;
+
+            // for ( i in nittyParagraphs ) { console.log(i); nittyParagraphs[i].style.display='block'; }
+
+            for ( i=0; i<nittyParagraphs.length; i++ ) {
+              nittyParagraphs[i].style.display='block';
+            }
+
+            document.getElementById("nittyButton").innerHTML = "Hide Nitty Gritty";
+
+          }
+
+
+        }
+
+        function showHelp(){
+
+            document.getElementById("helpDiv").style.display="block";
+
+        }
+        // function hideHelp(){
+        //
+        //     document.getElementById("helpDiv").style.display="none";
+        //
+        //}
+        function showSaveAdvice(){
+
+            document.getElementById("saveAdviceDiv").style.display="block";
+
+        }
+        // function hideSaveAdvice(){
+        //
+        //     document.getElementById("saveAdviceDiv").style.display="none";
+        //
+        // }
+        function showTestModeAdvice(){
+
+            document.getElementById("testModeAdviceDiv").style.display="block";
+
+        }
+        // function hideTestModeAdvice(){
+        //
+        //     document.getElementById("testModeAdviceDiv").style.display="none";
+        //
+        // }
+        function showSpecials(){
+
+            document.getElementById("specialsHelpDiv").style.display="block";
+
+        }
+        // function hideSpecials(){
+        //
+        //     document.getElementById("specialsHelpDiv").style.display="none";
+        //
+        // }
+        function showTypes(){
+
+            document.getElementById("typesHelpDiv").style.display="block";
+
+        }
+        // function hideTypes(){
+        //
+        //     document.getElementById("typesHelpDiv").style.display="none";
+        //
+        // }
+        function showComparisons(){
+
+            document.getElementById("comparisonsHelpDiv").style.display="block";
+
+        }
+        // function hideComparisons(){
+        //
+        //     document.getElementById("comparisonsHelpDiv").style.display="none";
+        //
+        // }
+
+        function showEgg( eggName ) {
+          hideAll();
+          document.getElementById( eggName ).style.display="block";
+        }
+
+        function gimmeFnord() {
+
+          document.getElementById( 'illuminatiDiv' ).innerHTML = fnord();
+
+        }
+
+        function hideAll() {
+          // hideHelp();
+          // hideSaveAdvice();
+          // hideTestModeAdvice();
+          // hideTypes();
+          // hideComparisons();
+          // hideSpecials();
+
+          itemsToHide = document.getElementsByClassName("hideMe");
+          for ( i=0; i < itemsToHide.length; i++ ) {
+
+            itemsToHide[i].style.display="none";
+
+          }
+
+
+        }
+
+        function addLineNumbers() {
+
+            originalLines = document.getElementById("userInput").value.split("\n");
+
+            outputString = "";
+
+
+            for ( i = 0; i < originalLines.length; i++ ) {
+
+                outputString += "<" + (i+1) + ">" + originalLines[i] +"\n";
+
+            }
+
+            document.getElementById("userInput").value = outputString;
+
+        }
+
+        function removeLineNumbers() {
+
+
+        }
+
+        function enterTemplate() {
+
+            document.getElementById("userInputTextArea").value = document.getElementById("basicTemplate").innerText;
+        }
+
+        function enterBetterTemplate() {
+
+            document.getElementById("userInputTextArea").value = document.getElementById("betterTemplate").innerText;
+        }
+
+        function showPage( pageToShow ) {
+
+          if ( document.getElementById( "page3" ).style.display == "block"  && pageToShow != 3 ) {
+
+            saveLocal();
+
+          }
+
+
+            for ( i=1; i<7; i++ ) {
+
+                document.getElementById( "page" + i ).style.display="none";
+
+            }
+
+
+            document.getElementById( "page" + pageToShow ).style.display="block";
+
+              tablinks = document.getElementsByClassName("tabButton");
+              for (i = 0; i < tablinks.length; i++) {
+                tablinks[i].className = tablinks[i].className.replace(" active", "");
+              }
+              event.currentTarget.className += " active";
+
+        }
+
+        function reviewUserInput() {
+
+          adventureArray = [];
+
+          document.getElementById("locationsDiv").innerHTML = "";
+
+          userLines = document.getElementById("userInputTextArea").value.split("\n");
+
+          reviewResults = "";
+          problemsFound = 0;
+
+          titleStr="";
+          multTitleWarn = 0;
+
+          creatorStr="";
+          multCreatorWarn = 0;
+
+          descriptionStr="";
+          multDescriptionWarn = 0;
+
+          testMode = 0;
+          multTestWarn = 0;
+
+          maxLevel = 0;
+          multMaxLevelWarn = 0;
+
+          firstLocation = "";
+
+          placesWeTryToGo = [];
+          placesWeCanGo = [];
+
+
+          for ( currentLine=0; currentLine < userLines.length; currentLine++ ) {
+
+            figuredThisLineOut = 0;
+
+            // TITLE check
+            if ( userLines[currentLine].substr(0,6).toLowerCase() == "@title" ) {
+
+              figuredThisLineOut = 1;
+
+              if ( titleStr == "" ) {
+
+                titleStr = userLines[currentLine].substring( 7, userLines[currentLine].length );
+
+                if ( titleStr.length > 30 ) {
+
+                  titleStr = titleStr.substr( 0, 30 );
+
+                  reviewResults += "The title is " + titleStr.length + " characters long, and will be truncated to \"" + titleStr + "\" (30 characters).<br>";
+                }
+              } else {
+                if ( multTitleWarn == 0 ) {
+                  multTitleWarn = 1;
+                  reviewResults += "There is more than one @title line, only the first will be used.<br>";
+                }
+              }
+            }
+
+            // CREATOR check
+            if ( userLines[currentLine].substr(0,8).toLowerCase() == "@creator" ) {
+
+              figuredThisLineOut = 1;
+
+              if ( creatorStr == "" ) {
+
+                creatorStr = userLines[currentLine].substring( 9, userLines[currentLine].length );
+
+                if ( creatorStr.length > 30 ) {
+
+                  creatorStr = creatorStr.substr( 0, 30 );
+
+                  reviewResults += "The creator line is " + creatorStr.length + " characters long, and will be truncated to \"" + creatorStr + "\" (30 characters).<br>";
+                }
+              } else {
+                if ( multCreatorWarn == 0 ) {
+                  multCreatorWarn = 1;
+                  reviewResults += "There is more than one @creator line, only the first will be used.<br>";
+                }
+              }
+            }
+
+            // DESCRIPTION check
+            if ( userLines[currentLine].substr(0,12).toLowerCase() == "@description" ) {
+
+              figuredThisLineOut = 1;
+
+              if ( descriptionStr == "" ) {
+
+                descriptionStr = userLines[currentLine].substring( 13, userLines[currentLine].length );
+
+                if ( descriptionStr.length > 30 ) {
+
+                  descriptionStr = descriptionStr.substr( 0, 30 );
+
+                  reviewResults += "The description line is " + descriptionStr.length + " characters long, and will be truncated to \"" + descriptionStr + "\" (30 characters).<br>";
+                }
+              } else {
+                if ( multDescriptionWarn == 0 ) {
+                  multDescriptionWarn = 1;
+                  reviewResults += "There is more than one @description, only the first will be used.<br>";
+                }
+              }
+            }
+
+            // TEST MODE check
+            if ( userLines[currentLine].substr(0,9).toLowerCase() == "@testmode" ) {
+
+              figuredThisLineOut = 1;
+
+              if ( testMode == 0 ) {
+
+                testMode = 1;
+
+              } else {
+                if ( multTestWarn == 0 ) {
+                  multTestWarn = 1;
+                  reviewResults += "Test mode is activated more than once, be sure to remove them all when the time comes to share your creation.<br>";
+                }
+              }
+            }
+
+            // MAX LEVEL check
+            if ( userLines[currentLine].substr(0,9).toLowerCase() == "@maxlevel" ) {
+
+              figuredThisLineOut = 1;
+
+              if ( maxLevel == 0 ) {
+
+                maxLevel = parseInt( userLines[currentLine].substring( 10, userLines[currentLine].length ) );
+
+                if ( maxLevel < 30 ) {
+                  reviewResults += "Basic characters in The Fantasy Trip start with 32 attribute points, except for Halflings who start with 30. Your max level is lower than this. You should consider designing your adventure for characters between 32 and 38 attribute points.<br>";
+                } else if ( maxLevel > 40 ) {
+                  reviewResults += "Characters with over 40 attribute points are very powerful and will probably require more rules than are implemented in TFT Helper. You should consider designing your adventure for characters between 32 and 38 attribute points.<br>";
+                }
+
+              } else {
+                if ( multMaxLevelWarn == 0 ) {
+                  multMaxLevelWarn = 1;
+                  reviewResults += "Max level is set more than once. Only the first entry will be used.<br>";
+                }
+              }
+            }
+
+            // Are we starting a location? We build a new entry for the adventureArray
+            if ( userLines[currentLine].substr(0,9).toLowerCase() == "@location" ) {
+
+              figuredThisLineOut = 1;
+
+              locationNameString = userLines[currentLine].substr(10,userLines[currentLine].length).toLowerCase();
+
+              if ( placesWeCanGo.indexOf(locationNameString) > -1 ) {
+                reviewResults += "Problem: There is more than one location, branch, or foe named '" + locationNameString + "'.<br>";
+                problemsFound++;
+              } else {
+                  placesWeCanGo.push( locationNameString );
+              }
+
+              if ( firstLocation == "" ) {
+                firstLocation = locationNameString;
+              }
+
+//              console.log( locationNameString );
+
+              thisLocation = {
+                type: "l",
+                name: locationNameString,
+                toDo: [],
+                html: "",
+                writing: ""
+              };
+
+
+              newLocationButton  = "<span onclick='adventureGo(";
+              newLocationButton += '\"' + locationNameString + '\"';
+              newLocationButton += ")''>" + locationNameString + "</span><br>";
+
+              document.getElementById("locationsDiv").innerHTML += newLocationButton;
+
+              while ( currentLine < userLines.length - 1
+                && userLines[currentLine + 1].substr(0,9).toLowerCase() != "@location"
+                && userLines[currentLine + 1].substr(0,7).toLowerCase() != "@branch"
+                && userLines[currentLine + 1].substr(0,4).toLowerCase() != "@foe" ) {
+
+                  if ( userLines[currentLine + 1].substr(0,7).toLowerCase() == "@button" ) {
+
+                    buttonDestination = userLines[currentLine + 1].substring( 8, userLines[ currentLine + 1 ].length).toLowerCase();
+
+                    if ( userLines.length > currentLine + 2 ) {
+
+                      buttonText = userLines[ currentLine + 2 ].substr(0,35);
+                      if ( userLines[ currentLine + 2 ].length > 35 ) {
+                        reviewResults += "Button text on line " + (currentLine + 1) + " is over 35 characters and will be truncated to '" + buttonText + "'.<br>";
+                      } else if ( buttonText.trim().length == 0 ) {
+                        reviewResults += "Button text on line " + (currentLine + 1) + " has no label. That will work but it's going to be confusing.<br>";
+                      }
+                    }
+
+                    placesWeTryToGo.push( "l^" + thisLocation.name + "^" + buttonDestination );
+
+                    buttonString = "<div class='adventureButton' onclick = 'adventureGo(";
+                    buttonString += '"' + buttonDestination + '"';
+                    buttonString += ")'>" + buttonText;
+                    buttonString += "</div>";
+
+                    thisLocation.html += buttonString;
+
+                    currentLine += 1;
+
+                  } else if ( userLines[currentLine + 1].substr(0,8) == "@writing" ) {
+                    thisLocation.writing = userLines[currentLine + 1].substr(9,999)
+                  } else if ( userLines[currentLine + 1].substr(0,1) == "^" ) {
+                    // variable change becomes a "toDo"
+                    thisLocation.toDo.push( userLines[currentLine + 1] );
+                  } else {
+                    thisLocation.html += userLines[currentLine + 1] + "<br>";
+                  }
+
+
+                  currentLine += 1;
+
+//                  console.log('End of While loop: ' + currentLine + userLines[currentLine].substr(0,10) );
+
+              } //end of for loop WITHIN LOCATION
+
+              if ( thisLocation.html == "" ) {
+                reviewResults += "Problem: The location " + locationNameString + " has no description.<br>";
+                problemsFound++;
+              }
+
+              adventureArray.push( thisLocation );
+
+            }  // end of parsing LOCATION
+
+
+
+            // Are we starting a branch? We build a new entry for the adventureArray (parse branch)
+            if ( userLines[currentLine].substr(0,7).toLowerCase() == "@branch" ) {
+
+              figuredThisLineOut = 1;
+
+              locationNameString = userLines[currentLine].substr(8,userLines[currentLine].length).toLowerCase();
+
+              if ( placesWeCanGo.indexOf(locationNameString) > -1 ) {
+                reviewResults += "Problem: There is more than one location or branch named '" + locationNameString + "'.<br>";
+                problemsFound++;
+              } else {
+                  placesWeCanGo.push( locationNameString );
+              }
+
+
+              thisLocation = {
+                type: "b",
+                name: locationNameString,
+                toDo: [],
+                bonuses: [],
+                description: "",
+                firstExpression: "",
+                secondExpression: "",
+                comparator: "",
+                successdestination: "",
+                failDestination: "",
+              };
+
+
+              newLocationButton  = "<span onclick='adventureGo(";
+              newLocationButton += '\"' + locationNameString + '\"';
+              newLocationButton += ")''>(branch)" + locationNameString + "</span><br>";
+
+              document.getElementById("locationsDiv").innerHTML += newLocationButton;
+
+              while ( currentLine < userLines.length - 1
+                && userLines[currentLine + 1].substr(0,9).toLowerCase() != "@location"
+                && userLines[currentLine + 1].substr(0,7).toLowerCase() != "@branch"
+                && userLines[currentLine + 1].substr(0,4).toLowerCase() != "@foe" ) {
+
+                  if ( userLines[currentLine + 1].substr(0,7).toLowerCase() == "@bonus" ) {
+
+                    //TODO parse bonuses
+
+                  } else if ( userLines[currentLine + 1].substr(0,19).toLowerCase() == "@successdestination" ) {
+
+                    if ( thisLocation.successdestination == "" ) {
+
+                      thisLocation.successDestination = userLines[currentLine + 1].substr(20,999).toLowerCase();
+
+                      placesWeTryToGo.push( "b^" + thisLocation.name + "^" + thisLocation.successDestination );
+
+                    } else {
+                      reviewResults += "The branch named " + locationNameString + " has more than one successDestination; only the first will be used.<br>";
+                    }
+
+                  } else if ( userLines[currentLine + 1].substr(0,16).toLowerCase() == "@faildestination" ) {
+
+                      if ( thisLocation.failDestination == "" ) {
+
+                        thisLocation.failDestination = userLines[currentLine + 1].substr(17,999).toLowerCase();
+
+                        placesWeTryToGo.push( "b^" + thisLocation.name + "^" + thisLocation.failDestination );
+
+                      } else {
+                        reviewResults += "The branch named " + locationNameString + " has more than one failDestination; only the first will be used.<br>";
+                      }
+
+                  } else { // must be the comparison line or description
+
+                    if ( thisLocation.firstExpression + thisLocation.secondExpression + thisLocation.comparator == "" ) {
+
+                      for ( i=0; i<comparators.length; i++ ) {
+                        whereIsIt = userLines[currentLine + 1].indexOf( comparators[i] );
+                        if ( whereIsIt > -1 ) {
+                          if ( comparators[i] == "vs" ) {
+                            thisLocation.comparator = "<=";
+                          } else {
+                            thisLocation.comparator = comparators[i];
+                          }
+                          thisLocation.firstExpression = userLines[currentLine+1].substr(0,whereIsIt).trim();
+
+                          thisLocation.secondExpression = userLines[currentLine+1].substr(whereIsIt+comparators[i].length,999).trim();
+
+                          break;
+                        }
+                      }
+
+                    } else if ( userLines[currentLine + 1].trim().length > 0 ) {
+
+                      if ( thisLocation.description == "" ) {
+
+                        thisLocation.description = userLines[currentLine + 1];
+
+                      } else {
+
+                        reviewResults += "The branch named " + locationNameString + " has an extraneous line (\"" + userLines[currentLine + 1] + "\").<br>";                    }
+
+                      }
+
+                  }
+
+                  currentLine += 1;
+
+                }  // end of while-loop for branch contents
+
+
+//                console.log ( thisLocation );
+
+                if ( thisLocation.successDestination == "" ) {
+                  reviewResults += "Problem: The branch named " + locationNameString + " has no @successDestination.<br>";
+                  problemsFound++;
+                }
+                if ( thisLocation.failDestination == "" ) {
+
+                  reviewResults += "Problem: The branch named " + locationNameString + " has no @failDestination.<br>";
+                  problemsFound++;
+                }
+                if ( thisLocation.faildestination == thisLocation.successdestination ) {
+                  reviewResults += "The branch named " + locationNameString + " has the same destination for true and false; this will work, but is probably not what you want.<br>";
+                  problemsFound++;
+                }
+
+                if ( thisLocation.firstExpression + thisLocation.secondExpression + thisLocation.comparator == "" ) {
+                  reviewResults += "Problem: The branch named " + locationNameString + " doesn't have a comparison line.<br>";
+                  problemsFound++;
+                }
+
+                if ( thisLocation.firstExpression == "" ||  thisLocation.secondExpression == "" ||  thisLocation.comparator == "" ) {
+                  reviewResults += "Problem: The branch named " + locationNameString + " has an unreadable comparison line.<br>";
+                  problemsFound++;
+                }
+
+
+                adventureArray.push( thisLocation );
+
+            }  // end of if-its-a-branch  parsing branch
+//***
+// Parsing Foe
+if ( userLines[currentLine].substr(0,4).toLowerCase() == "@foe" ) {
+
+  figuredThisLineOut = 1;
+
+  locationNameString = userLines[currentLine].substr(5,userLines[currentLine].length).toLowerCase();
+
+  if ( placesWeCanGo.indexOf(locationNameString) > -1 ) {
+    reviewResults += "Problem: There is more than one location, branch, or foe named '" + locationNameString + "'.<br>";
+    problemsFound++;
+  } else {
+      placesWeCanGo.push( locationNameString );
+  }
+
+
+  thisLocation = {
+    type: "f",
+    name: locationNameString,
+    foeName: "",
+    combatIntro: "",
+    toDo: [],
+    st: 0,
+    dx: 0,
+    iq: 0,
+    ma: 0,
+    armor: 0,
+    damage: "",
+    damage2: "",
+    foeType: 0,
+    winDestination: "",
+    loseDestination: "",
+    noFoe: ""
+  };
+
+
+  newLocationButton  = "<span onclick='adventureGo(";
+  newLocationButton += '\"' + locationNameString + '\"';
+  newLocationButton += ")''>(foe)" + locationNameString + "</span><br>";
+
+  document.getElementById("locationsDiv").innerHTML += newLocationButton;
+
+  while ( currentLine < userLines.length - 1
+    && userLines[currentLine + 1].substr(0,9).toLowerCase() != "@location"
+    && userLines[currentLine + 1].substr(0,7).toLowerCase() != "@branch"
+    && userLines[currentLine + 1].substr(0,4).toLowerCase() != "@foe" ) {
+
+      if ( userLines[currentLine + 1].substr(0,15).toLowerCase() == "@windestination" ) {
+
+        if ( thisLocation.winDestination == "" ) {
+
+          thisLocation.winDestination = userLines[currentLine + 1].substr(16,999).toLowerCase();
+
+          placesWeTryToGo.push( "f^" + thisLocation.name + "^" + thisLocation.winDestination );
+
+        } else {
+          reviewResults += "The foe named " + locationNameString + " has more than one winDestination; only the first will be used.<br>";
+        }
+
+      } else if ( userLines[currentLine + 1].substr(0,16).toLowerCase() == "@losedestination" ) {
+
+          if ( thisLocation.loseDestination == "" ) {
+
+            thisLocation.loseDestination = userLines[currentLine + 1].substr(17,999).toLowerCase();
+
+            placesWeTryToGo.push( "b^" + thisLocation.name + "^" + thisLocation.loseDestination );
+
+          } else {
+            reviewResults += "The foe named " + locationNameString + " has more than one loseDestination; only the first will be used.<br>";
+          }
+
+      } else if ( userLines[currentLine + 1].substr(0,6).toLowerCase() == "@nofoe" ) {
+
+          if ( thisLocation.noFoe == "" ) {
+
+            thisLocation.noFoe = userLines[currentLine + 1].substr(7,999).toLowerCase();
+
+            placesWeTryToGo.push( "b^" + thisLocation.name + "^" + thisLocation.noFoe );
+
+          } else {
+            reviewResults += "The foe named " + locationNameString + " has more than one @nofoe; only the first will be used.<br>";
+          }
+
+      } else if ( userLines[currentLine + 1].substr(0,5).toLowerCase() == "@type" ) {
+
+          if ( thisLocation.foeType == 0 ) {
+
+            thisLocation.foeType = parseInt( userLines[currentLine + 1].substr(6,8) );
+
+            thisLocation.foeName = userLines[currentLine + 2].substr( 0, 15 );
+
+            currentLine++;
+
+          } else {
+            reviewResults += "The foe named " + locationNameString + " has more than one foeType; only the first will be used.<br>";
+          }
+
+      } else if ( thisLocation.st == 0 && userLines[currentLine + 1].substr(0,2).toLowerCase() == "st" && userLines[currentLine + 1].toLowerCase().indexOf(", dx") > 0 ) {
+
+        statArray = userLines[currentLine + 1].split(",");
+        thisLocation.st = parseInt( statArray[0].substr(3,99) );
+        thisLocation.dx = parseInt( statArray[1].substr(3,99) );
+        thisLocation.iq = parseInt( statArray[2].substr(3,99) );
+        thisLocation.ma = parseInt( statArray[3].substr(3,99) );
+
+        if ( thisLocation.st < 1 || thisLocation.st > 19 ) {
+          reviewResults += "The foe named " + locationNameString + " has an unexpected value for ST. Consider using 1-19.<br>";
+          if ( thisLocation.st < 0 ) {
+            thisLocation.st = 0;
+          }
+        }
+
+        if ( thisLocation.dx < 1 || thisLocation.dx > 19 ) {
+          reviewResults += "The foe named " + locationNameString + " has an unexpected value for DX. Consider using 1-19.<br>";
+          if ( thisLocation.dx < 0 ) {
+            thisLocation.dx = 0;
+          }
+        }
+
+        if ( thisLocation.iq < 1 || thisLocation.iq > 19 ) {
+          reviewResults += "The foe named " + locationNameString + " has an unexpected value for IQ. Consider using 1-19.<br>";
+          if ( thisLocation.iq < 0 ) {
+            thisLocation.iq = 0;
+          }
+        }
+
+        if ( thisLocation.ma < 1 || thisLocation.ma > 19 ) {
+          reviewResults += "The foe named " + locationNameString + " has an unexpected value for MA. Consider using 1-19.<br>";
+          if ( thisLocation.ma < 0 ) {
+            thisLocation.ma = 0;
+          }
+        }
+
+      } else if ( userLines[currentLine + 1].substr(0,6).toLowerCase() == "armor:" ) {
+
+        thisArmor = userLines[currentLine + 1].substr( 7, 99 ).toLowerCase();
+
+        if ( thisArmor.trim().length == 0 ) {
+
+          thisLocation.armor = 0;
+
+        } else {
+
+          armorFound = armorTypes.indexOf( thisArmor );
+          armorValue = parseInt( thisArmor );
+
+          if ( armorFound > -1 ) {
+
+            thisLocation.armor = armorFound;
+
+
+          } else if ( isNaN( armorValue ) ) {
+
+            reviewResults += "Problem: The foe named " + locationNameString + " has unreadable armor ('" + thisArmor + "').<br>";
+
+            problemsFound++;
+
+          } else {
+//console.log('hi'+armorValue);
+            thisLocation.armor = armorValue;
+//console.log(thisLocation.armor);
+            if ( armorValue < 0 || armorValue > 10 ) {
+              reviewResults += "The foe named " + locationNameString + " has an unexpected value for Amror. Consider using 0-10.<br>";
+              if ( armorValue < 0 ) {
+                thisLocation.armor = 0;
+              }
+            }
+          }
+        }
+
+      } else if ( userLines[currentLine + 1].substr(0,8).toLowerCase() == "weapons:" ) {
+
+        if ( thisLocation.damage != "" ) {
+
+          reviewResults += "The foe named " + locationNameString + " seems to have an extra Weapons line('"+userLines[currentLine + 1]+"').<br>";
+
+        } else {
+
+          weaponsDamageMaybe = userLines[currentLine + 1].split("(");
+          if ( weaponsDamageMaybe.length > 1 ) {
+
+              thisLocation.damage = weaponsDamageMaybe[1].split(")")[0]
+
+            if ( weaponsDamageMaybe.length > 2) {
+
+              thisLocation.damage2 = weaponsDamageMaybe[2].split(")")[0]
+
+            }
+          }
+
+          // TODO sanity check those strings
+
+        }
+
+      } else if ( userLines[currentLine + 1].substr(0,19).toLowerCase() == "attacks and damage:" ) {
+
+        if ( thisLocation.damage != "" ) {
+
+          // we'll ignore this because we found at least one weapon
+
+        } else {
+
+          weaponsDamageMaybe = userLines[currentLine + 1].split("(");
+          if ( weaponsDamageMaybe.length > 1 ) {
+
+              thisLocation.damage = weaponsDamageMaybe[1].split(")")[0]
+
+            if ( weaponsDamageMaybe.length > 2) {
+
+              thisLocation.damage2 = weaponsDamageMaybe[2].split(")")[0]
+
+            }
+          } else {
+            reviewResults += "The foe named " + locationNameString + " doesn't seem to have any weapons or attacks (remember damage should be in parenthesis, eg \"(1d+1)\").<br>";
+          }
+
+          // TODO sanity check those strings
+
+        }
+
+      } else if ( userLines[currentLine + 1].indexOf( ", age" ) > -1
+          || userLines[currentLine + 1].substr(0,8).toLowerCase() == "talents:"
+          || userLines[currentLine + 1].substr(0,7).toLowerCase() == "spells:"
+          || userLines[currentLine + 1].substr(0,10).toLowerCase() == "equipment:"
+          || userLines[currentLine + 1].substr(0,13).toLowerCase() == "special note:" ) {
+          // || userLines[currentLine + 2].toLowerCase().indexOf(', age') > -1 ) {
+
+        // this is the race and age, we ignore it
+        // and these others
+
+      } else if ( userLines[currentLine].substr(0,4).toLowerCase() == "@foe" ) {
+
+        // if it makes no other sense and it's the second line, it's the combat intro
+        thisLocation.combatIntro = userLines[currentLine + 1];
+
+      }  else if ( userLines[currentLine + 1].trim().length > 0 ) {
+          reviewResults += "The foe named " + locationNameString + " has an extraneous line('"+userLines[currentLine + 1]+"').<br>";
+
+      }
+
+      currentLine += 1;
+
+    } // end of while loop within foe
+
+//      currentLine += 1;
+
+      adventureArray.push( thisLocation );
+
+  }  // end of foe parser
+
+
+//IS THIS IT?    }  // end of while-loop for userInputTextArea
+
+
+//                console.log ( thisLocation );
+
+    // if ( thisLocation.successdestination == "" ) {
+    //   reviewResults += "Problem: The branch named " + locationNameString + " has no @successdestination.<br>";
+    //   problemsFound++;
+    // }
+    // if ( thisLocation.faildestination == "" ) {
+    //   reviewResults += "Problem: The branch named " + locationNameString + " has no @faildestination.<br>";
+    //   problemsFound++;
+    // }
+    // if ( thisLocation.faildestination == thisLocation.successdestination ) {
+    //   reviewResults += "The branch named " + locationNameString + " has the same destination for true and false; this will work, but is probably not what you want.<br>";
+    //   problemsFound++;
+    // }
+    //
+    // if ( thisLocation.firstExpression + thisLocation.secondExpression + thisLocation.comparator == "" ) {
+    //   reviewResults += "Problem: The branch named " + locationNameString + " doesn't have a comparison line.<br>";
+    //   problemsFound++;
+    // }
+
+
+//***
+
+
+            if ( figuredThisLineOut == 0 && userLines[currentLine].trim().length > 0 ) {
+              reviewResults += "Line number " + currentLine + " doesn't seem to make sense. Possibly a key word is misspelled or another line is out of place. (" + userLines[currentLine] + ")<br>";
+
+            }
+
+//            console.log('End of For loop: ' + currentLine + userLines[ currentLine ].substr( 0, 10 ) );
+
+
+          }  // end of userLines[currentLine] for loop
+
+          // We're done with the user input lines, time to look for problems
+
+
+          //check if no title
+          if ( titleStr == "" ) {
+            reviewResults += "Problem: You need a @title line for your adventure.<br>";
+            problemsFound++;
+          }
+
+          //check if no creator
+          if ( creatorStr == "" ) {
+            reviewResults += "Problem: You need a @creator line for your adventure.<br>";
+            problemsFound++;
+          }
+
+          //check if no description
+          if ( descriptionStr == "" ) {
+            reviewResults += "Problem: You need a @description line for your adventure.<br>";
+            problemsFound++;
+          }
+
+          //check if no max level
+          if ( maxLevel == 0 ) {
+            reviewResults += "You didn't specify a @maxlevel for this adventure, so we'll assume the adventure is for starting characters (32 attribute points).<br>";
+            maxLevel = 32;
+          }
+
+          nodeNames=[];
+
+          for ( i = 0; i < placesWeTryToGo.length; i++ ) {
+
+            destinationArray = placesWeTryToGo[i].split("^");
+
+            nodeNames.push(destinationArray[2]);
+
+            if ( placesWeCanGo.indexOf( destinationArray[2] ) < 0 ){
+              reviewResults += "Problem: There is a ";
+              reviewResults += ( destinationArray[0] == "l" ? "button in the location " : "branch " );
+              reviewResults += "named '" + destinationArray[1];
+              reviewResults += "' that should lead to '";
+              reviewResults += destinationArray[2];
+              reviewResults += "' but there is no location with that name.<br>";
+              problemsFound++;
+            }
+
+          }
+
+          for ( i = 0; i < placesWeCanGo.length; i++ ) {
+
+            if ( nodeNames.indexOf(placesWeCanGo[i]) < 0 ){
+              reviewResults +="There is a location called ''" + placesWeCanGo[i] + "'' but nothing leads to that location.<br>";
+            }
+
+          }
+
+          document.getElementById("feedbackTextArea").innerHTML = reviewResults;
+          document.getElementById("problemCountDiv").innerHTML = "Problems found: " + problemsFound + "<br>";
+
+          if ( problemsFound > 0 ) {
+            document.getElementById("problemCountDiv").innerHTML += "While there are problems you will not be able to use the simulator or export your adventure.<br><br>";
+          }
+
+//          console.log(testMode);
+
+          if ( testMode == 1 ) {
+            document.getElementById("testModeWarningDiv").style.display = "block";
+          } else {
+            document.getElementById("testModeWarningDiv").style.display = "none";
+          }
+
+          if ( problemsFound == 0 ) {
+            adventureGo( firstLocation );
+            generateExportable();
+          } else {
+            document.getElementById("simulatedScreen").innerHTML = "You need to fix the problems listed at the bottom of the 'Edit & Review' tab before the simulator will work.";
+          }
+
+
+
+        }  //end of reviewUserInput()
+
+        function adventureGo( locName ) {
+
+          if ( problemsFound > 0 ) {
+            return;
+          }
+
+          newLoc = adventureArray.find( locn => locn.name === locName );
+
+          switch ( newLoc.type ) {
+            case "l":
+              // presenting location
+
+
+              if ( newLoc.writing != "" ) {
+                newHTML = newLoc.html.substr(0,newLoc.html.indexOf("<div"));
+                newHTML += "<span style=\"background-color: lightgrey;\">Characters with Literacty will also see: \"The writing says " + newLoc.writing + "\"</span>";
+                newHTML +=  newLoc.html.substr(newLoc.html.indexOf("<div"),9999);
+              } else {
+                newHTML = newLoc.html;
+              }
+
+              document.getElementById("simulatedScreen").innerHTML = newHTML;
+              break;
+            case "b":
+            // presenting branch
+
+            successDestination = newLoc.successDestination;
+            failureDestination = newLoc.failDestination;
+
+            document.getElementById("dryrunDiv").style.display = "block";
+
+            document.getElementById("dryrunInfoDiv").innerHTML = "You have run into a branch with the following condition:<br><br>";
+
+            document.getElementById("dryrunInfoDiv").innerHTML += "<span style='background-color: ghostwhite; border: solid thin; padding: 4px;'>" + newLoc.firstExpression + "</span>&nbsp;&nbsp;";
+            document.getElementById("dryrunInfoDiv").innerHTML += "<span style='background-color: ghostwhite; border: solid thin; padding: 4px;'>" + newLoc.comparator + "</span>&nbsp;&nbsp;";
+            document.getElementById("dryrunInfoDiv").innerHTML += "<span style='background-color: ghostwhite; border: solid thin; padding: 4px;'>" + newLoc.secondExpression + "</span><br><br>";
+
+            document.getElementById("dryrunInfoDiv").innerHTML += "Which pathway do you want to follow?<br><br>";
+
+            document.getElementById("dryrunInfoDiv").innerHTML += "<br><br><br>";
+
+
+            // document.getElementById("successButton").onclick = "document.getElementById('dryrunDiv').style.display = 'none';adventureGo(" + newLoc.successdestination + ") ";
+            //
+            // document.getElementById("failureButton").onclick = "document.getElementById('dryrunDiv').style.display = 'none';adventureGo(" + newLoc.faildestination + ") ";
+
+
+              break;
+            case "f":
+              // presenting foe
+
+              successDestination = newLoc.winDestination;
+              failureDestination = newLoc.loseDestination;
+
+
+              document.getElementById("combatDiv").style.display = "block";
+
+              document.getElementById("combatInfoDiv").innerHTML = "\"" + newLoc.combatIntro + "\"<br><br>";
+
+              document.getElementById("combatInfoDiv").innerHTML += "You have run into a foe with the following attributes:<br><br>";
+
+              document.getElementById("combatInfoDiv").innerHTML += "Name: " + newLoc.foeName + "<br>";
+
+              document.getElementById("combatInfoDiv").innerHTML += "ST " + newLoc.st + ", DX " + newLoc.dx + ", IQ " + newLoc.iq + ", MA " + newLoc.ma + "<br>";
+
+              document.getElementById("combatInfoDiv").innerHTML += "Type:  " + newLoc.foeType + ", armor stops " + newLoc.armor + ", Damage: " + newLoc.damage;
+
+              if ( newLoc.damage2 != "" ) {
+                  document.getElementById("combatInfoDiv").innerHTML += "/" + newLoc.damage2;
+              }
+
+              document.getElementById("combatInfoDiv").innerHTML += "<br>";
+
+              document.getElementById("combatInfoDiv").innerHTML += "<br><br><br>Which pathway do you want to follow?<br><br>";
+
+              document.getElementById("combatInfoDiv").innerHTML += "<br><br><br>";
+
+              break;
+
+          }
+
+        }
+
+        function successGo() {
+          document.getElementById("dryrunDiv").style.display = "none";
+          document.getElementById("combatDiv").style.display = "none";
+          adventureGo( successDestination );
+        }
+
+        function failureGo() {
+          document.getElementById("dryrunDiv").style.display = "none";
+          document.getElementById("combatDiv").style.display = "none";
+          adventureGo( failureDestination );
+        }
+
+        function setCurrentTime () {
+
+          var d = new Date();
+
+          hours = d.getHours();
+
+          if ( hours > 12 ) {
+            hours -= 12;
+            meridian = "PM";
+          } else {
+            meridian = "AM";
+          }
+
+          minutes = d.getMinutes();
+
+          if ( minutes < 10 ) {
+            minutes = "0" + minutes;
+          }
+
+
+          document.getElementById("currentTimeSpan").innerHTML = hours + ":" + minutes + " " + meridian;
+
+        }
+
+        function saveLocal() {
+          localStorage.setItem( "userAdventure", document.getElementById("userInputTextArea").value );
+        }
+
+        function loadLocal() {
+          document.getElementById("userInputTextArea").value = localStorage.getItem( "userAdventure" );
+        }
+
+        function overwriteFunction() {
+
+          switch ( overwrite ) {
+            case 'loadLocal':
+              loadLocal();
+              break;
+            case 'enterTemplate':
+              enterTemplate();
+              break;
+            case 'enterBetterTemplate':
+              enterBetterTemplate();
+              break;
+          }
+        }
+
+        // const downloadToFile = (content, filename, contentType) => {
+        //   const a = document.createElement('a');
+        //   const file = new Blob([content], {type: contentType});
+        //
+        //   a.href= URL.createObjectURL(file);
+        //   a.download = filename;
+        //   a.click();
+        //
+        // 	URL.revokeObjectURL(a.href);
+        // };
+
+        function saveToDownloads() {
+
+            const a = document.createElement('a');
+            const file = new Blob([ document.getElementById('userInputTextArea').value ], {type: 'text/plain'});
+
+            var d = new Date();
+
+                      dateString = d.getMonth() + "-" + d.getDate() + "-" + d.getYear() + " " + d.getHours() + " " + d.getMinutes();
+
+            a.href= URL.createObjectURL(file);
+            a.download = titleStr + " " + dateString;
+            a.click();
+
+          	URL.revokeObjectURL(a.href);
+
+
+
+        }
+
+var _0x25b6=['stringify','exportableTextArea4','16eBrUDX','46118dUfHYL','length','1TDRDnH','getElementById','charCodeAt','875352KDPgzf','174973fWKwUG','exportableTextArea','charAt','149575jiVPSd','1346798wplkKO','exportableTextArea3','652469onkZGC','innerHTML','18TgVyCs','46085DAsfwr','exportableTextArea2'];var _0x4924=function(_0x473769,_0x404b1f){_0x473769=_0x473769-0x14a;var _0x25b6b4=_0x25b6[_0x473769];return _0x25b6b4;};(function(_0x4b018d,_0xa95e72){var _0x26eb66=_0x4924;while(!![]){try{var _0x1adb41=-parseInt(_0x26eb66(0x154))+-parseInt(_0x26eb66(0x157))+parseInt(_0x26eb66(0x158))+parseInt(_0x26eb66(0x14d))*parseInt(_0x26eb66(0x15d))+parseInt(_0x26eb66(0x15a))+parseInt(_0x26eb66(0x15c))*-parseInt(_0x26eb66(0x14e))+parseInt(_0x26eb66(0x150))*-parseInt(_0x26eb66(0x153));if(_0x1adb41===_0xa95e72)break;else _0x4b018d['push'](_0x4b018d['shift']());}catch(_0x31391c){_0x4b018d['push'](_0x4b018d['shift']());}}}(_0x25b6,0xac82b));function generateExportable(){var _0x25dbc2=_0x4924;exportableString=fnord()+'\x0a',key=[],keyLength=exportableString[_0x25dbc2(0x14f)]-0x1;for(i=0x0;i<keyLength;i++){key[i]=exportableString['charCodeAt'](i)-0x20;}unscrambledString=titleStr+'\x0a',unscrambledString+=creatorStr+'\x0a',unscrambledString+=descriptionStr+'\x0a',unscrambledString+=maxLevel+'\x0a',unscrambledString+=testMode+'\x0a',unscrambledString+=JSON[_0x25dbc2(0x14b)](adventureArray),document[_0x25dbc2(0x151)](_0x25dbc2(0x155))['innerHTML']=exportableString+unscrambledString;for(i=0x0;i<unscrambledString[_0x25dbc2(0x14f)];i++){if(unscrambledString[_0x25dbc2(0x156)](i)=='\x0a')exportableString+='\x0a';else{codeToScramble=(unscrambledString[_0x25dbc2(0x152)](i)-0x20+key[i%keyLength])%(0x7f-0x20);if(codeToScramble>0x7f){}codeToScramble=codeToScramble+0x20,exportableString+=String['fromCharCode'](codeToScramble);}}document['getElementById'](_0x25dbc2(0x14a))[_0x25dbc2(0x15b)]=exportableString+'\x0a==========',document[_0x25dbc2(0x151)](_0x25dbc2(0x159))[_0x25dbc2(0x15b)]=unscramble(),document[_0x25dbc2(0x151)](_0x25dbc2(0x14c))[_0x25dbc2(0x15b)]=exportableString[_0x25dbc2(0x156)](0x0)+'\x20'+(exportableString['charCodeAt'](0x0)-0x20)+'\x20'+unscrambledString['charAt'](0x0)+'\x20'+(unscrambledString[_0x25dbc2(0x152)](0x0)-0x20)+'\x20'+exportableString['charAt'](keyLength+0x1)+'\x20'+(exportableString[_0x25dbc2(0x152)](keyLength+0x1)-0x20);}
+
+        function unscramble() {
+
+          index = 0;
+          key = [];
+          keyLength = 0;
+          returnString = "";
+
+          while ( exportableString.charAt(index) != "\n" ) {
+            key.push( exportableString.charCodeAt( index ) - 32 );
+            keyLength++;
+            returnString += exportableString.charAt(index);
+            index++;
+          }
+
+          index++;
+
+          returnString += "\n";
+
+//show=1;
+
+//        while ( index < exportableString.length ) {
+          for ( i=0; i + index < exportableString.length; i++ ) {
+
+            if ( exportableString.charAt( i+index ) == "\n" ) {
+              returnString += "\n";
+            } else {
+
+
+
+              unscrambledChar = exportableString.charCodeAt( i+index ) - 32;
+
+
+              unscrambledChar -= key[ i % keyLength ];
+
+              if ( unscrambledChar < 0 ) {
+                unscrambledChar = 127-32 + ( unscrambledChar );
+              }
+
+              unscrambledChar += 32;
+
+              returnString += String.fromCharCode( unscrambledChar );
+              }
+//            index++;
+
+          }
+
+
+
+          return returnString;
+
+        }
+
+
+    </script>
+
+    <style>
+
+        .niftyButton {
+            border: solid thin;
+            margin: 0.5vh;
+            border-radius: 10px;
+            padding: 0.3vh 0.7vh;
+            text-align: center;
+            box-shadow: 0.2vh 0.4vh;
+            background-color: white;
+
+        }
+
+        .niftyButton:active {
+            background-color: lightgrey;
+            box-shadow: 0.1vh 0.2vh;
+            transform: translateX( 2px);
+            transform: translateY( 2px);
+
+        }
+
+        .tabButton {
+            border: solid thin;
+            border-radius: 15px 15px 0 0;
+            padding: 5px 15px;
+            background-color: #bbb;
+        }
+
+        .tabButton:hover {
+            background-color: #ddd;
+        }
+
+        .tabButton.active {
+            background-color: white;
+/*            border-bottom: none;*/
+            border-bottom-color: white;
+        }
+
+        .page {
+            background-color: white;
+            border: solid thin;
+            margin: 5px 0px;
+            padding: 2vh;
+/*            clear: both;*/
+            z-index: -1;
+        }
+
+        .howto {
+            background-color: white;
+/*            float: left;*/
+            clear: both;
+        }
+
+        .example {
+            background-color: ivory;
+            font-family: monospace;
+/*            width: 50%;*/
+            border: dotted thin;
+/*            white-space: pre-wrap;*/
+        }
+
+        .nitty {
+            background-color: lightblue;
+            border: solid thin;
+            margin: 5px 0px;
+            padding: 2vh;
+            width: 50%;
+            float: right;
+            clear: both;
+            display: none;
+        }
+
+        .adventureButton {
+            background-image: linear-gradient(silver, white, silver);
+            border: solid thin;
+            width: 78%;
+            margin: 2%;
+            border-radius: 6px;
+            padding: 2% 8%;
+            text-align: center;
+        }
+
+        .adventureButton:active {
+            background-color: lightgrey;
+            box-shadow: 0.1vh 0.2vh;
+            transform: translateX( 2px);
+            transform: translateY( 2px);
+
+        }
+
+        .blinking{
+        	animation:blinkingText 3s infinite;
+        }
+        @keyframes blinkingText{
+        	0%{		color: #0F0;	}
+        	99%{	color:transparent;	}
+        	100%{	color: #000;	}
+        }
+
+    </style>
+
+    <body onLoad="initializeApp()" onClick="hideAll();" style = "overflow: scroll;" onbeforeunload="saveLocal()">
+
+        <div id="tabs">
+
+            <span class="tabButton" id="tab1" onclick="showPage(1)">Overview</span>
+            <span class="tabButton" id="tab2" onclick="showPage(2)">How To Write It</span>
+            <span class="tabButton" id="tab3" onclick="showPage(3)">Edit & Review</span>
+            <span class="tabButton" id="tab4" onclick="showPage(4)">Simulator</span>
+            <span class="tabButton" id="tab5" onclick="showPage(5)">Exportable</span>
+            <span class="tabButton" id="tab6" onclick="showPage(6)">Examples</span>
+
+        </div>
+
+        <div style="position: fixed; bottom: 5px; right: 5px; border: solid thin; background-color: lightgrey; padding: 7px; " onclick="window.scrollTo( 0, 0 );">
+          Back to Top
+        </div>
+
+        <div id="page1" class="page">
+
+            <p>
+                Welcome to the TFT Helper Adventure Creator! It's designed to make creating an adventure for TFT Helper as easy as possible. Thanks for checking it out!
+            </p>
+            <p>
+                You should see six tabs at the top of the screen. This first gives this overview of the process and some general guidance. The second tab explains how to write your adventure so the software can present it to the player. The third is where you write you adventure. The software will give you feedback about what you have written, pointing out problems that prevent the software from understanding what you wrote. The fourth tab is a simulator, that will let you make a dry run through your adventure to make sure it flows the way you intended. The fifth tab gives you scrambled adventure  you can paste into TFT Helper your mobile device for real testing. This is also the block of text that you will ultimately share with the world. The sixth tab includes some examples of more involved adventure mechanics to clarify and inspire.
+            </p>
+            <p>
+                You should strive for a high level of professionalism in an adventure you plan to share. While you are not writing for SJ Games, you are writing for the customers of SJ Games and they are accustomed to quality writing. Keep it PG, no hate. The SJ Games writer's guidelines will be very helpful.
+            </p>
+            <a href="http://www.sjgames.com/general/guidelines/authors/">http://www.sjgames.com/general/guidelines/authors/</a><br>
+            <a href="http://www.sjgames.com/general/guidelines/authors/writing-thefantasytrip/">http://www.sjgames.com/general/guidelines/authors/writing-thefantasytrip</a><br>
+            <a href="http://www.sjgames.com/general/online_policy.html">http://www.sjgames.com/general/online_policy.html</a><br>
+            <p>
+                Something as involved as this requires a lot of testing to be really reliable. Since we're relying on volunteer testers we'll probably never have that much testing. Thus while TFT Helper and player-created adventures are safe to run on your mobile device this feature of TFT Helper should be considered "beta" for the foreseeable future. If you run into any issues let us know at tfthelper@gmail.com.
+              </p>
+              <p>
+                Have fun!
+            </p>
+
+            <h2>Tips for Writing Solo Adventures</h2>
+            <p>
+              Much GMing and narrative construction advice carries over, and we don't need to go over that here. But here are some guidelines to keep in mind.
+            </p>
+            <p>
+              Don't make it too easy. If players complete the adventure on the first run through they are likely to feel disappointed and not revisit your adventure.
+            </p>
+            <p>
+              Don't make it too hard. Specifically, there will only be a single character without a lot of resources so they won't be able to face a series of fearsome foes. Put in some weaker foes. Create paths by which clever adventurers can get around some foes. Put in some encounters that offer healing (perhaps at a cost).
+            </p>
+            <p>
+              There should be a clear goal expressed early, perhaps even in the description. It's also fun to learn more about the goal in the first part of the adventure. Foreshadowing makes things great.
+            </p>
+            <p>
+              You can achieve replayability by providing multiple paths to victory and degrees of success. The player should finish the game wanting to try again and achieve a better result or to try the paths not taken.
+            </p>
+            <p>
+              Variables can create a lot of depth in the world, but they also create work for you. Lean towards fewer rather than many, but make them meaningful.
+            </p>
+            <p>
+              It is fun to learn hidden secrets. As they progress through the adventure an exciting reward is learning more about what's going on in the story, discovering that things are not as they appear.
+            </p>
+            <p>
+              Treasure is a classic reward, but that's because you look forward to spending it. You might devise a treasure that you can use during the adventure. Possessing a treasure can take the character to an alternate version of some locations where the character can see more or do more.
+            </p>
+            <p>
+              Beware of paths that become boring or frustrating. If the player makes choices that make winning impossible, wrap things up. Write a destination that explains that they lost, or introduce an unbeatable foe. Either way they get to try again and make different choices.
+            </p>
+            <p>
+              It's very rewarding to players to receive goodies because their characters have particular particular Talents. These should be extras, however; an adventure that can only be won though knowledge of Courtly Graces will be frustrating.
+            </p>
+        </div>
+
+
+        <div id="page2" class="page" style="display: none;">
+
+          <div id = "nittyButton" style="position: fixed; right: 20px; border: solid thin; background-color: lightblue; padding: 7px;" onclick="toggleNitty()">
+            Show Nitty Gritty Details
+          </div>
+
+          <div style="display: flex;">
+
+            <div style="width: 20%; text-align: right; padding: 1%;">
+              <a href="#basics">Basics</a> <br><br>
+
+              <a href="#extras">Extras</a><br><br>
+
+              <a href="#variables">Variables</a>
+            </div>
+
+            <div style = " padding: 1%;">
+              The Essentials: Locations, Foes, and Branches<br><br>
+
+              Handy tools that will make things easier for you<br><br>
+
+              Add depth to your world by tracking things
+            </div>
+
+          </div>
+
+          <!-- <a href="#basics">Basics</a> The Essentials: Locations, Foes, and Branches<br><br>
+
+          <a href="#extras">Extras</a> Handy tools that will make things easier for you<br><br>
+
+          <a href="#variables">Variables</a> Variables! Adding depth to the world<br><br> -->
+
+
+          <h1>Basics</h1><a id="basics"></a>
+
+            <div>
+              <P class="howto">
+A printed solo adventure has numbered paragraphs. These adventures will have three type of virtual paragraphs: locations, foes, and branches. A location could be a physical place, or another type of decision point such as within a conversation. A location has text describing the situation to the player, and buttons offering choices. A foe is just that, someone or something the character will fight. A branch is not presented to the player, it's a choice the virtual GM makes based on conditions or a die roll.</p>
+              <P class="howto">
+                You will write your adventure in fairly plain language, but in a specific format so the software can understand what's going on. The @ is used to set apart certain words. Here is a typical location:
+
+              </P>
+              <img src="art/sampleLocation.png" style="float: right; width: 40%;">
+
+              <P class="example" style="width:50%;">
+                  @location caveEntrance<br>
+                  The cave entrance is at least twelve feet high. Cool, damp air exudes from it. To the south is the path that leads back to the farmstead.<br><br>
+                  @button firstChamber<br>
+                  Enter the Cave<br><br>
+                  @button pathToCave<br>
+                  Follow The Path<br>
+                </P>
+
+                  <P class="howto">
+                    "@location" tells the software you a beginning a new location. After this is the name of the location, in this case "caveEntrance." This is the name buttons and branches will use to bring the player to this location. The next lines are the description presented to the player. This can be several paragraphs. "@button" tells the software you are creating a button, and it is followed by the name of a different location, in this case "firstChamber". If the player clicks this button it will take the character to the @location (or @branch) named "firstChamber". "Enter the Cave" is the text that will appear in the button.
+
+
+                  </P>
+
+                    <P class="howto">
+Blue sidebars offer nitty-gritty info, they are revealed by the button top right. You can skip them on your first read-through. For examples of how to write more involved adventure elements check that last tab.
+              </P>
+                <P class="howto">
+                     You will start your adventure with these three, hopefully self-explanatory, lines:
+                </P>
+
+                <P class="example">
+                    @title The Abandoned Keep<br>
+                    @creator Adam W.<br>
+                    @description It's long since this stretch of wilderness needed to be watched.<br>
+                </P>
+
+                <P class="howto">
+                    Don't use the at-sign '@' or caret '^' in the text of your adventure,  in location or branch names, or in button text. You can use all the other special characters on the keyboard, and you can use spaces in the names of locations, branches, and foes, but not in the names of variables.
+                </P>
+
+                <P class="nitty">
+                Captialization will never be important to this software. "@Title", "@title", "@TITLE", and "tItLe" are equivelent, and the location names "caveEntrance", "CaveEntrance", and "caveentrance" will all be the same place. Fair warning, nearly all modern programming languages care very much about capitalization, so avoid building bad habits. The names of locations and variables must be a continuous string of numbers and letters - no spaces, no special characters. Since many of your location names and variables will be several words stuck together, one programmer's trick you may want to adopt is "camelcase", where you capitalize the first letters of words after the first, such as "bottomOfTheStairs"" or "daysOfFoodLeft".
+                </P>
+
+                <!-- <P class="howto">
+                    A printed solo adventure has numbered paragraphs. These adventures will have three type of "nodes": locations, foes, and branches. A location could be a physical place, or another type of decision point such as a conversation. There is text describing the situation to the player, and buttons offering choices. A foe is just that, someone or something the character will fight. A branch is not presented to the player, it's a choice the virtual GM makes based on conditions or a die roll.
+                </P> -->
+
+                <!-- <P class="howto">
+                    Most of your adventure will consist of locations, which look like this:
+                </P> -->
+
+                <!-- <P class="example">
+                    @location caveEntrance<br>
+                    The cave entrance is at least twelve feet high. Cool, damp air exudes from it. To the south is the path that leads back to the farmstead.<br>
+                    @button firstChamber<br>
+                    Enter the Cave<br>
+                    @button pathToCave<br>
+                    Follow The Path<br>
+                </P>
+
+                <P class="howto">
+                    The word after the "@button" is the name of the location this button will take the player *to*. The line after that is the text that will appear in the button.
+                </P> -->
+
+                <P class="howto">
+                    There is nothing wrong with a location that has only a single button. You will do this when you want to give the player a little more information before continuing. If a location has no buttons the player will not be able to move on, their only recourse will be the Main Menu button in the upper left. That is fine if they are at the very end of the adventure, but you should explicitly tell them this is what happened or it will look very much like a mistake.
+                </P>
+
+                <P class="nitty">
+                    The text in the button will be truncated to twenty five letters to ensure a good user experience. You should limit your self to two to five words. If the options available to the player require a sentence or two to describe you should describe them in the location text, then put an abbreviated version in the actual button.
+                </P>
+
+                <P class="howto">
+                    Time to introduce a foe:
+                </P>
+
+                <P class="example">
+                    @foe swordsmanAtGate<br>
+                    The guard draws his sword...<br>
+                    @type 0<br>
+                    Scruffy Swordsman<br>
+                    Human, age <br>
+                    ST 12, DX 14, IQ 8, MA 10<br>
+                    Talents: Sword<br>
+                    Spells: <br>
+                    Weapons: Broadsword (2d), Main-Gauche (1d-1)<br>
+                    Attacks and Damage: Saber (2d-2), Main-Gauche (1d-1),  Punch 1d-3<br>
+                    Armor: <br>
+                    Equipment: <br>
+                    Special Note: <br>
+                    @winDestination searchSwordsmansBody<br>
+                    @loseDestination diedAtGate<br>
+                    @noFoe emptyGateway<br>
+                </P>
+
+                <P class="howto">
+                    The "@foe" tells the software that we are now entering combat. "swordsmanAtGate" is used exactly like a location name: buttons with this as a destination will bring you into combat with this foe. The next line is the introduction to the combat, this will appear at the beginning of the combat log. Generally this should be just a sentence, but can be several paragraphs. If there is a lot to say here consider putting another location in between the preceding location and the combat to explain what's happening.
+                </P>
+
+                <P class="howto">
+                    The "@type" line the software how the foe should act in combat. More on this in the nitty gritty sidebar.
+                </P>
+
+                <p class="nitty">
+                        Here are the foe types:<br>
+                    <br>
+                        -1 = creature, charges and melees, dropped/broken weapon means damage<br>
+                        0 = melee fighter, charges and melees, drops or breaks weapons as normal<br>
+                        1 = melee fighter with pole weapon<br>
+                        2 = archer, shoots immediately, then switches to their melee weapon and charges<br>
+                        3 = mage that casts Dazzle, then Magic Fist, has Staff<br>
+                        4 = mage that casts Illusions of bears<br>
+                        5 = mage that casts Sleep<br>
+                        6 = mage that casts Fireball<br>
+
+                </p>
+
+                <P class="howto">
+                    For convenience and clarity the foe format is the standard TFT character template. This format is imported and exported by all fine TFT software. As an adventure writer, though, you should be aware that the only things the software cares about are:<br>
+                    <br>
+                    The name (which will be used constantly in combat, use a shortened form)<br>
+                    ST (which becomes hit points)<br>
+                    DX (you should give the adjDX)<br>
+                    MA (assumed to be adjusted for armor, since it could be a beast)<br>
+                    IQ (in the event the foe tries to disbelieve a creation spell)<br>
+                    Damage from primary weapon<br>
+                    Damage from secondary weapon only for type 2 foes<br>
+                    Armor<br>
+                    <br>
+                    Everything else is ignored.
+                  </P>
+
+                  <p class="nitty">
+
+                    Not that damage is calculated from the Weapons line, or the Attacks line for beasts. It does not depend on strength. Strength is for hit points only. So you can effectively set hit points independently of attack damage. You can use this to balance combats, eg a foe could have a broadsword that does 2d of damage but an ST of 5 and thus 5 HP. This foe would be dangerous, but easy to take down. This would also work the other way around.
+
+                </P>
+
+                <P class="howto">
+                    "@winDestination searchSwordsmansBody" tells the software that if the player defeats the swordsman the next paragraph will be the one marked "@location searchswordsmansbody". "@losedestination" is similar. If a button at another location brings the player to this foe after it has already been defeated the software will take the player to the location named after @noFoe instead.
+                </P>
+
+                <P class="howto">
+                    Now we add  depth to our adventures: branches. A branch is a when the adventure may go more than one direction, but the choice belongs to the circumstances and the dice, not to the player. A branch is like a location or foe in that it has a name so a button can jump to the branch. The branch then compares two numbers and sends the player to one of two other locations.
+                </P>
+
+                <P class="example">
+                    @branch checkForSecretDoor<br>
+                    3d vs IQ<br>
+                    @successDestination passageShowingSecretDoor<br>
+                    @failDestination passageWithoutSecretDoor<br>
+                </P>
+
+                <P class="howto">
+                    Here "checkForSecretDoor" is the location name that will be after the "@button" that brings the player here. The comparison will be a roll of 3d against the characters IQ (less than or equal will pass). The next two lines take the player to one of two locations depending on the result.
+
+                </P>
+
+                <P class="howto">
+                    There are many possible numbers you could compare:<br>
+                    <br>
+                    1d > 5 (a basic reaction roll)<br>
+                    4d < = DX (a difficult climb, adjDX will be used)<br>
+                    ST > 12 (can the character lift that stone?)<br>
+                    Naturalist > 0 (does the character have a particular talent?)
+                    Elf > 0 (is the character an Elf?)
+                    Wizard > 0 (is the character a wizard?)
+                    armor > 2 (is the character wearing metal armor?)
+
+                </P>
+
+                <P class="nitty">
+                    The two numbers can be any of these:<br>
+                    <br>
+                    3, 99, any fixed number<br>
+                    ST, DX (adjDX will be used), IQ, MA<br>
+                    Armor (this will be the type of armor, useful for swimming, etc)<br>
+                    1d, 2d+1, 3d-2, etc (up to six dice)<br>
+                    ^variable, see the third section <br>
+                  </P>
+
+                  <P class="howto">
+                    In the branch example above the player would not know the branch had happened. This is appropriate in situations like a secret door. But if the character fails a climbing roll and takes damage the player needs to be informed. For this kind of branch just put a description line in after the comparison and before the destinations.
+
+                </P>
+
+                <P class="example">
+                    @branch attemptToClimbCliff<br>
+                    You attempt to scale the rocky face...<br>
+                    3d vs DX<br>
+                    @successDestination topOfCliff<br>
+                    @failDestination takeFallingDamage<br>
+                  </P>
+
+                  <P class="howto">
+                    If there is a description line it will be presented to the player with the die faces of the roll added.
+                </P>
+
+                <a id="extras"></a>
+
+                <h1>Extras</h1>
+
+                  <P class="howto">
+                    There are some other keywords that create more possibilities:
+                </P>
+
+                <P class="howto">
+                  <b>@damage</b> does damage to the character from non-combat sources such as traps, falls, poisons, curses, etc. Adventuring is not an easy life. It is very good form to give players a way to avoid this, whether by taking a smarter route, employing a Talent, making a roll, etc. But they knew the risks when they loaded your adventure.
+              </P>
+              <P class="example">
+                  @location trappedPassage<br>
+                  @damage 2d deathByRocks<br>
+                  As you proceed down the passage rocks fall from above.<br>
+                  @button nextRoom<br>
+                  Continue to the Next Room<br>
+                </P>
+                <P class="howto">
+                  The @damage line follows a @location line; the character will take the damage when they arrive at this location. "@damage" is followed by an amount, either a fixed number or a die roll. Armor will protect against this damage. After that is the name of a location to go to if the character dies from this damage.
+              </P>
+              <P class="howto">
+                <b>@heal</b> also follows a @location line, and will heal the character by the specified amount (fixed or die roll). It will not take a character above their starting hit points, of course. The description of the location should let them know that they have been healed.
+            </P>
+
+            <P class="howto">
+              <b>@removeFoe</b> also follows a @location line, and removes the named foe. This allows you to remove a foe from the adventure if the player bribes them, lures them away, befriends them, eliminates them through subterfuge, etc. Creating alternate ways to overcome a foe is a great way to allow a single character to succeed in a dangerous world.
+            </P>
+            <P class="howto">
+              <b>@bonus</b> follows the comparison line in a @branch, and gives a bonus to the die roll if the character has the appropriate Talent, Race, or Type. The bonus can be a negative number, so elves can get their penalty when insects are involved!
+            </P>
+            <P class="example">
+                @branch attempToFastTalk<br>
+                3d <= IQ<br>
+                @bonus 3 Courtly Graces<br>
+                @successDestination heBelieves<br>
+                @failDestination heDoesNotBelieve<br>
+              </P>
+              <P class="howto">
+                <b>@writing</b> is a shortcut that includes the text of writing encountered in the adventure if the character has Literacy. The description of a location should mention that there is writing on the wall (or whatever), but not describe what is written. Then after the description and before the buttons the text after @writing will be displayed if the character can read it. Illiterate characters will know that there is writing, but now what it says. You could accomplish the same thing with a branch and two versions of the location, but since this will come up often we have this shortcut.
+              </P>
+              <P class="example">
+                  @location lonelyGrave<br>
+                  At the top of the hill a small tombstone lays in the grass. There is an inscription.<br>
+                  @writing Ben Amony - He had few friends, but one too many enemies.<br>
+                  @button bottomOfHill<br>
+                  Head Back Down The Hill<br><br>
+                  @button placeDagger<br>
+                  Place Dagger on  Tombstone<br>
+                </P>
+              <P class="howto">
+                See the Examples tab for how to give extra information to characters with other Talents. Introducing extra information enriches the world, but be careful not to create adventures that can only be won by characters with Seamanship, etc.
+              </P>
+            <P class="howto">
+                <b>@testMode</b> helps you test your adventure in TFT Helper before distributing it. If you put this line in your adventure text the character will start with 23 hit points, so they won't die too easily. That means you will survive the combats, the falls, but it's not too many that you can't test character death. Additionally, you will see two buttons on the character sheet in TFT Helper, a red cross and a skull. The red cross resets character hit points to 23, and the skull sets them to zero. The latter won't kill the character immediately, but the next time character hit points are checked the character will be considered dead. Be sure take "@testmode" out before you share your adventures with others.
+              </P>
+
+
+              <a id="variables"></a>
+
+                <h1>Variables</h1>
+
+
+                <P class="howto">
+                    And this brings us to variables, such as "^daysleft". You can set up variables to keep track of all kinds things to make the adventure more interesting. You create the variables at the top, after @title, @creator, and @description, and before the first @location. You create them with a line like:
+                </P>
+
+                <P class="example">
+                    ^foodRemaining = 30
+                </P>
+
+                <P class="howto">
+                    You can name them any string of letters and numbers from 1 to 20 characters long, no special characters, no spaces, capitalization irrelevant. Even if you're not going to use a variable until much later, initialize it to zero here.
+                </P>
+
+                <P class="howto">
+                    Variables are altered by buttons. So when a player takes an action you can change one or more variables by describing the change after the "@button destination" line and before the next button or location. It will look something like these:
+                </P>
+
+                <P class="example">
+                    ^foodRemaining = ^foodRemaining - 1 (use up one day of food)<br>
+                    ^silverCollected = ^silverCollected + 30 (character found 30 sp)<br>
+                    ^silverCollected += 30 (same in fancy programmer talk)<br>
+                    ^triedPotion = 1 (they drank it, a branch will check for this later)<br>
+                    ^firefliesGrabbed = DX * 2 (the faster you are, the more you get)<br>
+                    ^foodRemaining = ^foodRemaining - 2d (lost a random amount to rats)
+                </P>
+
+                <P class="nitty">
+                    Obviously, you can refer to ST, DX, 2d, but you can't change them. You can only change the variables you created at the beginning.
+                </P>
+
+
+                <P class="howto">
+                    So you will create the variable with a value at the beginning of your text, modify then when players take particular actions, and check them with branches to create the effect of a dynamic game world.
+                  </P>
+
+
+                  <!-- <P class="howto">
+                    You can either let the player know about the branch or keep it a secret. You don't want to tell them they overlooked a secret door, but you do want to let them know they are attempting to dodge falling rocks. A branch like the one above will show the player nothing; the evaluation will be made and the adventure will continue at the appropriate location. If you insert an announcement, similar to the description of a location, it will be shown, along with the die roll and comparison. Then there will be a "Continue" button before the next location.
+                  </P> -->
+
+
+                  <!-- <P class="howto">
+                    Here's another tool for your utility belt: Character Talents. You can check for a talent  like this:
+                  </P>
+
+                  <P class="example">
+                    @branch checkForNaturalist<br>
+                    Naturlalist > 0<br>
+                    @successDestination chamberWithLichenClue<br>
+                    @failDestination chamberWithNoClue<br>
+                  </P>
+
+                  <P class="howto">
+                    Similarly, you can branch on character race or type with comparison lines like these...
+                  </P>
+
+                  <P class="example">
+                    Elf > 0<br>
+                    Wizard > 0<br>
+                  </P>
+
+                  <P class="howto">
+                    If you want to give a bonus to a die roll based on possesion a talent, you would do it like this:
+                  </P>
+
+
+                  <P class="example">
+                    @branch checkForSecretDoor<br>
+                    3d <= IQ<br>
+                    @bonus alertness<br>
+                    @bonus Architect<br>
+                    @successDestination passageShowingSecretDoor<br>
+                    @failDestination passageWithoutSecretDoor<br>
+                  </P>
+                  <p>What if branches lead to @damage or variable changes?</p> -->
+                  <!-- <P class="howto">
+                    One more magic word let you kick around your characters one more way, and maybe give them a chance to survive. "@damage" lets you take some hit points off, perhaps for a fall or some other non-combat misadventure. You can take off a specific number, the result of a die roll, etc:
+                </P>
+
+                <P class="example">
+                    @damage 2d (nasty fall)<br>
+                    @damage 15 - DX (you can dodge some of the darts)<br>
+                    @damage -1d (negative damage is healing!)<br>
+                </P> -->
+
+                <P class="nitty">
+                    The assumption is that armor protects you from this damage, so if you want them to take 2d damage from poison you would do 2d + armor to balance it out. The player will always be told when they take damage, but you need to explain why it happened in your adventure text. Healing won't take you above original hit points, of course. If the damage takes the character to zero or below the software will send them straight to a location called "@died" so be sure to have one of those.
+                </P>
+
+                <!-- <P class="howto">
+                    Sometimes the characters can eliminate a foe by some means other than combat. Perhaps they can lure away a creature with some food, or they bribe a guard. Under the button where they take this action put the line "@kill foeName" where "foeName" is the name of the foe. That foe's hit points will be set to zero, so when the character goes to the location where the foe should be they will go to the @noFoe location instead.
+                </P>
+
+
+                <P class="howto">
+                  <b>@testmode</b>
+                </P>
+
+                <P class="howto">
+                  <b>@writing</b> is a shortcut that allows characters with the Literacy talent to read during the adventure, while players whose characters cannot read won't see it. (You could accompish this with a branch and two versions of the location, but this comes up so often it has its own shortcut.) When writing the description of a location, only mention that a paper or wall or stone has writing on it. Then after the description and before the buttons put "@writing Whatever you want the text to say." This will cause TFT Helper to insert a paragraph that says: "The writing says..." along with your text.
+                </P> -->
+
+                <P class="howto">
+                    That's it. Give it a try, you cannot break anything.
+                </P>
+
+
+
+<!--
+
+                <P class="nitty">
+                </P>
+
+                <P class="example">
+                </P>
+
+                <P class="howto">
+
+                </P>
+
+-->
+            </div>
+
+
+
+        </div>
+
+
+        <div id="page3" class="page" style="display: none;">
+          <div style="display: flex">
+
+            <div>
+              <div style="display: flex; margin-bottom: 10px">
+                <div class="niftyButton" onclick="saveToDownloads()">Save to Downloads</div>
+                <div class="niftyButton" onclick="event.stopPropagation();saveLocal()">Save in Browser</div>
+                <div class="niftyButton" onclick="event.stopPropagation();overwrite='loadLocal';document.getElementById('overwriteDiv').style.display='block';">Load from Browser</div>
+                <div class="niftyButton" onclick="event.stopPropagation();showSaveAdvice()">?</div>
+
+              </div>
+
+              <div style=" margin-left: 15px; ">
+              Be sure to save your work in a text file somewhere!<br>
+              </div>
+<br>
+              <textarea id="userInputTextArea" rows="40" cols="60" oninput="reviewUserInput();"></textarea>
+            </div>
+
+            <div style="margin-left: 20px">
+              <span id="problemCountDiv"></span><br><br>
+
+              <span class="niftyButton" onclick="overwrite='enterTemplate';overwriteFunction()">Paste Template</span>
+
+              <span class="niftyButton" onclick="overwrite='enterBetterTemplate';overwriteFunction()">Paste Example</span><br>
+              <h2>Reference</h2>
+              <span style="font-size: small;">You can copy and paste these as templates, or just refer to them.</span>
+              <div style="font-family: arial; font-size:small; border: solid thin; padding: 5px;">
+<span class="niftyButton" style="float: right" onClick="event.stopPropagation();showSpecials();">Special Effects</span>                @location locationName<br>
+                Location description paragraphs&nbsp; &nbsp; &nbsp; <br><br>
+                @button button1Destination<br>
+                Button 1 Text<br>
+                @button button2Destination<br>
+                Button 2 Text<br>
+              </div>
+              <br>
+                <div style="font-family: arial; font-size:small; border: solid thin; padding: 5px;">
+<span class="niftyButton" style="float: right" onClick="event.stopPropagation();showComparisons()">Branch Comparisons</span>
+                @branch branchName<br>
+                3d <= IQ <br>
+                @bonus talent (or spell)<br>
+                @successDestination destinationIfTrue<br>
+                @failDestination destinationIfFalise<br>
+              </div>
+              <br>
+                <div style="font-family: arial; font-size:small; border: solid thin; padding: 5px;">
+                @damage amount destination<br>
+                @heal amount<br>
+                @removeFoe foeName<br>
+                @writing<br>
+                @testMode<br>
+              </div>
+              <br>
+                <div style="font-family: arial; font-size:small; border: solid thin; padding: 5px;">
+<span class="niftyButton" style="float: right" onClick="event.stopPropagation();showTypes()">Foe Types</span>
+                @foe foeName<br>
+                Combat intro text<br>
+                @type 0 &nbsp; &nbsp; &nbsp; <br>
+                Scruffy Swordsman<br>
+                Human, age<br>
+                ST 12, DX 14, IQ 8, MA 10<br>
+                Talents: Sword<br>
+                Spells:<br>
+                Weapons: Broadsword (2d), Main-Gauche (1d-1)<br>
+                Attacks and Damage: Punch 1d-3<br>
+                Armor:<br>
+                Equipment:<br>
+                Special Note:<br>
+                @winDestination searchSwordsmansBody<br>
+                @loseDestination diedAtGate<br>
+                @noFoe emptyGateway<br>
+            </div>
+
+            </div>
+
+          </div>
+
+
+          <div id="feedbackTextArea" style="border: solid thin; overflow: scroll;">
+
+            When you start writing your adventure the feedback will go here.
+
+          </div>
+
+
+
+<!--
+            <span class="niftyButton" onclick="addLineNumbers()">Add Line Numbers</span>
+
+            <span class="niftyButton" onclick="removeLineNumbers()">Remove Line Numbers</span>
+-->
+
+
+
+        </div>
+
+
+        <div id="page4" class="page" style="display: none;">
+
+          <div style="display: flex;">
+
+              <div style="flex-grow: 1">
+
+                  Variable values:
+
+                  <div id="variablesDiv" style="border: solid thin; ">
+variables
+                  </div>
+
+
+
+
+              </div>
+
+              <div style="flex-grow: 4; ">
+
+                <div style = "margin: auto; position: relative; background-color: black; padding: 2vh; border-radius: 30px; width: 400px; height: 720px;">
+
+
+                  <div style="position: absolute; top: 18px; left:180px; margin: auto; background-color: #444444; border-radius: 5px; height: 7px; font-size:5px; width: 80px;">
+
+                  </div>
+
+                  <div  style="position: relative; top:20px; text-align: center;  background-color: white; color: black; margin: auto; width: 350px; height: 20px; font-family: Arial, sans-serif; font-size: smaller; ">
+                    <img src="art/signalBars.png" height="20px" style="float: left;" onclick="event.stopPropagation();showEgg('signalDiv')">
+                    <span style="float: left; position: relative; top: 3px;" onclick="event.stopPropagation();gimmeFnord();showEgg('illuminatiDiv')">illuminati</span>
+                    <img src="art/WiFi.png" height="20px" style="float: left;" onclick="event.stopPropagation();showEgg('signalDiv')">
+                    <span id="currentTimeSpan" style=" position: relative; top: 3px; left: -15px">99:99</span>
+                    <img src="art/battery.png" height="20px" style="float: right;">
+                    <span style="float: right; position: relative; top: 3px;">110%</span>
+                    <img src="art/locator.png" height="20px" style="float: right;" onclick="event.stopPropagation();showEgg('locatorDiv')">
+                  </div>
+
+                  <div  style="position: relative; top:20px; text-align: center;  margin: auto; width: 350px; ">
+                    <img src="art/charSheet.png" width="350px">
+
+                  </div>
+                  <div id="simulatedScreen" style="position: relative; top:16px;  background-color: white; color: black; margin: auto; ; width: 350px; height: 410px">
+test
+                  </div>
+
+                  <div style="position: absolute; top: 680px; left:190px;  border: solid thin; border-color: #444444; background-color: black; border-radius: 25px; height: 50px;  width: 50px;">&nbsp;
+                  </div>
+
+                </div>
+
+
+
+              </div>
+
+              <div style="flex-grow: 1; ">
+
+                Click to Jump to a Location:
+
+                <div id="locationsDiv" style="border: solid thin; ">
+locations
+                </div>
+
+
+
+              </div>
+
+
+          </div>
+
+          <div id="dryrunDiv"   style="display: none; position: fixed; top: 30%; left: 30%; right: 30%; border: solid thick; background-color: lightgrey; color:navy; padding: 3.5vh; overflow: auto; z-index: 999;">
+            <div id="dryrunInfoDiv">
+
+              <p>
+                  This should not show up.
+              </p>
+            </div>
+  <div style="text-align: center;">
+            <span class="niftyButton" id="successButton" onclick = "successGo();" >Success</span>
+            <span class="niftyButton" id="failureButton" onclick = "failureGo();" >Fail</span>
+
+          </div>
+        </div>
+
+        <div id="combatDiv"   style="display: none; position: fixed; top: 30%; left: 30%; right: 30%; border: solid thick; background-color: lightgrey; color:darkred; padding: 3.5vh; overflow: auto; z-index: 999;">
+          <div id="combatInfoDiv">
+
+            <p>
+                This should not show up.
+            </p>
+          </div>
+<div style="text-align: center;">
+          <span class="niftyButton" id="successButton" onclick = "successGo();" >Win</span>
+          <span class="niftyButton" id="failureButton" onclick = "failureGo();" >Lose</span>
+
+        </div>
+      </div>
+
+
+
+        </div>
+
+
+        <div id="page5" class="page" style="display: none; ">
+
+          <div id="testModeWarningDiv" style="display: none;">
+
+            <span style="font: large; color: red;">
+              Test Mode active
+            </span>
+
+            <span class="niftyButton" onclick="event.stopPropagation();showTestModeAdvice()">What?</span><br><br>
+
+          </div>
+
+          original<br>
+          <textarea id="exportableTextArea" readonly rows=15 style="margin: auto; width: 60%; ">Nothing has been ready to export yet!</textarea>
+
+          <br>scrambled<br>
+          <textarea id="exportableTextArea2"  rows=15 style="margin: auto; width: 60%; ">Nothing has been ready to export yet!</textarea>
+
+          <br>recovered<br>
+          <textarea id="exportableTextArea3" readonly rows=15 style="margin: auto; width: 60%; ">Nothing has been ready to export yet!</textarea>
+
+          <br>math<br>
+          <textarea id="exportableTextArea4" readonly rows=15 style="margin: auto; width: 60%; ">Nothing has been ready to export yet!</textarea>
+
+
+        </div>
+
+        <div id="page6" class="page" style="display: none;">
+
+          <P class="howto">
+            The character is about to exit the forest and cross an open patch of ground to the entrance of the abandoned watch tower. The character doesn't know it yet, but there's a goblin at a window on the second story with a horse bow. If the character makes a 3d vs IQ roll they will see the goblin in time to make this a Dodge move. Alertness gives a bonus of 2. And of course, if the character ever returns to this spot they will definitely know about the goblin. How do we write this?
+          </P>
+
+
+          <P class="howto">
+            First, at the top of the adventure you'll set a variable to keep track of whether the character knows about the goblin. This is a simple flag: 0 means ignorance, 1 means the character knows.
+          </P>
+
+          <P class="example">
+              ^knowsAboutGoblinArcher=0
+          </P>
+
+          <P class="howto">
+            Next, we have the location in the trees:
+          </P>
+
+          <P class="example">
+              @location edgeOfForest<br>
+              You are at the edge of the forest. You can see a clearing to the north where the old watchtower stands. <br>
+              @button deepInTheForest<br>
+              Go Deeper Into The Forest<br>
+              @button checkIfGoblinKnown<br>
+              Enter the clearing<br>
+              <br>
+            </P>
+
+            <P class="howto">
+              The first branch checks to see if the character already knows about the goblin. The next makes the roll if they don't know about the goblin.
+            </P>
+
+            <P class="example">
+
+              @branch checkIfGoblinKnown<br>
+              ^knowsAboutGoblinArcher > 0<br>
+              @successDestination dodgeThroughClearing<br>
+              @failDestination rollToNoticeGoblin<br>
+              <br>
+
+              @branch rollToNoticeGoblin<br>
+              3d <= IQ<br>
+              @bonus Alertness -2
+              @successDestination spottedGoblin<br>
+              @failDestination goblinSneakAttack<br>
+              <br>
+
+              @location spottedGoblin<br>
+              As you enter the clearing you notice a goblin with a bow just inside a window on the second story. You immediately start zig-zagging to spoil his aim.<br>
+              @button dodgeThroughClearing<br>
+              Continue<br>
+              <br>
+
+              @branch goblinSneakAttack<br>
+              3d <= 10  [the goblin's adjDX for the shot is 10]<br>
+              @successDestination hitByGoblinSneakArrow<br>
+              @damage 1d
+              @failDestination missedByGoblinSneakArrow<br>
+              <br>
+
+              @branch dodgeThroughClearing<br>
+              4d <= 10  [the goblin's adjDX for the shot is 10]<br>
+              @successDestination hitByGoblinArrow<br>
+              @damage 1d<br>
+              @failDestination missedByGoblinArrow<br>
+              <br>
+
+              @location hitByGoblinSneakArrow<br>
+              @button keepDoorway<br>
+              Continue<br>
+              <br>
+
+              @location missedByGoblinSneakArrow<br>
+              @button keepDoorway<br>
+              Continue<br>
+              <br>
+
+              @location hitByGoblinArrow<br>
+              @button keepDoorway<br>
+              Continue<br>
+              <br>
+
+              @location missedByGoblinArrow<br>
+              @button keepDoorway<br>
+              Continue<br>
+              <br>
+
+
+              @location keepDoorway<br>
+              Etc
+              @button checkIfGoblinKnown
+              Head Out of the keep
+              @button lowerStairs
+              Head Up The Stairs
+
+              <P class="howto">
+                The redundancy of these last four paragraphs allows you to make sure the text flows smoothly through all variation
+              </P>
+
+
+
+          </P>
+
+        </div>
+
+
+        <div id="helpDiv" class="hideMe"  style="display: none; position: fixed; top: 20%;  left: 20%; right: 20%; border: solid thick; background-color: BlanchedAlmond; color:SaddleBrown; padding: 3.5vh; overflow: auto; z-index: 999;">
+
+            <p>
+                Thanks for trying out Exciting Web App. Have fun!
+            </p>
+        </div>
+
+        <div id="overwriteDiv" class="hideMe"  style="display: none; position: fixed; top: 20%;  left: 20%; right: 20%; border: solid thick; background-color: BlanchedAlmond; color:SaddleBrown; padding: 3.5vh; overflow: auto; z-index: 999;">
+
+            <p>
+                What you're about to do will overwrite the contents of the field in this browswer window with your text in it, and Undo will not fix it. Are you sure you want to proceed?
+            </p>
+
+<span class="niftyButton" onclick = "overwriteFunction()" >Yes, Overwrite</span>
+<span class="niftyButton" onclick="document.getElementById('overwriteDiv').style.display='none'">No, Wait, Cancel, Stop</span>
+
+        </div>
+
+        <div id="saveAdviceDiv" class="hideMe"  style="display: none; position: fixed; top: 20%; left: 20%; right: 20%; border: solid thick; background-color: BlanchedAlmond; color:SaddleBrown; padding: 3.5vh; overflow: auto; z-index: 999;">
+
+          <p>
+              You should periodically save the text you are  working on to a file on your computer or somewhere in the cloud.
+          </p>
+          <p>
+              For your convenince the TFT Helper Adventure Creator will try to save your work in your browser whenever you press the button with that name, whenever you switch tabs, and when you leave the page. Different browswers handle this differently, however, and the storage used is the kind the browser may clear if space is tight. Therefore you should save your work to your Downloads folder with the button, or copy your text and paste it somewhere else convenient as you like.
+          </p>
+
+
+        </div>
+
+        <div id="testModeAdviceDiv" class="hideMe"  style="display: none; position: fixed; top: 20%; left: 20%; right: 20%; border: solid thick; background-color: BlanchedAlmond; color:SaddleBrown; padding: 3.5vh; overflow: auto; z-index: 999;">
+
+          <p>
+              When you add the line "@testmode" to your adventure the exportable created tells the TFT Helper app that you are testing. This means your character will start with 23 hit points, and buttons will appear while playing the advenutre that will let you heal and decrease hit points. While very useful for testing, you want to be sure and remove this line before you share this adventure with anyone but collaborators.
+          </p>
+
+
+        </div>
+
+        <div id="specialsHelpDiv" class="hideMe"  style="display: none; position: fixed; top: 20%; left: 20%; right: 20%; border: solid thick; background-color: BlanchedAlmond; color:SaddleBrown; padding: 3.5vh; overflow: auto; z-index: 999;">
+
+          A location or button can also trigger a special effect. Just put the appropriate line underneath the location or button, and that action will occur on arriving at that location or when that button is pressed. Effects are:<br>
+          <br>
+          @damage 1d diedFromFall (@damage is followed by a value, either a fixed number or a die roll; this is the damage the character will take from whatever just happened. After this is a location to go to if that damage kills the character.)<br>
+          <br>
+          @foekill (remove a foe, whether they were scared off, killed by subterfuge, washed away in a stream, persuaded to go somewhere else, etc.)<br>
+          <br>
+          @heal (increases character hit points, not above initial ST)<br>
+
+
+          </div>
+
+          <div id="comparisonsHelpDiv" class="hideMe"  style="display: none; position: fixed; top: 20%;  left: 20%; right: 20%; border: solid thick; background-color: BlanchedAlmond; color:SaddleBrown; padding: 3.5vh; overflow: auto; z-index: 999;">
+
+            <p>
+                A @branch can compare:<br>
+                an integer, eg 12, 100<br>
+                a character attribute: ST, DX, IQ, adjDX, MA, Armor<br>
+                a modified attribute, eg DX-2
+                a character Talent (they don't have it = 0, if they do = 1)<br>
+                character Race or Type, eg "Wizard > 1"<br>
+                a die roll, eg 1d, 2d+2
+                <br>
+                Comparisons can be:<br>
+                vs (equivelent to <=)<br>
+                <=<br>
+                ><br>
+                >=<br>
+                = (you can also use == or === if you have those good habits)<br>
+                <br>
+                Bonuses can also be applied for talents. The bonus value given will be added to the second value in the comparison. The bonus can be negative. Examples:<br>
+                @bonus naturalist 3 (plus two if the character has the Naturalist talent)<br>
+                @bonus alertness 2
+                @bonus acrobatics 4
+            </p>
+
+
+          </div>
+
+
+          <div id="typesHelpDiv" class="hideMe"  style="display: none; position: fixed; top: 20%; left: 20%; right: 20%; border: solid thick; background-color: BlanchedAlmond; color:SaddleBrown; padding: 3.5vh; overflow: auto; z-index: 999;">
+
+            Here are the foe types:<br>
+        <br>
+            -1 = creature, charges and melees, dropped/broken weapon means damage<br>
+            0 = melee fighter, charges and melees, drops or breaks weapons as normal<br>
+            1 = melee fighter with pole weapon<br>
+            2 = archer, shoots immediately, then switches to their melee weapon and charges<br>
+            3 = mage that casts Dazzle, then Magic Fist, has Staff<br>
+            4 = mage that casts Illusions of bears<br>
+            5 = mage that casts Sleep<br>
+            6 = mage that casts Fireball<br>
+
+
+            </div>
+
+            <div id="signalDiv" class = "hideMe blinking" style="display: none;position: fixed; top: 20%; left: 30%;  background-color: black; color: lime; padding: 3.5vh;  z-index: 999;">
+
+              You can't stop the signal.
+
+            </div>
+
+            <div id="locatorDiv" class = "hideMe" style="display: none;position: fixed; top: 20%; left: 30%;  background-color: black; color: white; padding: 3.5vh;  z-index: 999;">
+
+              The Illuminati thanks you for carrying your tracking device everywhere - and for paying for it.
+
+            </div>
+
+            <div id="illuminatiDiv" class = "hideMe" style="display: none;position: fixed; top: 20%; left: 30%;  background-color: black; color: orange; fon-size: large; font-family:  arial; padding: 3.5vh;  z-index: 999;">
+            </div>
+
+
+
+        <div id="basicTemplate" style="display: none;">@title Not Much of an Adventure
+@creator Jane the GM
+@description Two safe, unoccupied rooms
+@maxlevel 32
+
+@location startLocation
+You're in a small room, there is one door.
+
+@button endLocation
+Go Through the Door
+
+@location endLocation
+You're in a slightly larger room.
+
+@button startLocation
+Go Back To The First Room</div>
+
+<div id="betterTemplate" style="display: none;">
+@title The Abandoned Watchtower
+@creator Jane the GM
+@description Abandoned, but is it empty?
+@maxlevel 33
+
+@location startLocation
+A couple hours off the main road sits an old watchtower. No one remembers why it was built, and everyone "knows" it's empty. Seems like it's worth an afternoon to check it out.
+
+As you enter the clearing from the south you see the watchtower in the middle of a barren circle - no grass, no vines, nothing. The door is gone and the dark doorway yawns open thirty paces in front of you.
+
+@button doorway
+Go up to the Door
+
+@button roadcheck
+Circle and Examine the Tower
+
+@branch roadcheck
+Naturalist > 0
+@successDestination northside_WITH_MUSHROOMS
+@failDestination northNoMushrooms
+
+@location northNoMushrooms
+As you come around to the north side of the tower you see the overgrown remains of a road running to the east and west. The tower sat right alongside this forgotten thoroughfare.
+
+@button doorway
+Circle Around the Doorway
+
+@location northside_WITH_MUSHROOMS
+As you come around to the north side of the tower you see the overgrown remains of a road running to the east and west. The tower sat right alongside this forgotten thoroughfare.
+
+At the base of the tower you notice brewer's mushrooms. These aren't magical, but they're certainly valuable. You will a pouch with them, hoping to trade them to the innkeeper for dinner.
+
+@button doorway
+Circle Around the Doorway
+
+@location doorway
+The door and hinges are long gone. There's enough daylight inside to see the floor is only dirt and the stairs leading up are badly broken down.
+
+@button roadcheck
+Circle Around to the North Side
+@button groundfloorcheck
+Enter The Tower
+
+@branch groundfloorcheck
+3d <= IQ
+@bonus alertness
+@successDestination groundfloorwithTRAPDOOR
+@failDestination groundfloor
+
+@location groundfloor
+The ground inside the tower is littered with rotting wood, loose dirt, and some barrel hoops. The wooden treads of the stairs have been scavenged, but enough of the frame remains that you could attempt to climb to the second floor.
+
+@button doorway
+Back to the Doorway
+
+@button tryToClimb
+Try To Climb the Stairs
+
+
+@location groundfloorwithTRAPDOOR
+The ground inside the tower is littered with rotting wood, loose dirt, and some barrel hoops. The wooden treads of the stairs have been scavenged, but enough of the frame remains that you could attempt to climb to the second floor.
+
+You spot a rectangular outline in the detritus, and lift up a trapdoor to reveal stairs going down into a basement.
+
+@button doorway
+Back to the Doorway
+
+@button giantRat
+Go Down the Stairs
+
+@button tryToClimb
+Try To Climb the Stairs
+
+@branch trytoclimb
+3d vs DX
+@bonus climbing 3
+@successDestination secondfloor
+@failDestination ouchwefell
+
+@branch ouchwefell
+3d vs DX
+@bonus acrobatics 3
+@successDestination safelanding
+@failDestination takedamage
+
+@location safelanding
+You catch yourself as you fall and avoid taking damage.
+@button groundfloor
+Continue
+
+@location takedamage
+@damage 1d diedfromfall
+You take damage from the fall.
+@button groundfloor
+Continue
+
+@foe giantRat
+As you reach the bottom of the stairs and your eyes adjust you see a giant rat. It's definite a rat, but it's definitely not rat-sized.
+@type -1
+The Giant Rat
+Human, age
+ST 6, DX 12, IQ 6, MA 10
+Talents:
+Spells:
+Weapons:
+Attacks and Damage: Bite (1d-1)
+Armor:
+Equipment:
+Special Note:
+@winDestination exploreBasement
+@loseDestination killedbyRat
+@noFoe exploreBasement
+
+@location killedbyrat
+The rat's repeated bites were too much for you. I guess that's why people like armor. An ignominious end.
+
+@location explorebasement
+Ignoring the dead rat, you search the basement and find a lot of rat footprints, and a collection of shiny objects they had collected, including an amulet that might be worth something...
+
+@button groundfloor
+Back Up the Steps
+
+
+@location secondfloor
+The second floor is in surprisingly good shape. From this platform you can look out over the crenellations and see only trees, thirty paces away, in every direction. Not much of a watchtower now that the forest has grown up.
+
+Someone has carved something in the floor.
+@writing Jared, I searched for the amulet but it's not here.
+
+@button groundfloorcheck
+Back Down The Stairs
+
+</div>
+
+
+    </body>
+<script>
+
+//  The Fnord Program
+//  Copyright 1997-1999, 2021 by Steve Jackson Games (http://www.sjgames.com/).
+//  All Rights Reserved.
+
+//  The Fnorder was originally written for the Illuminati BBS by Steve
+//  Jackson and Creede Lambard.  It was later reimplemented in C by
+//  Loyd Blankenship, and then converted to perl by Jackie Hamilton.
+//  Finally, Ian Gordon then converted the perl back to C.
+
+//  After "finally", Andrew Walters grabbed the C code and turned it into Javascript.
+
+adjectives = [
+   "23rd", "acceptable", "acrobatic", "alien", "amiable",
+   "amoeboid", "ancient", "arbitrary", "atomic", "avenging",
+   "awesome", "balanced", "besotted", "best", "black", "blue",
+   "calculating", "cast iron", "cat-like", "cautious", "Chinese",
+   "cold", "communist", "corrupt", "dead", "deadly", "dehydrated",
+   "disguised", "dizzy", "drug-crazed", "drunken", "easy",
+   "electric", "embossed", "enormous", "expensive", "explosive",
+   "extraterrestrial", "ferocious", "frozen", "furry", "gelatinous",
+   "glowing", "gnarly", "gold", "granular", "greedy", "green",
+   "high", "highest", "hot", "humming", "illuminated", "imitation",
+   "impotent", "impudent", "impulsive", "indictable", "innocent",
+   "insane", "Japanese", "lecherous", "lizard-like", "lovely",
+   "maniacal", "mauve", "medium-sized", "morbid", "most influential",
+   "mutant", "naughty", "nuclear", "oily", "oozing", "opaque",
+   "opulent", "orbital", "persuasive", "pickled", "poor",
+   "pregnant", "protozoan", "puce", "pulsating", "purple",
+   "putrid", "radical", "radioactive", "red", "reformed",
+   "reincarnated", "rubber", "Russian", "screaming", "sexy",
+   "shiftless", "shifty", "Siamese", "silver", "sin-ridden",
+   "sinister", "sizzling", "skeptical", "slack-producing",
+   "sleeping", "slick", "slime-dripping", "slimy", "slippery",
+   "sluggish", "smoking", "solid gold", "splendid", "squamous",
+   "stoned", "sweet", "temporary", "throbbing", "tin-plated",
+   "tiny", "transient", "treacherous", "tubular", "ugly",
+   "untouchable", "user-friendly", "user-serviceable", "vacant",
+   "vacillating", "vampiric", "vibrant", "virginal", "vivid",
+   "wealthy", "well-dressed", "white", "wimpy", "worthless",
+   "young","illegal", "tax-free", "drugged", "polluted",
+   "flaming", "diseased", "agnostic","anorexic", "conquering",
+   "cosmic", "dancing", "dyslexic", "frenzied", "lumpy", "musical",
+   "plump", "perfectly ordinary", "French", "Martian"
+];
+
+names = [
+   "007", "a dead relative", "a long-lost uncle","a dead rock star",
+   "Abdul Al-Azrad", "Abraham Lincoln", "Agent Orange","Bill Gates",
+   "Albert Einstein", "Alfred E. Neumann", "Ali Baba", "Aladdin",
+   "Arsenio Hall", "Barry Goldwater", "Batman", "Buck Rogers","Calvin",
+   "Bullwinkle", "Captain Ahab", "Captain America", "Captain Kirk",
+   "Captain Nemo", "Charlie Brown", "Cthulhu", "Dan Quayle","Dilbert",
+   "Darth Vader", "Dave Letterman", "Uncle Bob", "Dr. Destructo",
+   "Dracula", "Eddie Murphy", "Edgar Rice Burroughs", "Elvis",
+   "Erik Bloodaxe", "Evil Stevie", "Fearless Leader",
+   "Ferdinand Marcos", "Flamin' Jane", "Flaming Carrot",
+   "Gary Shandling", "George", "George Lucas", "Gerald Ford",
+   "Gandhi", "Gorbachev", "Grandmother", "Gumby", "Hamlet","Hobbes",
+   "Han Solo", "Hitler", "Ho Chi Minh", "Hulk Hogan","Hillary",
+   "Hunter S. Thompson", "Idi Amin", "Internal Security",
+   "Isaac Asimov", "Jack the Ripper", "Jane Fonda", "Jesus",
+   "Jimmy Carter", "Johnny Carson", "Johnny-B-Gud",
+   "Joseph Stalin", "Kareem Abdul-Jabbar", "King Arthur", "King Tut",
+   "Lex Luthor", "Luke Skywalker", "Manuel Noriega",
+   "Margaret Thatcher", "Michael Jordan", "Mick Jagger",
+   "Mohammed", "Moses", "Mr. Bill", "Mr. Ed", "Mr. Science",
+   "Mr. Spock", "Muffy", "Nancy Reagan", "Nelson Mandela", "Nixon",
+   "Norman Bates", "Obi-Wan Kenobi", "Oliver North", "Paul",
+   "Paul Newman", "Perry Mason", "President Clinton", "Princess Leia",
+   "Rambo", "Richard Pryor", "Ringo", "Robby the Robot",
+   "Robert Heinlein", "Rocky", "Roger Rabbit", "Ronald Reagan",
+   "Scrooge", "Sir Lancelot", "Snoopy", "Spaceman Spiff",
+   "Spiderman", "Squad 23", "Steve", "Steven Spielberg", "Superman",
+   "the A.C.L.U.", "The Computer", "the Discordian", "Sir Paul",
+   "the Hand", "The Illuminati", "the Joker", "the Legion of Doom",
+   "the ninja", "the Pentagon", "the Secret Master",
+   "the Secret Service", "the vice squad", "Thor", "Timothy Leary",
+   "Tiny Tim", "Tom Clancy", "Tweety-Bird", "Uncle Duke", "Weird Al",
+   "Winston Churchill", "yo' mama", "your brother",
+   "your evil twin", "your father", "your mother", "your sister",
+   "Zaphod Beeblebrox", "Zeus", "Zonker","Donovan's Brain",
+   "Jimmy Hoffa","Tristero","the Archdean","Asmodeus",
+   "Archangel Gabriel"
+];
+
+places = [
+   "(not available at your clearance)", "Alpha Centauri",
+   "Alpha Complex", "Atlantis", "Austin", "Berkeley", "Berlin",
+   "Buckingham Palace", "Callahan's Place", "Cheyenne Mountain",
+   "Chicago", "Cyberworld", "Dallas", "Death Valley", "Dime Box",
+   "Endsville", "Gasoline Alley", "headquarters", "Hell",
+   "Hollywood", "Hong Kong", "Iran", "Iraq", "Israel",
+   "Joe's Bar and Grill", "Katmandu", "Lake Geneva", "Las Vegas",
+   "left field", "Lithuania", "London", "Los Angeles", "Main Street",
+   "Mars", "Middle Earth", "Mission Control", "Mordor", "Moscow",
+   "Munich", "my back yard", "New York", "Peking", "Poland",
+   "San Francisco", "Siberia", "Sixth Street", "SJ Games",
+   "Switzerland", "Tel Aviv", "the back forty", "the Bastille",
+   "the bathroom", "the best place possible", "the brewery",
+   "the Bat Cave", "the corner bar", "the dentists' convention",
+   "the doghouse", "the dumpster", "the editorial department",
+   "the Empire State Building", "the hackers' convention",
+   "the home of a trusted friend", "the Hotel California",
+   "the Last National Bank", "the North Pole", "the ocean",
+   "the outback", "the Pentagon", "the Phoenix Project", "the river",
+   "the same place as before", "the service station", "the South Pole",
+   "the Super Bowl", "the tavern", "the toxic waste dump",
+   "the U.S. Attorney's Office", "the Vatican", "the Watergate Hotel",
+   "the White House", "the World Trade Center", "Toledo", "Topeka",
+   "Uranus", "Wall Street", "Washington, D.C.", "you-know-where",
+   "your place", "Yrth","the Death Star",
+   "beautiful downtown Burbank"
+];
+
+prepositions = [
+   "assumes responsibility for", "avoids servants of",
+   "deals with", "elopes with", "evades agents of", "flees from",
+   "flees to", "flies to", "flies toward", "goes for", "goes to",
+   "has finished in", "has left with", "hides in", "is attacked by",
+   "is commanded by", "is concerned about", "is contaminated by",
+   "is destroyed by", "is distressed by", "is financed by",
+   "is fondled by", "is found by", "is imitated by", "is infiltrated by",
+   "is joined by", "is like a god to", "is removed by",
+   "is the patron of", "is threatened by", "listens to", "makes fun of",
+   "may not visit", "moves to", "originates from", "reports to",
+   "retreats from", "returns to", "shoots henchmen of",
+   "should watch for", "steals from", "takes blame for",
+   "takes control of", "takes no notice of", "takes refuge in",
+   "travels to", "walks to", "was eliminated by", "was seen in",
+   "will go to", "withdraws from", "assumed responsibility for",
+   "avoided servants of","has dealt with", "eloped with",
+   "evaded agents of", "fled from", "fled to", "flew to",
+   "flew toward", "has gone for", "went to", "hides in",
+   "was attacked by", "was commanded by", "was concerned about",
+   "was contaminated by", "was destroyed by", "was distressed by",
+   "was financed by", "was fondled by", "was found by",
+   "was imitated by", "was infiltrated by", "was joined by",
+   "was removed by", "was the patron of", "was threatened by",
+   "listened to", "made fun of", "moved to", "originated from",
+   "reported to", "retreated from", "returned to", "shot henchmen of",
+   "watched for", "stole from", "took blame for", "took control of",
+   "took no notice of", "took refuge in", "traveled to",
+   "walked to","withdrew from", "plays with", "played with",
+   "is assassinated by", "was assassinated by", "is boggled by",
+   "was boggled by", "performs surgical alternations on"
+];
+
+
+actions = [
+   "amuses", "avoids", "berates", "boggles", "bothers",
+   "buries", "catches", "commands", "contaminates", "controls",
+   "converts", "delivers", "destroys", "disfigures", "eats", "enters",
+   "fondles", "handles", "harasses", "hassles", "helps",
+   "imitates", "infiltrates", "inherits", "joins", "kills", "leaves",
+   "massages", "molests", "persuades", "perverts", "pitches",
+   "rebuilds", "reinforces", "removes", "replaces", "resurrects",
+   "saves", "serves", "spanks", "squeezes", "strokes", "subverts",
+   "swallows", "swats", "torments", "tortures", "transforms",
+   "whips","teases", "stomps", "mates with", "tickles", "audits",
+   "beats", "defeats", "outwits","manipulates", "defects to",
+   "titillates", "perverts", "defenestrates", "discards",
+   "abandons", "talks to", "talks back to", "allies with",
+   "discovers", "betrays", "assassinates", "promotes",
+   "pretends to be", "disguises", "disobeys", "alters",
+   "intimidates"
+];
+
+ pronouns = [ "his", "my", "our", "the", "your" ];
+
+ intros = [
+   "4 out of 5 dentists recommend that","Abort immediately unless",
+   "Abort previous sequence.","Advance code sequence.",
+   "Alert all stations!","Confirmed report:",
+   "Contrary to popular belief,","Delete all evidence that",
+   "Determine whether","E.F. Hutton says","Effective immediately,",
+   "Enemy agents now know that","Fnord!","Follow plan x if",
+   "Ignore previous message.","Ignore this message.","Imperative that",
+   "It appears that","It is not true that",
+   "Most people surveyed believe that","Observe and report if",
+   "Oral Roberts dreamed that","Our foes believe that",
+   "Our reporters claim that","Pentagon officials deny that",
+   "Please investigate report that","Step up operation.",
+   "Terminate operation if", "The surgeon general warns that",
+   "Unsubstantiated rumor:","Urgent!","Usual sources confirm that",
+   "Warning!","We suspect that"
+];
+
+ nouns = [
+   "911 file", "(censored)", "amethyst",
+   "amulet", "ash tray", "baby", "BBS", "beer bottle", "blueprint",
+   "boat", "book", "bowling ball", "business card", "button", "cable",
+   "cactus", "cannibal", "capsule", "carnation", "cash", "cat",
+   "cauliflower", "chainsaw", "chair", "chicken", "club", "cockroach",
+   "code wheel", "coke can", "compact disc", "computer", "cork",
+   "couch", "cow", "crystal", "cummerbund",
+   "cyberdeck", "demon", "devil", "diamond", "dictaphone", "dictator",
+   "dinosaur", "disk drive", "document", "dragon", "drug", "duck",
+   "elephant", "engine", "eye", "file", "flag", "floppy disk",
+   "fly", "football", "frame", "frog", "geographer", "goldfish",
+   "grasshopper", "grimoire", "gyroslugger", "hammer", "hat",
+   "hat-rack", "helmet", "hemisphere", "hot tub", "hypodermic",
+   "ice cream", "ID card", "iguana", "implement", "infant", "insect",
+   "jellybean", "jet", "jet ski", "jukebox", "kitten", "Klingon",
+   "krugerrand", "kumquat", "lamp", "light bulb", "machine gun",
+   "mallet", "manuscript", "mason jar", "message", "mosquito",
+   "motorcycle", "mouse", "oar", "octopus", "olive", "ostrich",
+   "paddle", "paintbrush", "paper clip", "passport", "password file",
+   "password", "pendant", "penguin", "petunia", "phased plasma rifle",
+   "phone", "photocopy", "piranha", "pistol", "pit viper", "plant",
+   "playtester", "pop tart", "power drill", "ptarmigan", "pterodactyl",
+   "puppy", "pyramid", "racquetball", "radio", "railroad", "razor",
+   "rescuer", "ring", "rom chip", "saber", "saxophone", "scenario",
+   "scraper", "screwdriver", "scuba mask", "sculpture", "sex toy",
+   "shark", "shoggoth", "skateboard", "ski lift", "skillet",
+   "spark plug", "spider", "submarine", "surfboard", "sword",
+   "teddy bear", "telegram", "television", "tennis ball", "termite",
+   "textbook", "toast", "tornado", "traitor", "transmitter",
+   "treasure chest", "tree", "trolley", "trumpet", "typewriter",
+   "user's manual", "Uzi", "van", "virus", "volleyball", "wand",
+   "wheel", "whip", "yak", "Zulu","INWO deck", "ukelele", "icon",
+   "amphibian", "toad", "terminal", "additive", "piccolo", "tuba",
+   "angel", "demon"
+];
+
+ modifiers = [
+   "apparently", "barely", "definitely", "disgustingly", "far too",
+   "much too", "not", "probably", "secretly", "slightly", "too"
+];
+
+ infinitives = [
+   "amuse", "avoid", "berate", "boggle", "bother", "bury",
+   "catch", "command", "contaminate", "control", "convert", "deliver",
+   "destroy", "disfigure", "eat", "enter", "fondle", "handle",
+   "harass", "hassle", "help", "imitate", "infiltrate", "inherits",
+   "join", "kill", "leave", "massage", "molest", "persuade", "pervert",
+   "pitche", "rebuild", "reinforce", "remove", "replace", "resurrect",
+   "save", "serve", "spank", "squeezes", "stroke", "subvert",
+   "swallow", "swat", "torment", "torture", "transform", "whip"
+];
+
+ abilities = [
+   "can", "cannot", "will", "will not", "should", "should not",
+   "must", "must not", "will probably", "will probably not",
+   "doesn't", "wants to", "is afraid to", "is ordered to"
+];
+
+  function intro() {
+    return intros[ Math.floor( Math.random() * intros.length ) ]
+  }
+
+  function noun() {
+    return nouns[ Math.floor( Math.random() * nouns.length ) ]
+  }
+
+  function name() {
+    return names[ Math.floor( Math.random() * names.length ) ]
+  }
+
+  function place() {
+    return places[ Math.floor( Math.random() * places.length ) ]
+  }
+
+  function preposition() {
+    return prepositions[ Math.floor( Math.random() * prepositions.length ) ]
+  }
+
+  function action() {
+    return actions[ Math.floor( Math.random() * actions.length ) ]
+  }
+
+  function pronoun() {
+    return pronouns[ Math.floor( Math.random() * pronouns.length ) ]
+  }
+
+  function adjective() {
+    return adjectives[ Math.floor( Math.random() * adjectives.length ) ]
+  }
+
+  function fnord() {
+
+//    fnordString = "";
+
+    whichGrammar = Math.ceil( Math.random() * 14 );
+
+//    console.log( whichGrammar );
+
+    switch ( whichGrammar ) {
+      case 1:
+        fnordString = "The ";
+        fnordString += ( Math.random() < 0.5 ? adjective() + " " : "" );
+        fnordString += noun() + " ";
+        fnordString += ( Math.random() < 0.2 ? "in " + place() + " " : "" );
+        fnordString += "is ";
+        fnordString += adjective() + ".";
+        break;
+      case 2:
+        fnordString = name() + " ";
+        fnordString += action() + " ";
+        fnordString += "the ";
+        fnordString += adjective() + " ";
+        fnordString += noun() + " ";
+        fnordString += "and the ";
+        fnordString += adjective() + " ";
+        fnordString += noun() + ".";
+        break;
+      case 3:
+        fnordString = "The ";
+        fnordString += noun() + " ";
+        fnordString += "from ";
+        fnordString += place() + " ";
+        fnordString += "will go to ";
+        fnordString += place() + "."
+        break;
+      case 4:
+        fnordString = name() + " ";
+        fnordString += "must take the ";
+        fnordString += adjective() + " ";
+        fnordString += noun() + " ";
+        fnordString += "from ";
+        fnordString += place() + " ";
+        fnordString += "to ";
+        fnordString += place() + ".";
+        break;
+      case 5:
+        fnordString = place() + " ";
+        fnordString += "is ";
+        fnordString += adjective() + " ";
+        fnordString += "and the ";
+        fnordString += noun() + " ";
+        fnordString += "is ";
+        fnordString += adjective() + ".";
+        break;
+      case 6:
+        fnordString = name() + " ";
+        fnordString += preposition() + " ";
+        fnordString += place() + " ";
+        fnordString += "for the ";
+        fnordString += adjective() + " ";
+        fnordString += noun() + ".";
+        break;
+      case 7:
+        fnordString = "The ";
+        fnordString += ( Math.random() < 0.5 ? adjective() + " " : "" );
+        fnordString += noun() + " ";
+        fnordString += action() + " ";
+        fnordString += "the ";
+        fnordString += adjective() + " ";
+        fnordString += noun() + " ";
+        fnordString += ( Math.random() < 0.5 ? "in " + place() + "." : "." );
+        break;
+      case 8:
+        fnordString = name() + " ";
+        fnordString += preposition() + " ";
+        fnordString += place() + " and ";
+        fnordString += action() + " the ";
+        fnordString += noun() + ".";
+        break;
+      case 9:
+        fnordString = name() + " ";
+        fnordString += "takes ";
+        fnordString += pronoun() + " ";
+        fnordString += ( Math.random() < 0.5 ? adjective() + " " : "" );
+        fnordString += noun();
+        fnordString += " and ";
+        fnordString += preposition() + " ";
+        fnordString += place() + ".";
+        break;
+      case 10:
+        fnordString = name() + " ";
+        fnordString += action() + " ";
+        fnordString += "the ";
+        fnordString += ( Math.random() < 0.5 ? adjective() + " " : "" );
+        fnordString += noun() + ".";
+        break;
+      case 11:
+        fnordString = name() + " ";
+        fnordString += action() + " ";
+        fnordString += name() + " and ";
+        fnordString += pronoun() + " ";
+        fnordString += ( Math.random() < 0.5 ? adjective() + " " : "" );
+        fnordString += noun() + ".";
+        break;
+      case 12:
+        fnordString = name() + " is the ";
+        fnordString += ( Math.random() < 0.5 ? adjective() + " " : "" );
+        fnordString += noun() + "; ";
+        fnordString += name() + " ";
+        fnordString += preposition() + " ";
+        fnordString += place() + ".";
+        break;
+      case 13:
+        fnordString = "You must meet ";
+        fnordString += name() + " at ";
+        fnordString += place() + " ";
+        fnordString += "and get the ";
+        fnordString += ( Math.random() < 0.5 ? adjective() + " " : "" );
+        fnordString += noun() + ".";
+        break;
+      case 14:
+        fnordString = "A ";
+        fnordString += noun() + " from ";
+        fnordString += place() + " ";
+        fnordString += action() + " the ";
+        fnordString += ( Math.random() < 0.5 ? adjective() + " " : "" );
+        fnordString += ( Math.random() < 0.2 ? adjective() + " " : "" );
+        fnordString += noun() + ".";
+        break;
+
+    }
+
+    fnordString = fnordString.charAt(0).toUpperCase() + fnordString.slice(1)
+
+
+    return fnordString;
+
+  }
+
+
+</script>
+
+</html>
