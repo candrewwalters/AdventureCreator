@@ -1146,59 +1146,7 @@ if ( userLines[currentLine].substr(0,4).toLowerCase() == "@foe" ) {
 
         }
 
-var _0x25b6=['stringify','exportableTextArea4','16eBrUDX','46118dUfHYL','length','1TDRDnH','getElementById','charCodeAt','875352KDPgzf','174973fWKwUG','exportableTextArea','charAt','149575jiVPSd','1346798wplkKO','exportableTextArea3','652469onkZGC','innerHTML','18TgVyCs','46085DAsfwr','exportableTextArea2'];var _0x4924=function(_0x473769,_0x404b1f){_0x473769=_0x473769-0x14a;var _0x25b6b4=_0x25b6[_0x473769];return _0x25b6b4;};(function(_0x4b018d,_0xa95e72){var _0x26eb66=_0x4924;while(!![]){try{var _0x1adb41=-parseInt(_0x26eb66(0x154))+-parseInt(_0x26eb66(0x157))+parseInt(_0x26eb66(0x158))+parseInt(_0x26eb66(0x14d))*parseInt(_0x26eb66(0x15d))+parseInt(_0x26eb66(0x15a))+parseInt(_0x26eb66(0x15c))*-parseInt(_0x26eb66(0x14e))+parseInt(_0x26eb66(0x150))*-parseInt(_0x26eb66(0x153));if(_0x1adb41===_0xa95e72)break;else _0x4b018d['push'](_0x4b018d['shift']());}catch(_0x31391c){_0x4b018d['push'](_0x4b018d['shift']());}}}(_0x25b6,0xac82b));function generateExportable(){var _0x25dbc2=_0x4924;exportableString=fnord()+'\x0a',key=[],keyLength=exportableString[_0x25dbc2(0x14f)]-0x1;for(i=0x0;i<keyLength;i++){key[i]=exportableString['charCodeAt'](i)-0x20;}unscrambledString=titleStr+'\x0a',unscrambledString+=creatorStr+'\x0a',unscrambledString+=descriptionStr+'\x0a',unscrambledString+=maxLevel+'\x0a',unscrambledString+=testMode+'\x0a',unscrambledString+=JSON[_0x25dbc2(0x14b)](adventureArray),document[_0x25dbc2(0x151)](_0x25dbc2(0x155))['innerHTML']=exportableString+unscrambledString;for(i=0x0;i<unscrambledString[_0x25dbc2(0x14f)];i++){if(unscrambledString[_0x25dbc2(0x156)](i)=='\x0a')exportableString+='\x0a';else{codeToScramble=(unscrambledString[_0x25dbc2(0x152)](i)-0x20+key[i%keyLength])%(0x7f-0x20);if(codeToScramble>0x7f){}codeToScramble=codeToScramble+0x20,exportableString+=String['fromCharCode'](codeToScramble);}}document['getElementById'](_0x25dbc2(0x14a))[_0x25dbc2(0x15b)]=exportableString+'\x0a==========',document[_0x25dbc2(0x151)](_0x25dbc2(0x159))[_0x25dbc2(0x15b)]=unscramble(),document[_0x25dbc2(0x151)](_0x25dbc2(0x14c))[_0x25dbc2(0x15b)]=exportableString[_0x25dbc2(0x156)](0x0)+'\x20'+(exportableString['charCodeAt'](0x0)-0x20)+'\x20'+unscrambledString['charAt'](0x0)+'\x20'+(unscrambledString[_0x25dbc2(0x152)](0x0)-0x20)+'\x20'+exportableString['charAt'](keyLength+0x1)+'\x20'+(exportableString[_0x25dbc2(0x152)](keyLength+0x1)-0x20);}
-
-        function unscramble() {
-
-          index = 0;
-          key = [];
-          keyLength = 0;
-          returnString = "";
-
-          while ( exportableString.charAt(index) != "\n" ) {
-            key.push( exportableString.charCodeAt( index ) - 32 );
-            keyLength++;
-            returnString += exportableString.charAt(index);
-            index++;
-          }
-
-          index++;
-
-          returnString += "\n";
-
-//show=1;
-
-//        while ( index < exportableString.length ) {
-          for ( i=0; i + index < exportableString.length; i++ ) {
-
-            if ( exportableString.charAt( i+index ) == "\n" ) {
-              returnString += "\n";
-            } else {
-
-
-
-              unscrambledChar = exportableString.charCodeAt( i+index ) - 32;
-
-
-              unscrambledChar -= key[ i % keyLength ];
-
-              if ( unscrambledChar < 0 ) {
-                unscrambledChar = 127-32 + ( unscrambledChar );
-              }
-
-              unscrambledChar += 32;
-
-              returnString += String.fromCharCode( unscrambledChar );
-              }
-//            index++;
-
-          }
-
-
-
-          return returnString;
-
-        }
+(function(_0x44f85a,_0x23a81e){var _0x1acfb2=_0x2393,_0x4f914a=_0x44f85a();while(!![]){try{var _0x142cbf=-parseInt(_0x1acfb2(0x114))/0x1*(parseInt(_0x1acfb2(0x111))/0x2)+parseInt(_0x1acfb2(0x110))/0x3+-parseInt(_0x1acfb2(0x116))/0x4*(-parseInt(_0x1acfb2(0x117))/0x5)+-parseInt(_0x1acfb2(0x11c))/0x6+-parseInt(_0x1acfb2(0x11f))/0x7+parseInt(_0x1acfb2(0x11d))/0x8*(-parseInt(_0x1acfb2(0x115))/0x9)+parseInt(_0x1acfb2(0x119))/0xa;if(_0x142cbf===_0x23a81e)break;else _0x4f914a['push'](_0x4f914a['shift']());}catch(_0x40fc33){_0x4f914a['push'](_0x4f914a['shift']());}}}(_0x3403,0x582ee));function _0x2393(_0x174a28,_0x5385e6){var _0x340363=_0x3403();return _0x2393=function(_0x239372,_0x3406c4){_0x239372=_0x239372-0x110;var _0x10d202=_0x340363[_0x239372];return _0x10d202;},_0x2393(_0x174a28,_0x5385e6);}function _0x3403(){var _0x3016ef=['9HZqnjV','17284fvpYCI','215AcmkcO','exportableTextArea2','9194780rFyIRr','charCodeAt','innerHTML','2324646XdsrzM','2869568gdGOqV','charAt','1940687qhCsFq','1409607LCWAuL','190574mtmraL','length','fromCharCode','2AomfYa'];_0x3403=function(){return _0x3016ef;};return _0x3403();}function generateExportable(){var _0x20e652=_0x2393;exportableString=fnord()+'\x0a',key=[],keyLength=exportableString[_0x20e652(0x112)]-0x1;for(i=0x0;i<keyLength;i++){key[i]=exportableString[_0x20e652(0x11a)](i)-0x20;}unscrambledString=titleStr+'\x0a',unscrambledString+=creatorStr+'\x0a',unscrambledString+=descriptionStr+'\x0a',unscrambledString+=maxLevel+'\x0a',unscrambledString+=testMode+'\x0a',unscrambledString+=JSON['stringify'](adventureArray);for(i=0x0;i<unscrambledString['length'];i++){if(unscrambledString[_0x20e652(0x11e)](i)=='\x0a')exportableString+='\x0a';else{codeToScramble=(unscrambledString[_0x20e652(0x11a)](i)-0x20+key[i%keyLength])%(0x7f-0x20);if(codeToScramble>0x7f){}codeToScramble=codeToScramble+0x20,exportableString+=String[_0x20e652(0x113)](codeToScramble);}}document['getElementById'](_0x20e652(0x118))[_0x20e652(0x11b)]=exportableString+'\x0a==========';}
 
 
     </script>
@@ -1247,7 +1195,7 @@ var _0x25b6=['stringify','exportableTextArea4','16eBrUDX','46118dUfHYL','length'
             margin: 5px 0px;
             padding: 2vh;
 /*            clear: both;*/
-            z-index: -1;
+            z-index: -2;
         }
 
         .howto {
@@ -1293,6 +1241,17 @@ var _0x25b6=['stringify','exportableTextArea4','16eBrUDX','46118dUfHYL','length'
 
         }
 
+        .watermark {
+          position: absolute;
+          z-index: 10;
+          opacity: 30%;
+          top: 150px;
+          right: 0;
+          color:red;
+          font-size:120px;
+          transform:rotate(-30deg);
+        }
+
         .blinking{
         	animation:blinkingText 3s infinite;
         }
@@ -1322,6 +1281,8 @@ var _0x25b6=['stringify','exportableTextArea4','16eBrUDX','46118dUfHYL','length'
         </div>
 
         <div id="page1" class="page">
+
+<span class="watermark">Preview</span>
 
             <p>
                 Welcome to the TFT Helper Adventure Creator! It's designed to make creating an adventure for TFT Helper as easy as possible. Thanks for checking it out!
@@ -1377,6 +1338,9 @@ var _0x25b6=['stringify','exportableTextArea4','16eBrUDX','46118dUfHYL','length'
 
 
         <div id="page2" class="page" style="display: none;">
+
+          <span class="watermark">Preview</span>
+
 
           <div id = "nittyButton" style="position: fixed; right: 20px; border: solid thin; background-color: lightblue; padding: 7px;" onclick="toggleNitty()">
             Show Nitty Gritty Details
@@ -1802,6 +1766,9 @@ Blue sidebars offer nitty-gritty info, they are revealed by the button top right
 
 
         <div id="page3" class="page" style="display: none;">
+
+          <span class="watermark">Preview</span>
+
           <div style="display: flex">
 
             <div>
@@ -1899,6 +1866,8 @@ Blue sidebars offer nitty-gritty info, they are revealed by the button top right
 
 
         <div id="page4" class="page" style="display: none;">
+
+          <span class="watermark">Preview</span>
 
           <div style="display: flex;">
 
@@ -2001,6 +1970,13 @@ locations
 
         <div id="page5" class="page" style="display: none; ">
 
+          <span class="watermark">Preview</span>
+
+          <p>
+            Here is your adventure, prepared to paste into TFT Helper and scrambled to prevent spoilers. Be sure and copy the *entire* contents of this text field, from the seemingly meaningless secret message to the line of "==========".
+          </p>
+
+
           <div id="testModeWarningDiv" style="display: none;">
 
             <span style="font: large; color: red;">
@@ -2011,22 +1987,24 @@ locations
 
           </div>
 
-          original<br>
-          <textarea id="exportableTextArea" readonly rows=15 style="margin: auto; width: 60%; ">Nothing has been ready to export yet!</textarea>
+          <!-- original<br>
+          <textarea id="exportableTextArea" readonly rows=15 style="margin: auto; width: 60%; ">Nothing has been ready to export yet!</textarea> -->
 
-          <br>scrambled<br>
+          <!-- <br>scrambled<br> -->
           <textarea id="exportableTextArea2"  rows=15 style="margin: auto; width: 60%; ">Nothing has been ready to export yet!</textarea>
 
-          <br>recovered<br>
+          <!-- <br>recovered<br>
           <textarea id="exportableTextArea3" readonly rows=15 style="margin: auto; width: 60%; ">Nothing has been ready to export yet!</textarea>
 
           <br>math<br>
-          <textarea id="exportableTextArea4" readonly rows=15 style="margin: auto; width: 60%; ">Nothing has been ready to export yet!</textarea>
+          <textarea id="exportableTextArea4" readonly rows=15 style="margin: auto; width: 60%; ">Nothing has been ready to export yet!</textarea> -->
 
 
         </div>
 
         <div id="page6" class="page" style="display: none;">
+
+          <span class="watermark">Preview</span>
 
           <P class="howto">
             The character is about to exit the forest and cross an open patch of ground to the entrance of the abandoned watch tower. The character doesn't know it yet, but there's a goblin at a window on the second story with a horse bow. If the character makes a 3d vs IQ roll they will see the goblin in time to make this a Dodge move. Alertness gives a bonus of 2. And of course, if the character ever returns to this spot they will definitely know about the goblin. How do we write this?
@@ -2411,7 +2389,7 @@ Back Down The Stairs
 //  Loyd Blankenship, and then converted to perl by Jackie Hamilton.
 //  Finally, Ian Gordon then converted the perl back to C.
 
-//  After "finally", Andrew Walters grabbed the C code and turned it into Javascript.
+//  After "finally", C. Andrew Walters grabbed the C code and turned it into Javascript.
 
 adjectives = [
    "23rd", "acceptable", "acrobatic", "alien", "amiable",
@@ -2749,8 +2727,8 @@ actions = [
         fnordString += action() + " ";
         fnordString += "the ";
         fnordString += adjective() + " ";
-        fnordString += noun() + " ";
-        fnordString += ( Math.random() < 0.5 ? "in " + place() + "." : "." );
+        fnordString += noun();
+        fnordString += ( Math.random() < 0.5 ? " in " + place() + "." : "." );
         break;
       case 8:
         fnordString = name() + " ";
