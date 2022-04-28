@@ -8,1147 +8,7 @@
     </head>
 
     <script>
-    // How to spell check finished HTML
-    // document.body.contentEditable = true;
-    // document.designMode = 'on';
-
-//        Establish Variables
-
-        function initializeApp() {
-
-            document.getElementById("tab1").className += " active";
-            testMode = 0;
-
-            setCurrentTime();
-
-            setInterval( setCurrentTime, 60000 );
-
-            comparators = [
-              "<",
-              ">",
-              "<=",
-              "=<",
-              ">=",
-              "=>",
-              "=",
-              "==",
-              "===",
-              "vs"
-            ];
-
-            armorTypes = [
-              "none",
-              "cloth",
-              "leather",
-              "chainmail",
-              "half plate",
-              "plate armor",
-              "fine plate",
-            ];
-
-            nitty = 0;
-            nittyParagraphs = document.getElementsByClassName('nitty');
-
-            successDestination="";
-            failureDestination="";
-
-            document.getElementById("userInputTextArea").value = localStorage.getItem( "userAdventure" );
-
-            reviewUserInput();
-
-        }
-
-        function toggleNitty() {
-
-          if ( nitty ) {
-            nitty = 0;
-//            for ( i in nittyParagraphs ) nittyParagraphs[i].style.display='none';
-              for ( i=0; i<nittyParagraphs.length; i++ ) {
-              nittyParagraphs[i].style.display='none';
-            }
-            document.getElementById("nittyButton").innerHTML = "Show Nitty Gritty";
-          } else {
-            nitty = 1;
-
-            // for ( i in nittyParagraphs ) { console.log(i); nittyParagraphs[i].style.display='block'; }
-
-            for ( i=0; i<nittyParagraphs.length; i++ ) {
-              nittyParagraphs[i].style.display='block';
-            }
-
-            document.getElementById("nittyButton").innerHTML = "Hide Nitty Gritty";
-
-          }
-
-
-        }
-
-        function showHelp(){
-
-            document.getElementById("helpDiv").style.display="block";
-
-        }
-        // function hideHelp(){
-        //
-        //     document.getElementById("helpDiv").style.display="none";
-        //
-        //}
-        function showSaveAdvice(){
-
-            document.getElementById("saveAdviceDiv").style.display="block";
-
-        }
-        // function hideSaveAdvice(){
-        //
-        //     document.getElementById("saveAdviceDiv").style.display="none";
-        //
-        // }
-        function showTestModeAdvice(){
-
-            document.getElementById("testModeAdviceDiv").style.display="block";
-
-        }
-        // function hideTestModeAdvice(){
-        //
-        //     document.getElementById("testModeAdviceDiv").style.display="none";
-        //
-        // }
-        function showSpecials(){
-
-            document.getElementById("specialsHelpDiv").style.display="block";
-
-        }
-        // function hideSpecials(){
-        //
-        //     document.getElementById("specialsHelpDiv").style.display="none";
-        //
-        // }
-        function showTypes(){
-
-            document.getElementById("typesHelpDiv").style.display="block";
-
-        }
-        // function hideTypes(){
-        //
-        //     document.getElementById("typesHelpDiv").style.display="none";
-        //
-        // }
-        function showComparisons(){
-
-            document.getElementById("comparisonsHelpDiv").style.display="block";
-
-        }
-        // function hideComparisons(){
-        //
-        //     document.getElementById("comparisonsHelpDiv").style.display="none";
-        //
-        // }
-
-        function showEgg( eggName ) {
-          hideAll();
-          document.getElementById( eggName ).style.display="block";
-        }
-
-        function gimmeFnord() {
-
-          document.getElementById( 'illuminatiDiv' ).innerHTML = fnord();
-
-        }
-
-        function hideAll() {
-          // hideHelp();
-          // hideSaveAdvice();
-          // hideTestModeAdvice();
-          // hideTypes();
-          // hideComparisons();
-          // hideSpecials();
-
-          itemsToHide = document.getElementsByClassName("hideMe");
-          for ( i=0; i < itemsToHide.length; i++ ) {
-
-            itemsToHide[i].style.display="none";
-
-          }
-
-
-        }
-
-        function addLineNumbers() {
-
-            originalLines = document.getElementById("userInput").value.split("\n");
-
-            outputString = "";
-
-
-            for ( i = 0; i < originalLines.length; i++ ) {
-
-                outputString += "<" + (i+1) + ">" + originalLines[i] +"\n";
-
-            }
-
-            document.getElementById("userInput").value = outputString;
-
-        }
-
-        function removeLineNumbers() {
-
-
-        }
-
-        function enterTemplate() {
-
-            document.getElementById("userInputTextArea").value = document.getElementById("basicTemplate").innerText;
-        }
-
-        function enterBetterTemplate() {
-
-            document.getElementById("userInputTextArea").value = document.getElementById("betterTemplate").innerText;
-        }
-
-        function showPage( pageToShow ) {
-
-          if ( document.getElementById( "page3" ).style.display == "block"  && pageToShow != 3 ) {
-
-            saveLocal();
-
-          }
-
-
-            for ( i=1; i<7; i++ ) {
-
-                document.getElementById( "page" + i ).style.display="none";
-
-            }
-
-
-            document.getElementById( "page" + pageToShow ).style.display="block";
-
-              tablinks = document.getElementsByClassName("tabButton");
-              for (i = 0; i < tablinks.length; i++) {
-                tablinks[i].className = tablinks[i].className.replace(" active", "");
-              }
-              event.currentTarget.className += " active";
-
-        }
-
-        function reviewUserInput() {
-
-          adventureArray = [];
-
-          document.getElementById("locationsDiv").innerHTML = "";
-
-          userLines = document.getElementById("userInputTextArea").value.split("\n");
-
-          reviewResults = "";
-          problemsFound = 0;
-
-          titleStr="";
-          multTitleWarn = 0;
-
-          creatorStr="";
-          multCreatorWarn = 0;
-
-          descriptionStr="";
-          multDescriptionWarn = 0;
-
-          testMode = 0;
-          multTestWarn = 0;
-
-          maxLevel = 0;
-          multMaxLevelWarn = 0;
-
-          firstLocation = "";
-
-          placesWeTryToGo = [];
-          placesWeCanGo = [];
-
-
-          for ( currentLine=0; currentLine < userLines.length; currentLine++ ) {
-
-            figuredThisLineOut = 0;
-
-            // TITLE check
-            if ( userLines[currentLine].substr(0,6).toLowerCase() == "@title" ) {
-
-              figuredThisLineOut = 1;
-
-              if ( titleStr == "" ) {
-
-                titleStr = userLines[currentLine].substring( 7, userLines[currentLine].length );
-
-                if ( titleStr.length > 30 ) {
-
-                  titleStr = titleStr.substr( 0, 30 );
-
-                  reviewResults += "The title is " + titleStr.length + " characters long, and will be truncated to \"" + titleStr + "\" (30 characters).<br>";
-                }
-              } else {
-                if ( multTitleWarn == 0 ) {
-                  multTitleWarn = 1;
-                  reviewResults += "There is more than one @title line, only the first will be used.<br>";
-                }
-              }
-            }
-
-            // CREATOR check
-            if ( userLines[currentLine].substr(0,8).toLowerCase() == "@creator" ) {
-
-              figuredThisLineOut = 1;
-
-              if ( creatorStr == "" ) {
-
-                creatorStr = userLines[currentLine].substring( 9, userLines[currentLine].length );
-
-                if ( creatorStr.length > 30 ) {
-
-                  creatorStr = creatorStr.substr( 0, 30 );
-
-                  reviewResults += "The creator line is " + creatorStr.length + " characters long, and will be truncated to \"" + creatorStr + "\" (30 characters).<br>";
-                }
-              } else {
-                if ( multCreatorWarn == 0 ) {
-                  multCreatorWarn = 1;
-                  reviewResults += "There is more than one @creator line, only the first will be used.<br>";
-                }
-              }
-            }
-
-            // DESCRIPTION check
-            if ( userLines[currentLine].substr(0,12).toLowerCase() == "@description" ) {
-
-              figuredThisLineOut = 1;
-
-              if ( descriptionStr == "" ) {
-
-                descriptionStr = userLines[currentLine].substring( 13, userLines[currentLine].length );
-
-                if ( descriptionStr.length > 30 ) {
-
-                  descriptionStr = descriptionStr.substr( 0, 30 );
-
-                  reviewResults += "The description line is " + descriptionStr.length + " characters long, and will be truncated to \"" + descriptionStr + "\" (30 characters).<br>";
-                }
-              } else {
-                if ( multDescriptionWarn == 0 ) {
-                  multDescriptionWarn = 1;
-                  reviewResults += "There is more than one @description, only the first will be used.<br>";
-                }
-              }
-            }
-
-            // TEST MODE check
-            if ( userLines[currentLine].substr(0,9).toLowerCase() == "@testmode" ) {
-
-              figuredThisLineOut = 1;
-
-              if ( testMode == 0 ) {
-
-                testMode = 1;
-
-              } else {
-                if ( multTestWarn == 0 ) {
-                  multTestWarn = 1;
-                  reviewResults += "Test mode is activated more than once, be sure to remove them all when the time comes to share your creation.<br>";
-                }
-              }
-            }
-
-            // MAX LEVEL check
-            if ( userLines[currentLine].substr(0,9).toLowerCase() == "@maxlevel" ) {
-
-              figuredThisLineOut = 1;
-
-              if ( maxLevel == 0 ) {
-
-                maxLevel = parseInt( userLines[currentLine].substring( 10, userLines[currentLine].length ) );
-
-                if ( maxLevel < 30 ) {
-                  reviewResults += "Basic characters in The Fantasy Trip start with 32 attribute points, except for Halflings who start with 30. Your max level is lower than this. You should consider designing your adventure for characters between 32 and 38 attribute points.<br>";
-                } else if ( maxLevel > 40 ) {
-                  reviewResults += "Characters with over 40 attribute points are very powerful and will probably require more rules than are implemented in TFT Helper. You should consider designing your adventure for characters between 32 and 38 attribute points.<br>";
-                }
-
-              } else {
-                if ( multMaxLevelWarn == 0 ) {
-                  multMaxLevelWarn = 1;
-                  reviewResults += "Max level is set more than once. Only the first entry will be used.<br>";
-                }
-              }
-            }
-
-            // Are we starting a location? We build a new entry for the adventureArray
-            if ( userLines[currentLine].substr(0,9).toLowerCase() == "@location" ) {
-
-              figuredThisLineOut = 1;
-
-              locationNameString = userLines[currentLine].substr(10,userLines[currentLine].length).toLowerCase();
-
-              if ( placesWeCanGo.indexOf(locationNameString) > -1 ) {
-                reviewResults += "Problem: There is more than one location, branch, or foe named '" + locationNameString + "'.<br>";
-                problemsFound++;
-              } else {
-                  placesWeCanGo.push( locationNameString );
-              }
-
-              if ( firstLocation == "" ) {
-                firstLocation = locationNameString;
-              }
-
-//              console.log( locationNameString );
-
-              thisLocation = {
-                type: "l",
-                name: locationNameString,
-                toDo: [],
-                html: "",
-                writing: ""
-              };
-
-
-              newLocationButton  = "<span onclick='adventureGo(";
-              newLocationButton += '\"' + locationNameString + '\"';
-              newLocationButton += ")''>" + locationNameString + "</span><br>";
-
-              document.getElementById("locationsDiv").innerHTML += newLocationButton;
-
-              while ( currentLine < userLines.length - 1
-                && userLines[currentLine + 1].substr(0,9).toLowerCase() != "@location"
-                && userLines[currentLine + 1].substr(0,7).toLowerCase() != "@branch"
-                && userLines[currentLine + 1].substr(0,4).toLowerCase() != "@foe" ) {
-
-                  if ( userLines[currentLine + 1].substr(0,7).toLowerCase() == "@button" ) {
-
-                    buttonDestination = userLines[currentLine + 1].substring( 8, userLines[ currentLine + 1 ].length).toLowerCase();
-
-                    if ( userLines.length > currentLine + 2 ) {
-
-                      buttonText = userLines[ currentLine + 2 ].substr(0,35);
-                      if ( userLines[ currentLine + 2 ].length > 35 ) {
-                        reviewResults += "Button text on line " + (currentLine + 1) + " is over 35 characters and will be truncated to '" + buttonText + "'.<br>";
-                      } else if ( buttonText.trim().length == 0 ) {
-                        reviewResults += "Button text on line " + (currentLine + 1) + " has no label. That will work but it's going to be confusing.<br>";
-                      }
-                    }
-
-                    placesWeTryToGo.push( "l^" + thisLocation.name + "^" + buttonDestination );
-
-                    buttonString = "<div class='adventureButton' onclick = 'adventureGo(";
-                    buttonString += '"' + buttonDestination + '"';
-                    buttonString += ")'>" + buttonText;
-                    buttonString += "</div>";
-
-                    thisLocation.html += buttonString;
-
-                    currentLine += 1;
-
-                  } else if ( userLines[currentLine + 1].substr(0,8) == "@writing" ) {
-                    thisLocation.writing = userLines[currentLine + 1].substr(9,999)
-                  } else if ( userLines[currentLine + 1].substr(0,1) == "^" ) {
-                    // variable change becomes a "toDo"
-                    thisLocation.toDo.push( userLines[currentLine + 1] );
-                  } else {
-                    thisLocation.html += userLines[currentLine + 1] + "<br>";
-                  }
-
-
-                  currentLine += 1;
-
-//                  console.log('End of While loop: ' + currentLine + userLines[currentLine].substr(0,10) );
-
-              } //end of for loop WITHIN LOCATION
-
-              if ( thisLocation.html == "" ) {
-                reviewResults += "Problem: The location " + locationNameString + " has no description.<br>";
-                problemsFound++;
-              }
-
-              adventureArray.push( thisLocation );
-
-            }  // end of parsing LOCATION
-
-
-
-            // Are we starting a branch? We build a new entry for the adventureArray (parse branch)
-            if ( userLines[currentLine].substr(0,7).toLowerCase() == "@branch" ) {
-
-              figuredThisLineOut = 1;
-
-              locationNameString = userLines[currentLine].substr(8,userLines[currentLine].length).toLowerCase();
-
-              if ( placesWeCanGo.indexOf(locationNameString) > -1 ) {
-                reviewResults += "Problem: There is more than one location or branch named '" + locationNameString + "'.<br>";
-                problemsFound++;
-              } else {
-                  placesWeCanGo.push( locationNameString );
-              }
-
-
-              thisLocation = {
-                type: "b",
-                name: locationNameString,
-                toDo: [],
-                bonuses: [],
-                description: "",
-                firstExpression: "",
-                secondExpression: "",
-                comparator: "",
-                successdestination: "",
-                failDestination: "",
-              };
-
-
-              newLocationButton  = "<span onclick='adventureGo(";
-              newLocationButton += '\"' + locationNameString + '\"';
-              newLocationButton += ")''>(branch)" + locationNameString + "</span><br>";
-
-              document.getElementById("locationsDiv").innerHTML += newLocationButton;
-
-              while ( currentLine < userLines.length - 1
-                && userLines[currentLine + 1].substr(0,9).toLowerCase() != "@location"
-                && userLines[currentLine + 1].substr(0,7).toLowerCase() != "@branch"
-                && userLines[currentLine + 1].substr(0,4).toLowerCase() != "@foe" ) {
-
-                  if ( userLines[currentLine + 1].substr(0,7).toLowerCase() == "@bonus" ) {
-
-                    //TODO parse bonuses
-
-                  } else if ( userLines[currentLine + 1].substr(0,19).toLowerCase() == "@successdestination" ) {
-
-                    if ( thisLocation.successdestination == "" ) {
-
-                      thisLocation.successDestination = userLines[currentLine + 1].substr(20,999).toLowerCase();
-
-                      placesWeTryToGo.push( "b^" + thisLocation.name + "^" + thisLocation.successDestination );
-
-                    } else {
-                      reviewResults += "The branch named " + locationNameString + " has more than one successDestination; only the first will be used.<br>";
-                    }
-
-                  } else if ( userLines[currentLine + 1].substr(0,16).toLowerCase() == "@faildestination" ) {
-
-                      if ( thisLocation.failDestination == "" ) {
-
-                        thisLocation.failDestination = userLines[currentLine + 1].substr(17,999).toLowerCase();
-
-                        placesWeTryToGo.push( "b^" + thisLocation.name + "^" + thisLocation.failDestination );
-
-                      } else {
-                        reviewResults += "The branch named " + locationNameString + " has more than one failDestination; only the first will be used.<br>";
-                      }
-
-                  } else { // must be the comparison line or description
-
-                    if ( thisLocation.firstExpression + thisLocation.secondExpression + thisLocation.comparator == "" ) {
-
-                      for ( i=0; i<comparators.length; i++ ) {
-                        whereIsIt = userLines[currentLine + 1].indexOf( comparators[i] );
-                        if ( whereIsIt > -1 ) {
-                          if ( comparators[i] == "vs" ) {
-                            thisLocation.comparator = "<=";
-                          } else {
-                            thisLocation.comparator = comparators[i];
-                          }
-                          thisLocation.firstExpression = userLines[currentLine+1].substr(0,whereIsIt).trim();
-
-                          thisLocation.secondExpression = userLines[currentLine+1].substr(whereIsIt+comparators[i].length,999).trim();
-
-                          break;
-                        }
-                      }
-
-                    } else if ( userLines[currentLine + 1].trim().length > 0 ) {
-
-                      if ( thisLocation.description == "" ) {
-
-                        thisLocation.description = userLines[currentLine + 1];
-
-                      } else {
-
-                        reviewResults += "The branch named " + locationNameString + " has an extraneous line (\"" + userLines[currentLine + 1] + "\").<br>";                    }
-
-                      }
-
-                  }
-
-                  currentLine += 1;
-
-                }  // end of while-loop for branch contents
-
-
-//                console.log ( thisLocation );
-
-                if ( thisLocation.successDestination == "" ) {
-                  reviewResults += "Problem: The branch named " + locationNameString + " has no @successDestination.<br>";
-                  problemsFound++;
-                }
-                if ( thisLocation.failDestination == "" ) {
-
-                  reviewResults += "Problem: The branch named " + locationNameString + " has no @failDestination.<br>";
-                  problemsFound++;
-                }
-                if ( thisLocation.faildestination == thisLocation.successdestination ) {
-                  reviewResults += "The branch named " + locationNameString + " has the same destination for true and false; this will work, but is probably not what you want.<br>";
-                  problemsFound++;
-                }
-
-                if ( thisLocation.firstExpression + thisLocation.secondExpression + thisLocation.comparator == "" ) {
-                  reviewResults += "Problem: The branch named " + locationNameString + " doesn't have a comparison line.<br>";
-                  problemsFound++;
-                }
-
-                if ( thisLocation.firstExpression == "" ||  thisLocation.secondExpression == "" ||  thisLocation.comparator == "" ) {
-                  reviewResults += "Problem: The branch named " + locationNameString + " has an unreadable comparison line.<br>";
-                  problemsFound++;
-                }
-
-
-                adventureArray.push( thisLocation );
-
-            }  // end of if-its-a-branch  parsing branch
-//***
-// Parsing Foe
-if ( userLines[currentLine].substr(0,4).toLowerCase() == "@foe" ) {
-
-  figuredThisLineOut = 1;
-
-  locationNameString = userLines[currentLine].substr(5,userLines[currentLine].length).toLowerCase();
-
-  if ( placesWeCanGo.indexOf(locationNameString) > -1 ) {
-    reviewResults += "Problem: There is more than one location, branch, or foe named '" + locationNameString + "'.<br>";
-    problemsFound++;
-  } else {
-      placesWeCanGo.push( locationNameString );
-  }
-
-
-  thisLocation = {
-    type: "f",
-    name: locationNameString,
-    foeName: "",
-    combatIntro: "",
-    toDo: [],
-    st: 0,
-    dx: 0,
-    iq: 0,
-    ma: 0,
-    armor: 0,
-    damage: "",
-    damage2: "",
-    foeType: 0,
-    winDestination: "",
-    loseDestination: "",
-    noFoe: ""
-  };
-
-
-  newLocationButton  = "<span onclick='adventureGo(";
-  newLocationButton += '\"' + locationNameString + '\"';
-  newLocationButton += ")''>(foe)" + locationNameString + "</span><br>";
-
-  document.getElementById("locationsDiv").innerHTML += newLocationButton;
-
-  while ( currentLine < userLines.length - 1
-    && userLines[currentLine + 1].substr(0,9).toLowerCase() != "@location"
-    && userLines[currentLine + 1].substr(0,7).toLowerCase() != "@branch"
-    && userLines[currentLine + 1].substr(0,4).toLowerCase() != "@foe" ) {
-
-      if ( userLines[currentLine + 1].substr(0,15).toLowerCase() == "@windestination" ) {
-
-        if ( thisLocation.winDestination == "" ) {
-
-          thisLocation.winDestination = userLines[currentLine + 1].substr(16,999).toLowerCase();
-
-          placesWeTryToGo.push( "f^" + thisLocation.name + "^" + thisLocation.winDestination );
-
-        } else {
-          reviewResults += "The foe named " + locationNameString + " has more than one winDestination; only the first will be used.<br>";
-        }
-
-      } else if ( userLines[currentLine + 1].substr(0,16).toLowerCase() == "@losedestination" ) {
-
-          if ( thisLocation.loseDestination == "" ) {
-
-            thisLocation.loseDestination = userLines[currentLine + 1].substr(17,999).toLowerCase();
-
-            placesWeTryToGo.push( "b^" + thisLocation.name + "^" + thisLocation.loseDestination );
-
-          } else {
-            reviewResults += "The foe named " + locationNameString + " has more than one loseDestination; only the first will be used.<br>";
-          }
-
-      } else if ( userLines[currentLine + 1].substr(0,6).toLowerCase() == "@nofoe" ) {
-
-          if ( thisLocation.noFoe == "" ) {
-
-            thisLocation.noFoe = userLines[currentLine + 1].substr(7,999).toLowerCase();
-
-            placesWeTryToGo.push( "b^" + thisLocation.name + "^" + thisLocation.noFoe );
-
-          } else {
-            reviewResults += "The foe named " + locationNameString + " has more than one @nofoe; only the first will be used.<br>";
-          }
-
-      } else if ( userLines[currentLine + 1].substr(0,5).toLowerCase() == "@type" ) {
-
-          if ( thisLocation.foeType == 0 ) {
-
-            thisLocation.foeType = parseInt( userLines[currentLine + 1].substr(6,8) );
-
-            thisLocation.foeName = userLines[currentLine + 2].substr( 0, 15 );
-
-            currentLine++;
-
-          } else {
-            reviewResults += "The foe named " + locationNameString + " has more than one foeType; only the first will be used.<br>";
-          }
-
-      } else if ( thisLocation.st == 0 && userLines[currentLine + 1].substr(0,2).toLowerCase() == "st" && userLines[currentLine + 1].toLowerCase().indexOf(", dx") > 0 ) {
-
-        statArray = userLines[currentLine + 1].split(",");
-        thisLocation.st = parseInt( statArray[0].substr(3,99) );
-        thisLocation.dx = parseInt( statArray[1].substr(3,99) );
-        thisLocation.iq = parseInt( statArray[2].substr(3,99) );
-        thisLocation.ma = parseInt( statArray[3].substr(3,99) );
-
-        if ( thisLocation.st < 1 || thisLocation.st > 19 ) {
-          reviewResults += "The foe named " + locationNameString + " has an unexpected value for ST. Consider using 1-19.<br>";
-          if ( thisLocation.st < 0 ) {
-            thisLocation.st = 0;
-          }
-        }
-
-        if ( thisLocation.dx < 1 || thisLocation.dx > 19 ) {
-          reviewResults += "The foe named " + locationNameString + " has an unexpected value for DX. Consider using 1-19.<br>";
-          if ( thisLocation.dx < 0 ) {
-            thisLocation.dx = 0;
-          }
-        }
-
-        if ( thisLocation.iq < 1 || thisLocation.iq > 19 ) {
-          reviewResults += "The foe named " + locationNameString + " has an unexpected value for IQ. Consider using 1-19.<br>";
-          if ( thisLocation.iq < 0 ) {
-            thisLocation.iq = 0;
-          }
-        }
-
-        if ( thisLocation.ma < 1 || thisLocation.ma > 19 ) {
-          reviewResults += "The foe named " + locationNameString + " has an unexpected value for MA. Consider using 1-19.<br>";
-          if ( thisLocation.ma < 0 ) {
-            thisLocation.ma = 0;
-          }
-        }
-
-      } else if ( userLines[currentLine + 1].substr(0,6).toLowerCase() == "armor:" ) {
-
-        thisArmor = userLines[currentLine + 1].substr( 7, 99 ).toLowerCase();
-
-        if ( thisArmor.trim().length == 0 ) {
-
-          thisLocation.armor = 0;
-
-        } else {
-
-          armorFound = armorTypes.indexOf( thisArmor );
-          armorValue = parseInt( thisArmor );
-
-          if ( armorFound > -1 ) {
-
-            thisLocation.armor = armorFound;
-
-
-          } else if ( isNaN( armorValue ) ) {
-
-            reviewResults += "Problem: The foe named " + locationNameString + " has unreadable armor ('" + thisArmor + "').<br>";
-
-            problemsFound++;
-
-          } else {
-//console.log('hi'+armorValue);
-            thisLocation.armor = armorValue;
-//console.log(thisLocation.armor);
-            if ( armorValue < 0 || armorValue > 10 ) {
-              reviewResults += "The foe named " + locationNameString + " has an unexpected value for Amror. Consider using 0-10.<br>";
-              if ( armorValue < 0 ) {
-                thisLocation.armor = 0;
-              }
-            }
-          }
-        }
-
-      } else if ( userLines[currentLine + 1].substr(0,8).toLowerCase() == "weapons:" ) {
-
-        if ( thisLocation.damage != "" ) {
-
-          reviewResults += "The foe named " + locationNameString + " seems to have an extra Weapons line('"+userLines[currentLine + 1]+"').<br>";
-
-        } else {
-
-          weaponsDamageMaybe = userLines[currentLine + 1].split("(");
-          if ( weaponsDamageMaybe.length > 1 ) {
-
-              thisLocation.damage = weaponsDamageMaybe[1].split(")")[0]
-
-            if ( weaponsDamageMaybe.length > 2) {
-
-              thisLocation.damage2 = weaponsDamageMaybe[2].split(")")[0]
-
-            }
-          }
-
-          // TODO sanity check those strings
-
-        }
-
-      } else if ( userLines[currentLine + 1].substr(0,19).toLowerCase() == "attacks and damage:" ) {
-
-        if ( thisLocation.damage != "" ) {
-
-          // we'll ignore this because we found at least one weapon
-
-        } else {
-
-          weaponsDamageMaybe = userLines[currentLine + 1].split("(");
-          if ( weaponsDamageMaybe.length > 1 ) {
-
-              thisLocation.damage = weaponsDamageMaybe[1].split(")")[0]
-
-            if ( weaponsDamageMaybe.length > 2) {
-
-              thisLocation.damage2 = weaponsDamageMaybe[2].split(")")[0]
-
-            }
-          } else {
-            reviewResults += "The foe named " + locationNameString + " doesn't seem to have any weapons or attacks (remember damage should be in parenthesis, eg \"(1d+1)\").<br>";
-          }
-
-          // TODO sanity check those strings
-
-        }
-
-      } else if ( userLines[currentLine + 1].indexOf( ", age" ) > -1
-          || userLines[currentLine + 1].substr(0,8).toLowerCase() == "talents:"
-          || userLines[currentLine + 1].substr(0,7).toLowerCase() == "spells:"
-          || userLines[currentLine + 1].substr(0,10).toLowerCase() == "equipment:"
-          || userLines[currentLine + 1].substr(0,13).toLowerCase() == "special note:" ) {
-          // || userLines[currentLine + 2].toLowerCase().indexOf(', age') > -1 ) {
-
-        // this is the race and age, we ignore it
-        // and these others
-
-      } else if ( userLines[currentLine].substr(0,4).toLowerCase() == "@foe" ) {
-
-        // if it makes no other sense and it's the second line, it's the combat intro
-        thisLocation.combatIntro = userLines[currentLine + 1];
-
-      }  else if ( userLines[currentLine + 1].trim().length > 0 ) {
-          reviewResults += "The foe named " + locationNameString + " has an extraneous line('"+userLines[currentLine + 1]+"').<br>";
-
-      }
-
-      currentLine += 1;
-
-    } // end of while loop within foe
-
-//      currentLine += 1;
-
-      adventureArray.push( thisLocation );
-
-  }  // end of foe parser
-
-
-//IS THIS IT?    }  // end of while-loop for userInputTextArea
-
-
-//                console.log ( thisLocation );
-
-    // if ( thisLocation.successdestination == "" ) {
-    //   reviewResults += "Problem: The branch named " + locationNameString + " has no @successdestination.<br>";
-    //   problemsFound++;
-    // }
-    // if ( thisLocation.faildestination == "" ) {
-    //   reviewResults += "Problem: The branch named " + locationNameString + " has no @faildestination.<br>";
-    //   problemsFound++;
-    // }
-    // if ( thisLocation.faildestination == thisLocation.successdestination ) {
-    //   reviewResults += "The branch named " + locationNameString + " has the same destination for true and false; this will work, but is probably not what you want.<br>";
-    //   problemsFound++;
-    // }
-    //
-    // if ( thisLocation.firstExpression + thisLocation.secondExpression + thisLocation.comparator == "" ) {
-    //   reviewResults += "Problem: The branch named " + locationNameString + " doesn't have a comparison line.<br>";
-    //   problemsFound++;
-    // }
-
-
-//***
-
-
-            if ( figuredThisLineOut == 0 && userLines[currentLine].trim().length > 0 ) {
-              reviewResults += "Line number " + currentLine + " doesn't seem to make sense. Possibly a key word is misspelled or another line is out of place. (" + userLines[currentLine] + ")<br>";
-
-            }
-
-//            console.log('End of For loop: ' + currentLine + userLines[ currentLine ].substr( 0, 10 ) );
-
-
-          }  // end of userLines[currentLine] for loop
-
-          // We're done with the user input lines, time to look for problems
-
-
-          //check if no title
-          if ( titleStr == "" ) {
-            reviewResults += "Problem: You need a @title line for your adventure.<br>";
-            problemsFound++;
-          }
-
-          //check if no creator
-          if ( creatorStr == "" ) {
-            reviewResults += "Problem: You need a @creator line for your adventure.<br>";
-            problemsFound++;
-          }
-
-          //check if no description
-          if ( descriptionStr == "" ) {
-            reviewResults += "Problem: You need a @description line for your adventure.<br>";
-            problemsFound++;
-          }
-
-          //check if no max level
-          if ( maxLevel == 0 ) {
-            reviewResults += "You didn't specify a @maxlevel for this adventure, so we'll assume the adventure is for starting characters (32 attribute points).<br>";
-            maxLevel = 32;
-          }
-
-          nodeNames=[];
-
-          for ( i = 0; i < placesWeTryToGo.length; i++ ) {
-
-            destinationArray = placesWeTryToGo[i].split("^");
-
-            nodeNames.push(destinationArray[2]);
-
-            if ( placesWeCanGo.indexOf( destinationArray[2] ) < 0 ){
-              reviewResults += "Problem: There is a ";
-              reviewResults += ( destinationArray[0] == "l" ? "button in the location " : "branch " );
-              reviewResults += "named '" + destinationArray[1];
-              reviewResults += "' that should lead to '";
-              reviewResults += destinationArray[2];
-              reviewResults += "' but there is no location with that name.<br>";
-              problemsFound++;
-            }
-
-          }
-
-          for ( i = 0; i < placesWeCanGo.length; i++ ) {
-
-            if ( nodeNames.indexOf(placesWeCanGo[i]) < 0 ){
-              reviewResults +="There is a location called ''" + placesWeCanGo[i] + "'' but nothing leads to that location.<br>";
-            }
-
-          }
-
-          document.getElementById("feedbackTextArea").innerHTML = reviewResults;
-          document.getElementById("problemCountDiv").innerHTML = "Problems found: " + problemsFound + "<br>";
-
-          if ( problemsFound > 0 ) {
-            document.getElementById("problemCountDiv").innerHTML += "While there are problems you will not be able to use the simulator or export your adventure.<br><br>";
-          }
-
-//          console.log(testMode);
-
-          if ( testMode == 1 ) {
-            document.getElementById("testModeWarningDiv").style.display = "block";
-          } else {
-            document.getElementById("testModeWarningDiv").style.display = "none";
-          }
-
-          if ( problemsFound == 0 ) {
-            adventureGo( firstLocation );
-            generateExportable();
-          } else {
-            document.getElementById("simulatedScreen").innerHTML = "You need to fix the problems listed at the bottom of the 'Edit & Review' tab before the simulator will work.";
-          }
-
-
-
-        }  //end of reviewUserInput()
-
-        function adventureGo( locName ) {
-
-          if ( problemsFound > 0 ) {
-            return;
-          }
-
-          newLoc = adventureArray.find( locn => locn.name === locName );
-
-          switch ( newLoc.type ) {
-            case "l":
-              // presenting location
-
-
-              if ( newLoc.writing != "" ) {
-                newHTML = newLoc.html.substr(0,newLoc.html.indexOf("<div"));
-                newHTML += "<span style=\"background-color: lightgrey;\">Characters with Literacty will also see: \"The writing says " + newLoc.writing + "\"</span>";
-                newHTML +=  newLoc.html.substr(newLoc.html.indexOf("<div"),9999);
-              } else {
-                newHTML = newLoc.html;
-              }
-
-              document.getElementById("simulatedScreen").innerHTML = newHTML;
-              break;
-            case "b":
-            // presenting branch
-
-            successDestination = newLoc.successDestination;
-            failureDestination = newLoc.failDestination;
-
-            document.getElementById("dryrunDiv").style.display = "block";
-
-            document.getElementById("dryrunInfoDiv").innerHTML = "You have run into a branch with the following condition:<br><br>";
-
-            document.getElementById("dryrunInfoDiv").innerHTML += "<span style='background-color: ghostwhite; border: solid thin; padding: 4px;'>" + newLoc.firstExpression + "</span>&nbsp;&nbsp;";
-            document.getElementById("dryrunInfoDiv").innerHTML += "<span style='background-color: ghostwhite; border: solid thin; padding: 4px;'>" + newLoc.comparator + "</span>&nbsp;&nbsp;";
-            document.getElementById("dryrunInfoDiv").innerHTML += "<span style='background-color: ghostwhite; border: solid thin; padding: 4px;'>" + newLoc.secondExpression + "</span><br><br>";
-
-            document.getElementById("dryrunInfoDiv").innerHTML += "Which pathway do you want to follow?<br><br>";
-
-            document.getElementById("dryrunInfoDiv").innerHTML += "<br><br><br>";
-
-
-            // document.getElementById("successButton").onclick = "document.getElementById('dryrunDiv').style.display = 'none';adventureGo(" + newLoc.successdestination + ") ";
-            //
-            // document.getElementById("failureButton").onclick = "document.getElementById('dryrunDiv').style.display = 'none';adventureGo(" + newLoc.faildestination + ") ";
-
-
-              break;
-            case "f":
-              // presenting foe
-
-              successDestination = newLoc.winDestination;
-              failureDestination = newLoc.loseDestination;
-
-
-              document.getElementById("combatDiv").style.display = "block";
-
-              document.getElementById("combatInfoDiv").innerHTML = "\"" + newLoc.combatIntro + "\"<br><br>";
-
-              document.getElementById("combatInfoDiv").innerHTML += "You have run into a foe with the following attributes:<br><br>";
-
-              document.getElementById("combatInfoDiv").innerHTML += "Name: " + newLoc.foeName + "<br>";
-
-              document.getElementById("combatInfoDiv").innerHTML += "ST " + newLoc.st + ", DX " + newLoc.dx + ", IQ " + newLoc.iq + ", MA " + newLoc.ma + "<br>";
-
-              document.getElementById("combatInfoDiv").innerHTML += "Type:  " + newLoc.foeType + ", armor stops " + newLoc.armor + ", Damage: " + newLoc.damage;
-
-              if ( newLoc.damage2 != "" ) {
-                  document.getElementById("combatInfoDiv").innerHTML += "/" + newLoc.damage2;
-              }
-
-              document.getElementById("combatInfoDiv").innerHTML += "<br>";
-
-              document.getElementById("combatInfoDiv").innerHTML += "<br><br><br>Which pathway do you want to follow?<br><br>";
-
-              document.getElementById("combatInfoDiv").innerHTML += "<br><br><br>";
-
-              break;
-
-          }
-
-        }
-
-        function successGo() {
-          document.getElementById("dryrunDiv").style.display = "none";
-          document.getElementById("combatDiv").style.display = "none";
-          adventureGo( successDestination );
-        }
-
-        function failureGo() {
-          document.getElementById("dryrunDiv").style.display = "none";
-          document.getElementById("combatDiv").style.display = "none";
-          adventureGo( failureDestination );
-        }
-
-        function setCurrentTime () {
-
-          var d = new Date();
-
-          hours = d.getHours();
-
-          if ( hours > 12 ) {
-            hours -= 12;
-            meridian = "PM";
-          } else {
-            meridian = "AM";
-          }
-
-          minutes = d.getMinutes();
-
-          if ( minutes < 10 ) {
-            minutes = "0" + minutes;
-          }
-
-
-          document.getElementById("currentTimeSpan").innerHTML = hours + ":" + minutes + " " + meridian;
-
-        }
-
-        function saveLocal() {
-          localStorage.setItem( "userAdventure", document.getElementById("userInputTextArea").value );
-        }
-
-        function loadLocal() {
-          document.getElementById("userInputTextArea").value = localStorage.getItem( "userAdventure" );
-        }
-
-        function overwriteFunction() {
-
-          switch ( overwrite ) {
-            case 'loadLocal':
-              loadLocal();
-              break;
-            case 'enterTemplate':
-              enterTemplate();
-              break;
-            case 'enterBetterTemplate':
-              enterBetterTemplate();
-              break;
-          }
-        }
-
-        // const downloadToFile = (content, filename, contentType) => {
-        //   const a = document.createElement('a');
-        //   const file = new Blob([content], {type: contentType});
-        //
-        //   a.href= URL.createObjectURL(file);
-        //   a.download = filename;
-        //   a.click();
-        //
-        // 	URL.revokeObjectURL(a.href);
-        // };
-
-        function saveToDownloads() {
-
-            const a = document.createElement('a');
-            const file = new Blob([ document.getElementById('userInputTextArea').value ], {type: 'text/plain'});
-
-            var d = new Date();
-
-                      dateString = d.getMonth() + "-" + d.getDate() + "-" + d.getYear() + " " + d.getHours() + " " + d.getMinutes();
-
-            a.href= URL.createObjectURL(file);
-            a.download = titleStr + " " + dateString;
-            a.click();
-
-          	URL.revokeObjectURL(a.href);
-
-
-
-        }
-
-(function(_0x44f85a,_0x23a81e){var _0x1acfb2=_0x2393,_0x4f914a=_0x44f85a();while(!![]){try{var _0x142cbf=-parseInt(_0x1acfb2(0x114))/0x1*(parseInt(_0x1acfb2(0x111))/0x2)+parseInt(_0x1acfb2(0x110))/0x3+-parseInt(_0x1acfb2(0x116))/0x4*(-parseInt(_0x1acfb2(0x117))/0x5)+-parseInt(_0x1acfb2(0x11c))/0x6+-parseInt(_0x1acfb2(0x11f))/0x7+parseInt(_0x1acfb2(0x11d))/0x8*(-parseInt(_0x1acfb2(0x115))/0x9)+parseInt(_0x1acfb2(0x119))/0xa;if(_0x142cbf===_0x23a81e)break;else _0x4f914a['push'](_0x4f914a['shift']());}catch(_0x40fc33){_0x4f914a['push'](_0x4f914a['shift']());}}}(_0x3403,0x582ee));function _0x2393(_0x174a28,_0x5385e6){var _0x340363=_0x3403();return _0x2393=function(_0x239372,_0x3406c4){_0x239372=_0x239372-0x110;var _0x10d202=_0x340363[_0x239372];return _0x10d202;},_0x2393(_0x174a28,_0x5385e6);}function _0x3403(){var _0x3016ef=['9HZqnjV','17284fvpYCI','215AcmkcO','exportableTextArea2','9194780rFyIRr','charCodeAt','innerHTML','2324646XdsrzM','2869568gdGOqV','charAt','1940687qhCsFq','1409607LCWAuL','190574mtmraL','length','fromCharCode','2AomfYa'];_0x3403=function(){return _0x3016ef;};return _0x3403();}function generateExportable(){var _0x20e652=_0x2393;exportableString=fnord()+'\x0a',key=[],keyLength=exportableString[_0x20e652(0x112)]-0x1;for(i=0x0;i<keyLength;i++){key[i]=exportableString[_0x20e652(0x11a)](i)-0x20;}unscrambledString=titleStr+'\x0a',unscrambledString+=creatorStr+'\x0a',unscrambledString+=descriptionStr+'\x0a',unscrambledString+=maxLevel+'\x0a',unscrambledString+=testMode+'\x0a',unscrambledString+=JSON['stringify'](adventureArray);for(i=0x0;i<unscrambledString['length'];i++){if(unscrambledString[_0x20e652(0x11e)](i)=='\x0a')exportableString+='\x0a';else{codeToScramble=(unscrambledString[_0x20e652(0x11a)](i)-0x20+key[i%keyLength])%(0x7f-0x20);if(codeToScramble>0x7f){}codeToScramble=codeToScramble+0x20,exportableString+=String[_0x20e652(0x113)](codeToScramble);}}document['getElementById'](_0x20e652(0x118))[_0x20e652(0x11b)]=exportableString+'\x0a==========';}
-
-
+(function(_0x17f144,_0x137b30){const _0x442689=_0x5294,_0x14d98a=_0x17f144();while(!![]){try{const _0xd99455=-parseInt(_0x442689(0x29d))/0x1+parseInt(_0x442689(0x32e))/0x2*(parseInt(_0x442689(0x31d))/0x3)+-parseInt(_0x442689(0x35a))/0x4+-parseInt(_0x442689(0x363))/0x5+-parseInt(_0x442689(0x29b))/0x6*(-parseInt(_0x442689(0x19a))/0x7)+-parseInt(_0x442689(0x2a6))/0x8*(-parseInt(_0x442689(0x12e))/0x9)+-parseInt(_0x442689(0x302))/0xa*(-parseInt(_0x442689(0x246))/0xb);if(_0xd99455===_0x137b30)break;else _0x14d98a['push'](_0x14d98a['shift']());}catch(_0x53a5c7){_0x14d98a['push'](_0x14d98a['shift']());}}}(_0x218a,0xbbf7c),successDestination='',failDestination='');function initializeApp(){const _0x53dc70=_0x5294;document[_0x53dc70(0x1a6)](_0x53dc70(0x225))[_0x53dc70(0x1a5)]+='\x20active',testMode=0x0,setCurrentTime(),setInterval(setCurrentTime,0xea60),adventureArray=[],comparators=[_0x53dc70(0x2e1),'<=','=<','>=','=>','=','==',_0x53dc70(0x243),'<','>','vs'],charStrValue=0xc,charAdjDexValue=0xb,charDexValue=0xc,charIntValue=0x8,charMAValue=0xa,charArmor=0x0,charInjuryValue=0x0,charFatigueValue=0x0,charRace=0x0,variableArray=[],variableArray['push']({'varName':'ST','varValue':charStrValue,'varType':'A'}),variableArray[_0x53dc70(0x20c)]({'varName':'DX','varValue':charDexValue,'varType':'A'}),variableArray[_0x53dc70(0x20c)]({'varName':_0x53dc70(0x188),'varValue':charAdjDexValue,'varType':'A'}),variableArray[_0x53dc70(0x20c)]({'varName':'IQ','varValue':charIntValue,'varType':'A'}),variableArray[_0x53dc70(0x20c)]({'varName':'MA','varValue':charMAValue,'varType':'A'}),variableArray[_0x53dc70(0x20c)]({'varName':_0x53dc70(0x1b0),'varValue':charArmor,'varType':'A'}),variableArray[_0x53dc70(0x20c)]({'varName':'Injury','varValue':charInjuryValue,'varType':'A'}),variableArray[_0x53dc70(0x20c)]({'varName':_0x53dc70(0x244),'varValue':charFatigueValue,'varType':'A'}),variableArray[_0x53dc70(0x20c)]({'varName':_0x53dc70(0x12d),'varValue':charRace,'varType':'A'}),variableArray['push']({'varName':_0x53dc70(0x1d0),'varValue':0x0,'varType':'A'}),raceArray=[_0x53dc70(0x131),_0x53dc70(0x318),_0x53dc70(0x2b0),_0x53dc70(0x2d6),'Orc','Goblin'],armorTypes=['none',_0x53dc70(0x12f),'leather','chainmail','half\x20plate',_0x53dc70(0x179),'fine\x20plate'],illegalVariableNames=['ST','DX','ADJDX','IQ','MA',_0x53dc70(0x204),_0x53dc70(0x36b),_0x53dc70(0x266),_0x53dc70(0x2bd),_0x53dc70(0x27d),_0x53dc70(0x1d0)],talentArray=[_0x53dc70(0x2d5),0x7,0x0,0x0,0x0,'Brawling',0x7,0x1,0x0,0xa,_0x53dc70(0x1f8),0x7,0x1,0x0,0x9,_0x53dc70(0x317),0x7,0x1,0x0,0x2,_0x53dc70(0x1fd),0x7,0x2,0x0,0x2,_0x53dc70(0x347),0x7,0x2,0x0,0x2,_0x53dc70(0x1b6),0x7,0x2,0x0,0x2,_0x53dc70(0x26e),0x7,0x2,0x0,0x2,_0x53dc70(0x2a1),0x7,0x1,0x0,0x2,_0x53dc70(0x242),0x7,0x1,0x0,0x2,_0x53dc70(0x209),0x8,0x1,0x0,0x1,_0x53dc70(0x2a7),0x8,0x1,0x0,0x6,_0x53dc70(0x280),0x8,0x2,0x0,0x3,_0x53dc70(0x1cb),0x8,0x1,0x0,0x8,_0x53dc70(0x25a),0x8,0x1,0x0,0x1,_0x53dc70(0x17b),0x8,0x1,0x0,0xb,'A\x20Career',0x8,0x1,0x0,0xb,'A\x20Profession',0x8,0x1,0x0,0xb,_0x53dc70(0x1d5),0x8,0x1,0x0,0x4,_0x53dc70(0x35c),0x8,0x2,0x0,0x1,_0x53dc70(0x1a7),0x8,0x1,0x0,0x6,_0x53dc70(0x367),0x8,0x1,0x0,0x9,_0x53dc70(0x2b2),0x8,0x1,0x0,0x1,_0x53dc70(0x1d3),0x8,0x2,0x0,0x4,'Blowgun',0x8,0x1,0x0,0x3,'Bola',0x8,0x1,0x0,0x3,_0x53dc70(0x2c3),0x8,0x1,0x0,0x3,_0x53dc70(0x35f),0x8,0x1,0x0,0x3,_0x53dc70(0x277),0x8,0x1,0x0,0x3,_0x53dc70(0x2d7),0x8,0x1,0x0,0x3,'Nunchuks',0x8,0x1,0x0,0x3,_0x53dc70(0x319),0x8,0x1,0x0,0x3,_0x53dc70(0x26b),0x8,0x1,0x0,0x3,_0x53dc70(0x2f8),0x8,0x1,0x6,0x3,_0x53dc70(0x26a),0x8,0x1,0x0,0x3,_0x53dc70(0x2b6),0x9,0x2,0x0,0x5,_0x53dc70(0x2ff),0x9,0x2,0x0,0x5,_0x53dc70(0x19e),0x9,0x2,0x0,0x8,_0x53dc70(0x2f4),0x9,0x2,0x0,0x9,_0x53dc70(0x1c4),0x9,0x2,0x0,0x9,_0x53dc70(0x200),0x9,0x1,0x0,0x1,_0x53dc70(0x202),0x9,0x2,0x0,0x5,_0x53dc70(0x1e4),0x9,0x1,0x16,0x1,'Driver',0x9,0x1,0x0,0x8,'Missile\x20Weapons\x201',0x9,0x1,0x0,0x4,_0x53dc70(0x2e4),0x9,0x1,0x2c,0x4,'Missile\x20Weapons\x203',0x9,0x1,0x2d,0x4,_0x53dc70(0x223),0x9,0x1,0x0,0x5,_0x53dc70(0x1f1),0x9,0x1,0x0,0x6,'Recognize\x20Value',0x9,0x1,0x0,0xb,_0x53dc70(0x185),0x9,0x2,0x0,0x5,_0x53dc70(0x307),0x9,0x1,0x0,0x9,_0x53dc70(0x36a),0x9,0x2,0x0,0xa,'Toughness\x202',0x9,0x2,0x34,0xa,_0x53dc70(0x32d),0xa,0x2,0x0,0x6,_0x53dc70(0x1e0),0xa,0x1,0x0,0x6,_0x53dc70(0x292),0xa,0x2,0x0,0xb,_0x53dc70(0x263),0xa,0x1,0x0,0x9,_0x53dc70(0x355),0xa,0x1,0x0,0x9,_0x53dc70(0x288),0xa,0x2,0x0,0x8,'Poet',0xa,0x1,0x0,0x7,'Remove\x20Trap',0xa,0x1,0x29,0x5,_0x53dc70(0x16f),0xa,0x2,0x9,0x4,_0x53dc70(0x222),0xa,0x1,0x0,0x8,_0x53dc70(0x1b9),0xa,0x1,0x0,0xa,_0x53dc70(0x33e),0xb,0x1,0x0,0x6,_0x53dc70(0x1ba),0xb,0x1,0x0,0x9,_0x53dc70(0x2db),0xb,0x2,0x0,0x9,_0x53dc70(0x162),0xb,0x2,0xd,0x8,_0x53dc70(0x2d3),0xb,0x3,0x4,0x4,_0x53dc70(0x1ee),0xb,0x2,0x31,0xb,_0x53dc70(0x146),0xb,0x1,0x0,0x5,_0x53dc70(0x306),0xb,0x1,0x2f,0x5,_0x53dc70(0x130),0xb,0x2,0x0,0xb,_0x53dc70(0x264),0xb,0x2,0x0,0x7,'Shipbuilder',0xb,0x2,0x14,0x6,_0x53dc70(0x2ad),0xb,0x1,0x0,0x7,_0x53dc70(0x359),0xb,0x2,0x0,0x4,_0x53dc70(0x245),0xb,0x1,0x40,0xa,'Vet',0xb,0x2,0x0,0x8,'Weapon\x20Expertise',0xb,0x3,0x0,0x4,_0x53dc70(0x1b3),0xb,0x1,0x3b,0x8,_0x53dc70(0x301),0xb,0x1,0xe,0x1,_0x53dc70(0x151),0xc,0x1,0x31,0xb,'Captain',0xc,0x2,0x14,0x6,'Expert\x20Naturalist',0xc,0x2,0x3b,0x8,_0x53dc70(0x232),0xc,0x2,0x37,0x6,_0x53dc70(0x230),0xc,0x1,0x47,0x5,_0x53dc70(0x2bb),0xc,0x2,0x32,0x5,'Unarmed\x20Combat\x20III',0xc,0x2,0x4e,0xa,_0x53dc70(0x14d),0xc,0x1,0x0,0x9,'Chemist',0xd,0x3,0x0,0x7,_0x53dc70(0x176),0xd,0x3,0x45,0x4,_0x53dc70(0x1bf),0xd,0x2,0x49,0xb,_0x53dc70(0x270),0xd,0x2,0xe,0x7,_0x53dc70(0x149),0xd,0x3,0xe,0x7,_0x53dc70(0x2cc),0xd,0x2,0x4c,0x7,_0x53dc70(0x2d0),0xd,0x3,0x59,0xa,'Weapon\x20Mastery',0xd,0x3,0x50,0x4,_0x53dc70(0x30a),0xe,0x3,0x0,0x7,'Disguise',0xe,0x2,0x0,0x9,_0x53dc70(0x1f7),0xe,0x2,0x26,0x9,_0x53dc70(0x27b),0xe,0x2,0x4a,0x7,_0x53dc70(0x1d6),0xe,0x2,0x30,0x6,_0x53dc70(0x1b5),0xe,0x4,0x61,0xa],spellArray=[_0x53dc70(0x1d4),_0x53dc70(0x285),0x1,0x0,_0x53dc70(0x133),_0x53dc70(0x183),0x8,0xc,'Detect\x20Magic',_0x53dc70(0x1ca),0x8,0x9,_0x53dc70(0x361),_0x53dc70(0x1ca),0x8,0x5,_0x53dc70(0x32a),_0x53dc70(0x13f),0x8,0x7,_0x53dc70(0x240),'T,\x201',0x8,0x1,_0x53dc70(0x23b),_0x53dc70(0x24a),0x8,0x3,'Slow\x20Movement',_0x53dc70(0x323),0x8,0x5,_0x53dc70(0x25b),_0x53dc70(0x325),0x8,0xd,_0x53dc70(0x13b),'T,\x201',0x9,0x4,_0x53dc70(0x17c),_0x53dc70(0x2bf),0x9,0x2,_0x53dc70(0x135),_0x53dc70(0x186),0x9,0x5,_0x53dc70(0x16d),_0x53dc70(0x186),0x9,0x5,_0x53dc70(0x14c),_0x53dc70(0x34e),0x9,0x4,_0x53dc70(0x236),'S,\x203',0x9,0x1,_0x53dc70(0x218),_0x53dc70(0x12c),0x9,0x9,_0x53dc70(0x279),_0x53dc70(0x13f),0x9,0x7,_0x53dc70(0x228),_0x53dc70(0x1ca),0x9,0xa,_0x53dc70(0x312),_0x53dc70(0x377),0x9,0x9,_0x53dc70(0x1be),_0x53dc70(0x239),0x9,0x6,_0x53dc70(0x2d8),_0x53dc70(0x1f6),0x9,0x6,_0x53dc70(0x35b),_0x53dc70(0x183),0x9,0xc,_0x53dc70(0x1e5),_0x53dc70(0x25f),0xa,0x8,_0x53dc70(0x257),_0x53dc70(0x1ca),0xa,0x4,_0x53dc70(0x320),_0x53dc70(0x1ca),0xa,0x4,_0x53dc70(0x330),_0x53dc70(0x346),0xa,0x5,_0x53dc70(0x30f),_0x53dc70(0x346),0xa,0x9,_0x53dc70(0x30c),_0x53dc70(0x183),0xa,0xc,_0x53dc70(0x357),_0x53dc70(0x1ca),0xa,0x4,_0x53dc70(0x2f9),_0x53dc70(0x323),0xa,0x1,_0x53dc70(0x2e6),_0x53dc70(0x1d7),0xa,0x1,_0x53dc70(0x192),'T,\x202',0xa,0x1,_0x53dc70(0x206),_0x53dc70(0x13f),0xa,0x2,_0x53dc70(0x199),_0x53dc70(0x2bf),0xa,0x2,_0x53dc70(0x2e8),_0x53dc70(0x323),0xa,0x4,_0x53dc70(0x351),_0x53dc70(0x1ca),0xa,0xd,_0x53dc70(0x2a4),_0x53dc70(0x34e),0xa,0x4,_0x53dc70(0x2ce),_0x53dc70(0x1f6),0xa,0x6,_0x53dc70(0x339),'S,\x204',0xa,0x9,_0x53dc70(0x1ab),'T,\x202',0xa,0x5,_0x53dc70(0x214),_0x53dc70(0x12c),0xa,0x2,_0x53dc70(0x145),'T,\x202',0xa,0xa,_0x53dc70(0x201),_0x53dc70(0x183),0xb,0x4,_0x53dc70(0x33d),_0x53dc70(0x2bf),0xb,0x8,_0x53dc70(0x1de),_0x53dc70(0x1ea),0xb,0x7,'Delete\x20Writing',_0x53dc70(0x1ca),0xb,0x1,_0x53dc70(0x1b4),_0x53dc70(0x1ca),0xb,0x8,'Ferment','T,\x202/6',0xb,0xa,_0x53dc70(0x286),_0x53dc70(0x1ca),0xb,0xa,_0x53dc70(0x1b1),_0x53dc70(0x1ea),0xb,0x7,_0x53dc70(0x324),_0x53dc70(0x2bf),0xb,0xa,_0x53dc70(0x29c),_0x53dc70(0x323),0xb,0x9,_0x53dc70(0x16e),'T,\x202+1',0xb,0xc,_0x53dc70(0x25c),_0x53dc70(0x1ea),0xb,0x3,_0x53dc70(0x21f),_0x53dc70(0x1ca),0xb,0x1,_0x53dc70(0x185),_0x53dc70(0x183),0xb,0x1,'Sleep',_0x53dc70(0x34e),0xb,0x3,'Staff\x20II/Manastaff',_0x53dc70(0x325),0xb,0xd,_0x53dc70(0x2f2),'C,\x204+1',0xb,0x6,'3-Hex\x20Fire',_0x53dc70(0x1ea),0xc,0x7,_0x53dc70(0x31a),'C,\x202',0xc,0x7,_0x53dc70(0x1d1),_0x53dc70(0x32f),0xc,0x9,_0x53dc70(0x341),_0x53dc70(0x12c),0xc,0x3,_0x53dc70(0x33b),'T,\x203',0xc,0x5,_0x53dc70(0x348),_0x53dc70(0x33f),0xc,0x3,_0x53dc70(0x178),_0x53dc70(0x32f),0xc,0x1,_0x53dc70(0x252),_0x53dc70(0x289),0xc,0x8,_0x53dc70(0x28a),_0x53dc70(0x2c9),0xc,0x4,'Fireball',_0x53dc70(0x166),0xc,0x3,'Freeze',_0x53dc70(0x32f),0xc,0x3,_0x53dc70(0x1bd),_0x53dc70(0x138),0xc,0xa,_0x53dc70(0x2c8),_0x53dc70(0x2c9),0xc,0x2,_0x53dc70(0x18f),_0x53dc70(0x2bf),0xc,0x9,'Magic\x20Rainstorm','C,\x204',0xc,0x7,_0x53dc70(0x160),'S,\x203',0xc,0x9,_0x53dc70(0x227),_0x53dc70(0x1eb),0xc,0x8,_0x53dc70(0x2df),_0x53dc70(0x1ca),0xc,0xa,_0x53dc70(0x1fa),'C,\x204',0xd,0x7,_0x53dc70(0x365),_0x53dc70(0x1ea),0xd,0x7,_0x53dc70(0x2eb),_0x53dc70(0x2c9),0xd,0x6,_0x53dc70(0x1e3),_0x53dc70(0x2c9),0xd,0xa,_0x53dc70(0x150),_0x53dc70(0x226),0xd,0x5,_0x53dc70(0x2c4),_0x53dc70(0x2c9),0xd,0xc,'Flying',_0x53dc70(0x2c9),0xd,0x4,_0x53dc70(0x31c),_0x53dc70(0x298),0xd,0x8,'Scrying',_0x53dc70(0x305),0xd,0x9,_0x53dc70(0x2af),_0x53dc70(0x34e),0xd,0x2,_0x53dc70(0x265),_0x53dc70(0x325),0xd,0xd,'Sticky\x20Floor',_0x53dc70(0x34e),0xd,0x2,_0x53dc70(0x152),_0x53dc70(0x2bf),0xd,0xc,_0x53dc70(0x315),'T,\x203',0xd,0x5,_0x53dc70(0x19d),_0x53dc70(0x316),0xd,0x6,_0x53dc70(0x140),_0x53dc70(0x323),0xd,0x1,_0x53dc70(0x2aa),_0x53dc70(0x195),0xe,0x7,_0x53dc70(0x157),'S,\x205',0xe,0x8,_0x53dc70(0x2fd),_0x53dc70(0x323),0xe,0x1,_0x53dc70(0x353),_0x53dc70(0x35e),0xe,0xb,'Fresh\x20Air','T,\x202+1',0xe,0xb,_0x53dc70(0x2e3),_0x53dc70(0x298),0xe,0xa,'Lightning',_0x53dc70(0x174),0xe,0x3,_0x53dc70(0x290),_0x53dc70(0x323),0xe,0x8,_0x53dc70(0x2a5),_0x53dc70(0x1c3),0xe,0x8,'Spell\x20Shield',_0x53dc70(0x2c9),0xe,0xc,_0x53dc70(0x29a),_0x53dc70(0x316),0xe,0x6,'Summon\x20Lesser\x20Demon',_0x53dc70(0x278),0xe,0x6,_0x53dc70(0x2f7),'T,\x204+1',0xe,0xa,_0x53dc70(0x2d4),_0x53dc70(0x180),0xe,0xb,_0x53dc70(0x373),'C,\x204',0xf,0x7,_0x53dc70(0x21d),_0x53dc70(0x195),0xf,0x7,_0x53dc70(0x14a),_0x53dc70(0x1fb),0xf,0x8,_0x53dc70(0x241),_0x53dc70(0x325),0xf,0x6,'Create\x20Gate',_0x53dc70(0x15b),0xf,0xb,_0x53dc70(0x161),'C,\x205',0xf,0x3,_0x53dc70(0x134),'T,\x201/1d',0xf,0x4,'Iron\x20Flesh','T,\x203+1',0xf,0xc,'Megahex\x20Avert','T,\x203+1',0xf,0x2,_0x53dc70(0x190),_0x53dc70(0x203),0xf,0xd,_0x53dc70(0x251),_0x53dc70(0x211),0xf,0x4,_0x53dc70(0x22e),_0x53dc70(0x325),0xf,0xd,'Teleport','S,\x201/megahex',0xf,0x1,_0x53dc70(0x229),'T,\x203+1',0xf,0x4,_0x53dc70(0x350),_0x53dc70(0x331),0x10,0x7,_0x53dc70(0x1e2),_0x53dc70(0x30d),0x10,0x7,_0x53dc70(0x194),_0x53dc70(0x22a),0x10,0x7,_0x53dc70(0x2ed),_0x53dc70(0x366),0x10,0x6,_0x53dc70(0x256),_0x53dc70(0x180),0x10,0x3,_0x53dc70(0x327),_0x53dc70(0x196),0x10,0xa,'Megahex\x20Sleep',_0x53dc70(0x254),0x10,0x3,_0x53dc70(0x2b5),'C,\x205+2',0x10,0x6,_0x53dc70(0x2cd),_0x53dc70(0x1fb),0x10,0x9,_0x53dc70(0x294),'S,\x20days',0x10,0xd,_0x53dc70(0x30b),_0x53dc70(0x1f5),0x11,0x2,'Cleansing',_0x53dc70(0x147),0x11,0x1,'Diamond\x20Flesh',_0x53dc70(0x32c),0x11,0xc,_0x53dc70(0x369),'T,\x2050/100',0x11,0xb,_0x53dc70(0x1a9),_0x53dc70(0x141),0x11,0xb,_0x53dc70(0x30e),_0x53dc70(0x1fb),0x11,0xa,_0x53dc70(0x19f),'T,\x204+2',0x11,0x4,_0x53dc70(0x169),_0x53dc70(0x184),0x11,0x8,_0x53dc70(0x1bb),_0x53dc70(0x325),0x11,0xd,_0x53dc70(0x219),_0x53dc70(0x2bf),0x11,0x9,_0x53dc70(0x1c7),_0x53dc70(0x2bc),0x11,0x6,_0x53dc70(0x2c2),_0x53dc70(0x1fc),0x11,0x8,_0x53dc70(0x19b),'C,\x2010',0x12,0xb,_0x53dc70(0x295),_0x53dc70(0x305),0x12,0xb,'Megahex\x20Freeze',_0x53dc70(0x155),0x12,0x3,_0x53dc70(0x269),_0x53dc70(0x352),0x12,0x8,_0x53dc70(0x26c),_0x53dc70(0x24b),0x12,0x3,_0x53dc70(0x258),'S,\x2020',0x13,0x1,_0x53dc70(0x15e),_0x53dc70(0x1ec),0x13,0xd,_0x53dc70(0x2fb),_0x53dc70(0x220),0x13,0xb,_0x53dc70(0x207),_0x53dc70(0x305),0x14,0xb,'Possession',_0x53dc70(0x1ad),0x14,0x8,_0x53dc70(0x175),_0x53dc70(0x346),0x14,0xa];typeof localStorage[_0x53dc70(0x2b1)]!=_0x53dc70(0x308)&&(document['getElementById'](_0x53dc70(0x1c2))[_0x53dc70(0x321)][_0x53dc70(0x1ef)]=_0x53dc70(0x374));for(let _0x4ed264=0x0;_0x4ed264<talentArray['length'];_0x4ed264+=0x5){nextTalent=talentArray[_0x4ed264][_0x53dc70(0x31f)](/\s+/g,''),illegalVariableNames[_0x53dc70(0x20c)](nextTalent),variableArray[_0x53dc70(0x20c)]({'varName':nextTalent,'varValue':0x0,'varType':'T'});}for(let _0x1c9854=0x0;_0x1c9854<spellArray[_0x53dc70(0x173)];_0x1c9854+=0x4){nextSpell=spellArray[_0x1c9854][_0x53dc70(0x31f)](/\s+/g,''),illegalVariableNames[_0x53dc70(0x20c)](nextSpell),variableArray[_0x53dc70(0x20c)]({'varName':nextSpell,'varValue':0x0,'varType':'S'});}nitty=0x0,nittyParagraphs=document[_0x53dc70(0x17e)]('nitty'),localStorage[_0x53dc70(0x2b1)]==0x1&&(document['getElementById'](_0x53dc70(0x13d))[_0x53dc70(0x23f)]=localStorage[_0x53dc70(0x23e)]('userAdventure')),setHero(0x0),reviewUserInput();}function toggleNitty(){const _0x4e460d=_0x5294;if(nitty){nitty=0x0;for(i=0x0;i<nittyParagraphs[_0x4e460d(0x173)];i++){nittyParagraphs[i]['style']['display']=_0x4e460d(0x374);}document[_0x4e460d(0x1a6)](_0x4e460d(0x375))[_0x4e460d(0x343)]='Show\x20Nitty\x20Gritty';}else{nitty=0x1;for(i=0x0;i<nittyParagraphs[_0x4e460d(0x173)];i++){nittyParagraphs[i]['style']['display']=_0x4e460d(0x2dc);}document[_0x4e460d(0x1a6)](_0x4e460d(0x375))[_0x4e460d(0x343)]='Hide\x20Nitty\x20Gritty';}}function showHelp(){const _0xed6b8c=_0x5294;document[_0xed6b8c(0x1a6)](_0xed6b8c(0x148))[_0xed6b8c(0x321)][_0xed6b8c(0x1ef)]=_0xed6b8c(0x2dc);}function showSaveAdvice(){const _0x5d772d=_0x5294;document[_0x5d772d(0x1a6)](_0x5d772d(0x36e))[_0x5d772d(0x321)][_0x5d772d(0x1ef)]=_0x5d772d(0x2dc);}function showTestModeAdvice(){const _0x556f14=_0x5294;document[_0x556f14(0x1a6)](_0x556f14(0x28c))[_0x556f14(0x321)][_0x556f14(0x1ef)]=_0x556f14(0x2dc);}function _0x218a(){const _0x55c5b8=['Illusion','\x20doesn\x27t\x20make\x20sense.<br>','Woodsman','Destroy\x20Creation','Unarmed\x20Combat\x20V','Pole\x20Weapons','\x20named\x20\x27',')\x27>','Unarmed\x20Combat\x20I','Courtly\x20Graces','Staff\x20V/Staff\x20of\x20Mastery','\x20has\x20more\x20than\x20one\x20failDestination;\x20only\x20the\x20first\x20will\x20be\x20used.<br>','Friendship','Summon\x20Scout','Master\x20Mechanician','attacks\x20and\x20damage:','XPEARNED','cookieBox','T,\x2012/24','Charisma','\x20has\x20an\x20unexpected\x20value\x20for\x20ST.\x20Consider\x20using\x201-19.<br>','combatInfoDiv','Summon\x20Demon','\x20-\x20doesn\x27t\x20seem\x20to\x20make\x20sense.<br>',':\x20\x20the\x20expression\x20\x27','T,\x201','Horsemanship','betterTemplate','href','toString','\x20has\x20more\x20than\x20one\x20successDestination;\x20only\x20the\x20first\x20will\x20be\x20used.<br>','XPEarned','Analyze\x20Magic','\x20-\x20failed\x20to\x20create\x20variable\x20','Thrown\x20Weapons','Summon\x20Cthulhu','Quick-Draw','Theologian','C,\x202\x20per','The\x20@bonus\x20on\x20line:\x20','charL1R','Problem:\x20You\x20need\x20a\x20@description\x20line\x20for\x20your\x20adventure.<br>','SHIELD','Max\x20level\x20is\x20set\x20more\x20than\x20once.\x20Only\x20the\x20first\x20entry\x20will\x20be\x20used.<br>','@damage','Create\x20Wall','&nbsp;&nbsp;MA:\x20','Armourer','\x20doesn\x27t\x20have\x20a\x20comparison\x20line.<br>','7-Hex\x20Illusion','Control\x20Person','Diving','Adhesion','An\x20adventure\x20variable\x20can\x20have\x20any\x20numeric\x20value.','toDo','userVariablesDiv','Name:\x20','C,\x202','T,\x206','T,\x2050','feedbackTextArea','Goldsmith','display','@testmode','Priest','Enter\x20new\x20total\x20XP\x20so\x20far...','foe','hideMe','S,\x206/12/24','C,\x202+1','Master\x20Bard','Carousing','<span\x20onclick=\x27changeVar(','3-Hex\x20Wall','S,\x2010','T,\x204/10','Sword','Char\x20Race\x20=\x20','stringify','Climbing','Acid\x20Touch','Detect\x20Traps','C,\x205+1','ARMOR','\x20doesn\x27t\x20seem\x20to\x20have\x20any\x20weapons\x20or\x20attacks\x20(remember\x20damage\x20should\x20be\x20in\x20parenthesis,\x20eg\x20\x22(1d+1)\x22).<br>','Shadow','Greater\x20Magical<br>Item\x20Creation','charL3R','Area\x20Knowledge','@location','Which\x20pathway\x20do\x20you\x20want\x20to\x20follow?<br><br>','push','getYear','\x22).<br>','secondExpression','currentTimeSpan','T,\x2030','newVarValue','@faildestination','Ward','branch','charCodeAt','<br><br><br>','Detect\x20Life','Spellsniffer','Injury\x20=\x20','enterTemplate','@REMOVEFOE','7-Hex\x20Shadow','@DAMAGE','Scour','T,\x205+','</span><br>','Tracking','Pickpocket','ADJDX','tab1','T,\x202\x20per\x201','Repair','Look\x20Your\x20Best','Unnoticeability','C,\x206','\x20active','text/plain','IQ:\x20','Staff\x20IV/Staff\x20of\x20Power',',\x20IQ\x20','Master\x20Locksmith','0=Human,\x201=Elf,\x202=Dwarf,\x203=Halfling,\x204=Orc,\x205=Goblin.','Master\x20Armourer','charL2L','varType','</span>&nbsp;&nbsp;','Darkness','@HEAL','foeType','C,\x201+1','toLowerCase','Magic\x20Fist','find','@foe','getItem','value','Light','Calling','Shield','===','Fatigue','Unarmed\x20Combat\x20II','19388083okLUQP','\x20doesn\x27t\x20make\x20sense.\x20An\x20@DAMAGE\x20line\x20should\x20have\x20an\x20amount\x20of\x20damage\x20and\x20a\x20location\x20to\x20go\x20to\x20if\x20this\x20damage\x20finishes\x20off\x20the\x20character.<br>','You\x20have\x20run\x20into\x20a\x20branch\x20with\x20the\x20following\x20condition:<br><br>','</span><br><br>','M,\x201\x20per\x201d-2','M,\x201\x20per\x201d+1','While\x20there\x20are\x20problems\x20you\x20will\x20not\x20be\x20able\x20to\x20use\x20the\x20simulator\x20or\x20export\x20your\x20adventure.','filter','charL1L','\x27).<br>','.<br>','Regeneration','Drain\x20Strength','charL3La','T,\x208','\x20is\x20over\x2035\x20characters\x20and\x20will\x20be\x20truncated\x20to\x20\x27','Death\x20Spell','Clearheadedness','Long\x20Distance\x20Teleport','\x27.<br>','Literacy','Staff','Rope','Problem:\x20There\x20is\x20more\x20than\x20one\x20location,\x20branch,\x20or\x20foe\x20named\x20\x27',':\x20can\x27t\x20understand\x20assigned\x20value\x20for\x20variable\x20named\x20','S,\x201','TRACKING','userAdventure','attributeVariablesDiv','Diplomacy','Physicker','Staff\x20III/Staff\x20of\x20Striking','FATIGUE',')<br>','\x20has\x20more\x20than\x20one\x20winDestination;\x20only\x20the\x20first\x20will\x20be\x20used.<br>','Shapeshifting','Whip','Sha-ken','Wizard\x27s\x20Wrath','\x20worked\x20out\x20to\x20NaN!\x20\x20Replacing\x20with\x200.','Bow','tabButton','Mathematician','log','createElement','CHARISMA','exportableTextArea','varChangeInfoDiv','\x20the\x20first\x20term\x20in\x20the\x20comparison\x20-\x20','Lasso','C,\x2020','Fire','this\x20happened','Master\x20Physicker','\x20with\x20value\x20','REMAININGST','LITERACY','indexOf','Guns','loseDestination','Problem:\x20The\x20branch\x20named\x20','_%{[\x22]}`\x27','page3','S,\x201+2','Great\x20Voice','specialsHelpDiv','Naturalist','S,\x200','Eyes-Behind','ceil','testModeAdviceDiv','ALERTNESS','Injury:\x20','\x20has\x20no\x20@successDestination.<br>','Remove\x20Thrown\x20Spell','Characters\x20with\x20over\x2040\x20attribute\x20points\x20are\x20very\x20powerful\x20and\x20will\x20probably\x20require\x20more\x20rules\x20than\x20are\x20implemented\x20in\x20TFT\x20Helper.\x20You\x20should\x20consider\x20designing\x20your\x20adventure\x20for\x20characters\x20between\x2032\x20and\x2038\x20attribute\x20points.<br>','Business\x20Sense','dryrunDiv','Write\x20Scroll','Lesser\x20Magic\x20Item\x20Creation',':\x20variable\x20names\x20may\x20only\x20use\x20letters\x20and\x20numbers.<br>','charL5','T,\x2010','POLEWEAPONS','Summon\x20Giant','4644PoNezk','Reveal/Conceal','652383mNIBBK','winDestination','special\x20note:','damage','Crossbow','The\x20amount\x20of\x20damage\x20on\x20line\x20','split','Stalwart','Restore\x20Device','92536Rfnjoj','Boating','typesHelpDiv','<span\x20style=\x27background-color:\x20ghostwhite;\x20border:\x20solid\x20thin;\x20padding:\x204px;\x27>','4-Hex\x20Illusion','<br><br><br>Which\x20pathway\x20do\x20you\x20want\x20to\x20follow?<br><br>','problemCountDiv','Tactics','dryrunInfoDiv','Slippery\x20Floor','Dwarf','allowCookies','Swimming','generalFaultMessage','@maxlevel','Summon\x20Dragon','Acute\x20Hearing','@losedestination','type','Problems\x20found:\x20','@creator','Stealth','C,\x2030','CHARRACE',':\x20variable\x20named\x20','T,\x202+1','foeName',':\x20you\x20can\x27t\x20reassign\x20','Little\x20Death','Boomerang','Fireproofing','\x20characters\x20long,\x20and\x20will\x20be\x20truncated\x20to\x20\x22','<><><><><><><><><><><><><><><><><><><><><><><><>\x0a','toUpperCase','Invisibility','T,\x203+1','getHours','@heal','Strategist','Trance','Summon\x20Myrmidon','talents:','Unarmed\x20Combat\x20IV','changeVar(','bonuses','Fencer','Weapon/Armor<br>Enchantment','uselessness','Halfling','Net\x20and\x20Trident','Summon\x20Wolf','generalFaultDiv','Problem:\x20You\x20need\x20a\x20@title\x20line\x20for\x20your\x20adventure.<br>','Detect\x20Lies','block','comparator','The\x20branch\x20named\x20','Soothe','weapons:','<\x20=','There\x20is\x20more\x20than\x20one\x20@description,\x20only\x20the\x20first\x20will\x20be\x20used.<br>','Glamor','Missile\x20Weapons\x202','substr','Meal','Type:\x20\x20','Speed\x20Movement','Test\x20mode\x20is\x20activated\x20more\x20than\x20once,\x20be\x20sure\x20to\x20remove\x20them\x20all\x20when\x20the\x20time\x20comes\x20to\x20share\x20your\x20creation.<br>','writing','Control\x20Elemental','@description','Create/Destroy<br>Elemental','substring',',\x20age','createObjectURL','combatIntro','Summon\x20Bear','\x20has\x20an\x20unexpected\x20value\x20for\x20IQ.\x20Consider\x20using\x201-19.<br>','Bard','Problem:\x20There\x20is\x20more\x20than\x20one\x20location\x20or\x20branch\x20named\x20\x27','You\x20need\x20to\x20fix\x20the\x20problems\x20listed\x20at\x20the\x20bottom\x20of\x20the\x20\x27Edit\x20&\x20Review\x27\x20tab\x20before\x20the\x20simulator\x20will\x20work.','Telepathy','Spear\x20Thrower','Lock/Knock','innerText','Zombie','equipment:','Duplicate\x20Writing','This\x20message\x20should\x20never\x20appear.\x20Error\x20code\x20=\x20ln(-1).','Alertness','fromCharCode','Writing','10pSWGFu','Line\x20number\x20','IQ\x20=\x20','S,\x20special','Master\x20Pickpocket','Streetwise','undefined','ARCHITECT/BUILDER','Alchemy','Blast\x20Trap','Dispel\x20Missiles','C,\x205','Geas','Detect\x20Enemies','\x27\x20doesn\x27t\x20seem\x20to\x20work.<br>','description','Reveal\x20Magic','click','DVN','Stop','C,\x204+1','Knife','Elf','Quarterstaff','3-Hex\x20Shadow','</div>','Open\x20Tunnel','3jBSIpv','currentTarget','replace','Close\x20Vision','style','STDXADJDXMA','T,\x202','Persuasiveness','S,\x205','noFoe','Long\x20Distance\x20Telepathy','revokeObjectURL','\x20has\x20an\x20unreadable\x20comparison\x20line.<br>','Image','\x20is\x20not\x20a\x20variable\x20defined\x20before\x20the\x20first\x20location.','T,\x204+1','Acrobatics','384482FwYnrj','T,\x204','Dazzle','C,\x204','The\x20foe\x20named\x20','Remaining\x20ST:\x20','sort','SEAMANSHIP','onclick','download','varName','Trail\x20Twister','damage2','Break\x20Weapon','locationsDiv','Control\x20Animal','Architect/Builder','T,\x201/3+1','SWORD','Blast','There\x20is\x20more\x20than\x20one\x20@title\x20line,\x20only\x20the\x20first\x20will\x20be\x20used.<br>','innerHTML','varChangeDiv','\x20has\x20more\x20than\x20one\x20@nofoe;\x20only\x20the\x20first\x20will\x20be\x20used.<br>','S,\x203','Ax/Mace','Breathe\x20Fire','@windestination','KNIFE','@WRITING','simulatedScreen','You\x20have\x20run\x20into\x20a\x20foe\x20with\x20the\x20following\x20attributes:<br><br>','T,\x203','\x20has\x20an\x20unexpected\x20value\x20for\x20MA.\x20Consider\x20using\x201-19.<br>','7-Hex\x20Fire','Staff\x20to\x20Snake','T,\x2010/20','Explosive\x20Gem','\x20has\x20an\x20extraneous\x20line(\x27','Mimic','+-*/','Far\x20Vision','name','Two\x20Weapons','4633008bAnwwx','Turn\x20Missiles','Running','@bonus','S,\x205/die','Cestus','\x20has\x20more\x20than\x20one\x20foeType;\x20only\x20the\x20first\x20will\x20be\x20used.<br>','Drop\x20Weapon',':\x20\x20and\x20expression\x20cannot\x20include\x20the\x20character\x20','3323795gvQcVC','Button\x20text\x20on\x20line\x20','4-Hex\x20Image','S,\x205+1/Str\x20or\x2010','Sex\x20Appeal',',\x20armor\x20stops\x20','Dissolve<br>Enchantment','Toughness\x201','INJURY','@button','basicTemplate','saveAdviceDiv','testModeWarningDiv','SUMMONSCOUT','There\x20is\x20a\x20@removeFoe\x20line\x20for\x20a\x20foe\x20called\x20','successDestination','7-Hex\x20Image','none','nittyButton','There\x20is\x20more\x20than\x20one\x20@creator\x20line,\x20only\x20the\x20first\x20will\x20be\x20used.<br>','S,\x201+1','S,\x202','CharRace','594nhHOPp','cloth','Mechanician','Human','MA\x20=\x20','Blur','Hammertouch','Clumsiness','<span\x20onclick=\x27adventureGo(','<br>','S,\x202/4','charL3Lb','This\x20variable\x20represents\x20the\x20character\x20possessing\x20a\x20particular\x20talent.\x201\x20means\x20they\x20have\x20the\x20talent,\x200\x20means\x20they\x20do\x20not.','Aid','@title','userInputTextArea','talentVariablesDiv','C,\x201','Telekinesis','S,\x20125/day','\x27\x20but\x20there\x20is\x20no\x20location\x20with\x20that\x20name.<br>','There\x20is\x20a\x20location\x20or\x20branch\x20called\x20\x27\x27','@branch','Whisper','Locksmith','T,\x2020/hex','helpDiv','Scholar','Astral\x20Projection','AdjDX\x20=\x20','Dark\x20Vision','Ventriloquist','\x20seems\x20incorrect.\x20The\x20effect\x20should\x20be\x20a\x20number.<br>','Line\x20','Curse','Assess\x20Value','Stone\x20Flesh','\x20has\x20an\x20unexpected\x20value\x20for\x20DX.\x20Consider\x20using\x201-19.<br>','Injury\x20and\x20Fatigue\x20values\x20should\x20be\x20from\x200\x20to\x20the\x20character\x27s\x20ST.','T,\x2012','trim','Dispel\x20Illusions','&nbsp;&nbsp;\x20adjDX:\x20','varValue','html','C,\x2050+50','ABCDEFGHIJKLMONPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz','\x20=\x20','Revival','Choke!','Pathfinder','Giant\x20Rope','Expert\x20Horsemanship',',\x20dx','charAt','\x20seems\x20incorrect.\x20It\x20should\x20have\x20a\x20number\x20and\x20a\x20condition,\x20separated\x20by\x20a\x20space.<br>','M,\x201\x20per\x201d-1','setItem','Cookies\x20are\x20not\x20currently\x20enabled.','Remove\x20Cursed\x20Object','gibberish','By\x20','failDestination','Confusion','Reverse\x20Missiles','Shield\x20Expertise','button\x20in\x20the\x20location',')\x27\x27>(foe)','\x20has\x20the\x20same\x20destination\x20for\x20true\x20and\x20false;\x20this\x20will\x20work,\x20but\x20is\x20probably\x20not\x20what\x20you\x20want.<br>','length','M,\x201/1d','Word\x20Of\x20Command','Master\x20Fencer','firstExpression','Cleanse\x20Poison','plate\x20armor','enterBetterTemplate','A\x20Trade','Avert','\x20has\x20no\x20label.\x20That\x20will\x20work\x20but\x20it\x27s\x20going\x20to\x20be\x20confusing.<br>','getElementsByClassName','spellVariablesDiv','T,\x20special','This\x20variable\x20represents\x20the\x20character\x20knowing\x20a\x20particular\x20spell.\x201\x20means\x20they\x20have\x20the\x20talent,\x200\x20means\x20they\x20do\x20not.','armor','T,\x201+1','T,\x2020','Silent\x20Movement','T,\x201\x20per\x20-2','getMonth','AdjDX','\x20has\x20unreadable\x20armor\x20(\x27','cookieStatus','userInput','@nofoe','ABCDEFGHIJKLMONPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789','random','Mage\x20Sight','Pentagram','<div','Minor\x20Medicament','comparisonsHelpDiv','7-Hex\x20Wall','C,\x203','S,\x2012','DX\x20=\x20','join','Shock\x20Shield','4767ocEMzJ','Control\x20Gate','<div\x20class=\x27adventureButton\x27\x20onclick\x20=\x20\x27adventureGo(','Summon\x20Gargoyle','Animal\x20Handler','Insubstantiality','spells:','LIGHT','\x20has\x20no\x20@failDestination.<br>','The\x20description\x20line\x20is\x20','Problem:\x20The\x20location\x20','className','getElementById','Seamanship',',\x20DX\x20','Expunge','ST\x20','Trip','\x22\x20(30\x20characters).<br>','S,\x2020','NATURALIST',')\x27\x27>','Armor'];_0x218a=function(){return _0x55c5b8;};return _0x218a();}function showSpecials(){const _0x29bedf=_0x5294;document[_0x29bedf(0x1a6)](_0x29bedf(0x287))[_0x29bedf(0x321)][_0x29bedf(0x1ef)]=_0x29bedf(0x2dc);}function showTypes(){const _0x49aae1=_0x5294;document[_0x49aae1(0x1a6)](_0x49aae1(0x2a8))[_0x49aae1(0x321)][_0x49aae1(0x1ef)]='block';}function showComparisons(){const _0x2cb89a=_0x5294;document[_0x2cb89a(0x1a6)](_0x2cb89a(0x193))[_0x2cb89a(0x321)][_0x2cb89a(0x1ef)]='block';}function showEgg(_0x88234b){const _0x87d24e=_0x5294;hideAll(),document[_0x87d24e(0x1a6)](_0x88234b)[_0x87d24e(0x321)]['display']=_0x87d24e(0x2dc);}function gimmeFnord(){const _0x21af3d=_0x5294;document[_0x21af3d(0x1a6)]('illuminatiDiv')[_0x21af3d(0x343)]=fnord();}function hideAll(){const _0x1260f2=_0x5294;itemsToHide=document['getElementsByClassName'](_0x1260f2(0x1f4));for(i=0x0;i<itemsToHide[_0x1260f2(0x173)];i++){itemsToHide[i][_0x1260f2(0x321)]['display']=_0x1260f2(0x374);}}function addLineNumbers(){const _0x40bc28=_0x5294;originalLines=document[_0x40bc28(0x1a6)](_0x40bc28(0x18b))[_0x40bc28(0x23f)][_0x40bc28(0x2a3)]('\x0a'),outputString='';for(i=0x0;i<originalLines['length'];i++){outputString+='<'+(i+0x1)+'>'+originalLines[i]+'\x0a';}document[_0x40bc28(0x1a6)](_0x40bc28(0x18b))[_0x40bc28(0x23f)]=outputString;}function removeLineNumbers(){}function enterTemplate(){const _0x1732c1=_0x5294;document['getElementById'](_0x1732c1(0x13d))['value']=document[_0x1732c1(0x1a6)](_0x1732c1(0x36d))[_0x1732c1(0x2fa)];}function _0x5294(_0x3bca78,_0x1bfd00){const _0x218ae=_0x218a();return _0x5294=function(_0x5294e3,_0x2b336e){_0x5294e3=_0x5294e3-0x12c;let _0x3aa46c=_0x218ae[_0x5294e3];return _0x3aa46c;},_0x5294(_0x3bca78,_0x1bfd00);}function enterBetterTemplate(){const _0x8757ff=_0x5294;document[_0x8757ff(0x1a6)](_0x8757ff(0x13d))[_0x8757ff(0x23f)]=document[_0x8757ff(0x1a6)](_0x8757ff(0x1cc))[_0x8757ff(0x2fa)];}function showPage(_0x316ece){const _0x212b1b=_0x5294;document['getElementById'](_0x212b1b(0x284))[_0x212b1b(0x321)]['display']=='block'&&_0x316ece!=0x3&&saveLocal();for(i=0x1;i<0x8;i++){document[_0x212b1b(0x1a6)]('page'+i)[_0x212b1b(0x321)][_0x212b1b(0x1ef)]=_0x212b1b(0x374);}document[_0x212b1b(0x1a6)]('page'+_0x316ece)['style'][_0x212b1b(0x1ef)]=_0x212b1b(0x2dc),tablinks=document[_0x212b1b(0x17e)](_0x212b1b(0x26f));for(i=0x0;i<tablinks[_0x212b1b(0x173)];i++){tablinks[i][_0x212b1b(0x1a5)]=tablinks[i][_0x212b1b(0x1a5)][_0x212b1b(0x31f)]('\x20active','');}event[_0x212b1b(0x31e)]['className']+=_0x212b1b(0x22b);}function setHero(_0x21a3a5){const _0x1ec675=_0x5294;switch(_0x21a3a5){case 0x0:charStrValue=0xc,charAdjDexValue=0x9,charDexValue=0xc,charIntValue=0x8,charMAValue=0x6,charArmor=0x3,charInjuryValue=0x0,charFatigueValue=0x0,charRace=0x0,variableArray[_0x1ec675(0x23c)](_0x8c4c49=>_0x8c4c49[_0x1ec675(0x338)][_0x1ec675(0x2c7)]()===_0x1ec675(0x340))[_0x1ec675(0x159)]=0x1,variableArray[_0x1ec675(0x23c)](_0x468676=>_0x468676[_0x1ec675(0x338)][_0x1ec675(0x2c7)]()===_0x1ec675(0x34a))[_0x1ec675(0x159)]=0x1,variableArray['find'](_0x4a2ac9=>_0x4a2ac9['varName'][_0x1ec675(0x2c7)]()===_0x1ec675(0x299))[_0x1ec675(0x159)]=0x1,variableArray[_0x1ec675(0x23c)](_0x387172=>_0x387172[_0x1ec675(0x338)][_0x1ec675(0x2c7)]()===_0x1ec675(0x1db))[_0x1ec675(0x159)]=0x1,variableArray['find'](_0x3c52ea=>_0x3c52ea[_0x1ec675(0x338)]['toUpperCase']()===_0x1ec675(0x27e))[_0x1ec675(0x159)]=0x0,variableArray['find'](_0x131744=>_0x131744[_0x1ec675(0x338)][_0x1ec675(0x2c7)]()===_0x1ec675(0x1ae))['varValue']=0x0,variableArray[_0x1ec675(0x23c)](_0x1ec19b=>_0x1ec19b[_0x1ec675(0x338)][_0x1ec675(0x2c7)]()===_0x1ec675(0x28d))[_0x1ec675(0x159)]=0x0,variableArray['find'](_0x4fc82a=>_0x4fc82a[_0x1ec675(0x338)][_0x1ec675(0x2c7)]()===_0x1ec675(0x309))[_0x1ec675(0x159)]=0x0,variableArray[_0x1ec675(0x23c)](_0x1886b1=>_0x1886b1['varName'][_0x1ec675(0x2c7)]()===_0x1ec675(0x335))['varValue']=0x0,variableArray[_0x1ec675(0x23c)](_0x168daf=>_0x168daf['varName'][_0x1ec675(0x2c7)]()===_0x1ec675(0x273))[_0x1ec675(0x159)]=0x0,variableArray[_0x1ec675(0x23c)](_0x357896=>_0x357896[_0x1ec675(0x338)][_0x1ec675(0x2c7)]()===_0x1ec675(0x260))[_0x1ec675(0x159)]=0x0,variableArray[_0x1ec675(0x23c)](_0x579385=>_0x579385[_0x1ec675(0x338)][_0x1ec675(0x2c7)]()===_0x1ec675(0x370))[_0x1ec675(0x159)]=0x0,variableArray[_0x1ec675(0x23c)](_0x585a54=>_0x585a54[_0x1ec675(0x338)][_0x1ec675(0x2c7)]()==='LIGHT')[_0x1ec675(0x159)]=0x0;break;case 0x1:charStrValue=0x9,charAdjDexValue=0xc,charDexValue=0xc,charIntValue=0xb,charMAValue=0xc,charArmor=0x0,charInjuryValue=0x0,charFatigueValue=0x0,charRace=0x0,variableArray['find'](_0x31d5ad=>_0x31d5ad[_0x1ec675(0x338)][_0x1ec675(0x2c7)]()==='SWORD')['varValue']=0x0,variableArray[_0x1ec675(0x23c)](_0xb9666b=>_0xb9666b[_0x1ec675(0x338)][_0x1ec675(0x2c7)]()==='KNIFE')[_0x1ec675(0x159)]=0x1,variableArray[_0x1ec675(0x23c)](_0x4ffba6=>_0x4ffba6[_0x1ec675(0x338)][_0x1ec675(0x2c7)]()===_0x1ec675(0x299))[_0x1ec675(0x159)]=0x0,variableArray[_0x1ec675(0x23c)](_0x4c4b5c=>_0x4c4b5c[_0x1ec675(0x338)]['toUpperCase']()===_0x1ec675(0x1db))[_0x1ec675(0x159)]=0x0,variableArray[_0x1ec675(0x23c)](_0x3fe6ef=>_0x3fe6ef['varName'][_0x1ec675(0x2c7)]()===_0x1ec675(0x27e))['varValue']=0x1,variableArray[_0x1ec675(0x23c)](_0x4e0747=>_0x4e0747[_0x1ec675(0x338)][_0x1ec675(0x2c7)]()===_0x1ec675(0x1ae))[_0x1ec675(0x159)]=0x0,variableArray[_0x1ec675(0x23c)](_0x5adb95=>_0x5adb95[_0x1ec675(0x338)]['toUpperCase']()==='ALERTNESS')[_0x1ec675(0x159)]=0x0,variableArray[_0x1ec675(0x23c)](_0x57112a=>_0x57112a[_0x1ec675(0x338)]['toUpperCase']()==='ARCHITECT/BUILDER')[_0x1ec675(0x159)]=0x0,variableArray['find'](_0x52baf2=>_0x52baf2[_0x1ec675(0x338)][_0x1ec675(0x2c7)]()===_0x1ec675(0x335))['varValue']=0x0,variableArray[_0x1ec675(0x23c)](_0x3bff39=>_0x3bff39[_0x1ec675(0x338)][_0x1ec675(0x2c7)]()===_0x1ec675(0x273))[_0x1ec675(0x159)]=0x0,variableArray[_0x1ec675(0x23c)](_0x2baec2=>_0x2baec2['varName'][_0x1ec675(0x2c7)]()===_0x1ec675(0x260))[_0x1ec675(0x159)]=0x0,variableArray[_0x1ec675(0x23c)](_0x5435b3=>_0x5435b3[_0x1ec675(0x338)][_0x1ec675(0x2c7)]()==='SUMMONSCOUT')[_0x1ec675(0x159)]=0x1,variableArray[_0x1ec675(0x23c)](_0x463149=>_0x463149['varName'][_0x1ec675(0x2c7)]()===_0x1ec675(0x1a1))['varValue']=0x1;break;case 0x2:charStrValue=0xa,charAdjDexValue=0xa,charDexValue=0xc,charIntValue=0xa,charMAValue=0x8,charArmor=0x2,charInjuryValue=0x0,charFatigueValue=0x0,charRace=0x2,variableArray['find'](_0x476702=>_0x476702[_0x1ec675(0x338)][_0x1ec675(0x2c7)]()===_0x1ec675(0x340))[_0x1ec675(0x159)]=0x0,variableArray[_0x1ec675(0x23c)](_0x217ec7=>_0x217ec7[_0x1ec675(0x338)]['toUpperCase']()===_0x1ec675(0x34a))['varValue']=0x0,variableArray[_0x1ec675(0x23c)](_0x5b27f9=>_0x5b27f9['varName'][_0x1ec675(0x2c7)]()===_0x1ec675(0x299))['varValue']=0x0,variableArray[_0x1ec675(0x23c)](_0x308dbe=>_0x308dbe[_0x1ec675(0x338)][_0x1ec675(0x2c7)]()==='SHIELD')[_0x1ec675(0x159)]=0x0,variableArray[_0x1ec675(0x23c)](_0x5ed672=>_0x5ed672[_0x1ec675(0x338)][_0x1ec675(0x2c7)]()===_0x1ec675(0x27e))[_0x1ec675(0x159)]=0x1,variableArray['find'](_0x3869f9=>_0x3869f9[_0x1ec675(0x338)]['toUpperCase']()===_0x1ec675(0x1ae))['varValue']=0x1,variableArray[_0x1ec675(0x23c)](_0x762918=>_0x762918[_0x1ec675(0x338)][_0x1ec675(0x2c7)]()==='ALERTNESS')['varValue']=0x1,variableArray['find'](_0xc9c9ba=>_0xc9c9ba[_0x1ec675(0x338)][_0x1ec675(0x2c7)]()===_0x1ec675(0x309))[_0x1ec675(0x159)]=0x1,variableArray['find'](_0x431d26=>_0x431d26[_0x1ec675(0x338)][_0x1ec675(0x2c7)]()==='SEAMANSHIP')[_0x1ec675(0x159)]=0x1,variableArray[_0x1ec675(0x23c)](_0x525058=>_0x525058[_0x1ec675(0x338)]['toUpperCase']()==='CHARISMA')['varValue']=0x1,variableArray['find'](_0x4cbb1a=>_0x4cbb1a[_0x1ec675(0x338)][_0x1ec675(0x2c7)]()===_0x1ec675(0x260))[_0x1ec675(0x159)]=0x1,variableArray[_0x1ec675(0x23c)](_0x1fb392=>_0x1fb392[_0x1ec675(0x338)]['toUpperCase']()===_0x1ec675(0x370))[_0x1ec675(0x159)]=0x0,variableArray[_0x1ec675(0x23c)](_0x22f47c=>_0x22f47c[_0x1ec675(0x338)][_0x1ec675(0x2c7)]()===_0x1ec675(0x1a1))[_0x1ec675(0x159)]=0x0;break;default:setHero(0x0);break;}}function reviewUserInput(){const _0x3619cd=_0x5294;adventureArray=[],variableArray[_0x3619cd(0x23c)](_0x2824ee=>_0x2824ee[_0x3619cd(0x338)][_0x3619cd(0x2c7)]()==='ST')[_0x3619cd(0x159)]=charStrValue,variableArray[_0x3619cd(0x23c)](_0x43f70e=>_0x43f70e[_0x3619cd(0x338)][_0x3619cd(0x2c7)]()==='DX')[_0x3619cd(0x159)]=charDexValue,variableArray[_0x3619cd(0x23c)](_0x35c248=>_0x35c248[_0x3619cd(0x338)][_0x3619cd(0x2c7)]()===_0x3619cd(0x224))[_0x3619cd(0x159)]=charAdjDexValue,variableArray['find'](_0x4e255a=>_0x4e255a[_0x3619cd(0x338)][_0x3619cd(0x2c7)]()==='IQ')['varValue']=charIntValue,variableArray['find'](_0x327f6d=>_0x327f6d['varName']['toUpperCase']()==='MA')[_0x3619cd(0x159)]=charMAValue,variableArray[_0x3619cd(0x23c)](_0x55ad3d=>_0x55ad3d[_0x3619cd(0x338)][_0x3619cd(0x2c7)]()===_0x3619cd(0x204))['varValue']=charArmor,variableArray[_0x3619cd(0x23c)](_0x3aa974=>_0x3aa974[_0x3619cd(0x338)][_0x3619cd(0x2c7)]()===_0x3619cd(0x36b))['varValue']=charInjuryValue,variableArray[_0x3619cd(0x23c)](_0xaf6958=>_0xaf6958[_0x3619cd(0x338)][_0x3619cd(0x2c7)]()===_0x3619cd(0x266))[_0x3619cd(0x159)]=charFatigueValue,variableArray['find'](_0x2ed4ea=>_0x2ed4ea['varName']['toUpperCase']()==='CHARRACE')['varValue']=charRace,variableArray[_0x3619cd(0x23c)](_0x50a403=>_0x50a403['varName'][_0x3619cd(0x2c7)]()==='XPEARNED')[_0x3619cd(0x159)]=0x0,variableArray=variableArray[_0x3619cd(0x24d)](_0x2b8274=>_0x2b8274['varType']!='U'),document[_0x3619cd(0x1a6)](_0x3619cd(0x33c))[_0x3619cd(0x343)]='',userLines=document[_0x3619cd(0x1a6)]('userInputTextArea')[_0x3619cd(0x23f)][_0x3619cd(0x2a3)]('\x0a');for(let _0xf2bc86=0x0;_0xf2bc86<userLines['length'];_0xf2bc86++){userLines[_0xf2bc86]=userLines[_0xf2bc86]['replace'](/</g,'<\x20');}reviewResults='',problemsFound=0x0,titleStr='',multTitleWarn=0x0,creatorStr='',multCreatorWarn=0x0,descriptionStr='',multDescriptionWarn=0x0,testMode=0x0,multTestWarn=0x0,maxLevel=0x0,multMaxLevelWarn=0x0,atLeastOneLocation=0x0,firstLocation='',placesWeTryToGo=[],placesWeCanGo=[],foesThatExist=[],foesWeTryToRemove=[];for(currentLine=0x0;currentLine<userLines['length'];currentLine++){figuredThisLineOut=0x0;userLines[currentLine][_0x3619cd(0x2e5)](0x0,0x6)['toLowerCase']()==_0x3619cd(0x13c)&&(figuredThisLineOut=0x1,titleStr==''?(titleStr=userLines[currentLine][_0x3619cd(0x2ee)](0x7,userLines[currentLine][_0x3619cd(0x173)]),titleStr['length']>0x1e&&(titleStr=titleStr[_0x3619cd(0x2e5)](0x0,0x1e),reviewResults+='The\x20title\x20is\x20'+titleStr[_0x3619cd(0x173)]+_0x3619cd(0x2c5)+titleStr+'\x22\x20(30\x20characters).<br>')):multTitleWarn==0x0&&(multTitleWarn=0x1,reviewResults+=_0x3619cd(0x342)));userLines[currentLine][_0x3619cd(0x2e5)](0x0,0x8)[_0x3619cd(0x23a)]()==_0x3619cd(0x2ba)&&(figuredThisLineOut=0x1,creatorStr==''?(creatorStr=userLines[currentLine]['substring'](0x9,userLines[currentLine][_0x3619cd(0x173)]),creatorStr[_0x3619cd(0x173)]>0x1e&&(creatorStr=creatorStr[_0x3619cd(0x2e5)](0x0,0x1e),reviewResults+='The\x20creator\x20line\x20is\x20'+creatorStr[_0x3619cd(0x173)]+_0x3619cd(0x2c5)+creatorStr+'\x22\x20(30\x20characters).<br>')):multCreatorWarn==0x0&&(multCreatorWarn=0x1,reviewResults+=_0x3619cd(0x376)));userLines[currentLine]['substr'](0x0,0xc)['toLowerCase']()==_0x3619cd(0x2ec)&&(figuredThisLineOut=0x1,descriptionStr==''?(descriptionStr=userLines[currentLine][_0x3619cd(0x2ee)](0xd,userLines[currentLine][_0x3619cd(0x173)]),descriptionStr[_0x3619cd(0x173)]>0x1e&&(descriptionStr=descriptionStr[_0x3619cd(0x2e5)](0x0,0x1e),reviewResults+=_0x3619cd(0x1a3)+descriptionStr[_0x3619cd(0x173)]+_0x3619cd(0x2c5)+descriptionStr+_0x3619cd(0x1ac))):multDescriptionWarn==0x0&&(multDescriptionWarn=0x1,reviewResults+=_0x3619cd(0x2e2)));userLines[currentLine]['substr'](0x0,0x9)[_0x3619cd(0x23a)]()==_0x3619cd(0x1f0)&&(figuredThisLineOut=0x1,testMode==0x0?testMode=0x1:multTestWarn==0x0&&(multTestWarn=0x1,reviewResults+=_0x3619cd(0x2e9)));if(userLines[currentLine]['substr'](0x0,0x9)[_0x3619cd(0x23a)]()==_0x3619cd(0x2b4)){figuredThisLineOut=0x1;if(maxLevel==0x0){maxLevel=parseInt(userLines[currentLine][_0x3619cd(0x2ee)](0xa,userLines[currentLine][_0x3619cd(0x173)]));if(maxLevel<0x1e)reviewResults+='Basic\x20characters\x20in\x20The\x20Fantasy\x20Trip\x20start\x20with\x2032\x20attribute\x20points,\x20except\x20for\x20Halflings\x20who\x20start\x20with\x2030.\x20Your\x20max\x20level\x20is\x20lower\x20than\x20this.\x20You\x20should\x20consider\x20designing\x20your\x20adventure\x20for\x20characters\x20between\x2032\x20and\x2038\x20attribute\x20points.<br>';else maxLevel>0x28&&(reviewResults+=_0x3619cd(0x291));}else multMaxLevelWarn==0x0&&(multMaxLevelWarn=0x1,reviewResults+=_0x3619cd(0x1dc));}if(userLines[currentLine][_0x3619cd(0x2e5)](0x0,0x1)=='^'&&atLeastOneLocation==0x0){figuredThisLineOut=0x1,newVarSuccess=0x1;let _0x421676=userLines[currentLine][_0x3619cd(0x2e5)](0x1,0x3e7)[_0x3619cd(0x2a3)]('\x20')[_0x3619cd(0x198)]('');newVarName=_0x421676[_0x3619cd(0x2e5)](0x0,_0x421676[_0x3619cd(0x27f)]('='))['substr'](0x0,0x14),newVarValue=_0x421676[_0x3619cd(0x2e5)](_0x421676[_0x3619cd(0x27f)]('=')+0x1,0x3e7);if(_0x421676[_0x3619cd(0x27f)]('=')==-0x1||newVarName[_0x3619cd(0x173)]==0x0||newVarValue['length']==0x0)reviewResults+=_0x3619cd(0x14f)+(currentLine+0x1)+':\x20looks\x20like\x20an\x20incomplete\x20variable\x20declaration\x20\x27.<br>',newVarSuccess=0x0;else{for(let _0x54e030=0x0;_0x54e030<illegalVariableNames[_0x3619cd(0x173)];_0x54e030++){newVarName==illegalVariableNames[_0x54e030]&&(reviewResults+=_0x3619cd(0x14f)+(currentLine+0x1)+':\x20you\x20can\x27t\x20name\x20a\x20variable\x20\x27'+newVarName+'\x27.<br>',newVarSuccess=0x0);}_0x3619cd(0x15c)['indexOf'](newVarName[_0x3619cd(0x2e5)](0x0,0x1))<0x0&&(reviewResults+=_0x3619cd(0x14f)+(currentLine+0x1)+':\x20variable\x20names\x20must\x20start\x20with\x20a\x20letter.<br>',newVarSuccess=0x0);for(varNamePos=0x1;varNamePos<newVarName['length'];varNamePos++){_0x3619cd(0x18d)['indexOf'](newVarName[_0x3619cd(0x2e5)](varNamePos,0x1))<0x0&&(reviewResults+=_0x3619cd(0x14f)+(currentLine+0x1)+_0x3619cd(0x296),newVarSuccess=0x0);}typeof variableArray[_0x3619cd(0x23c)](_0x3452e7=>_0x3452e7[_0x3619cd(0x338)]['toUpperCase']()===newVarName[_0x3619cd(0x2c7)]())!='undefined'&&(reviewResults+=_0x3619cd(0x14f)+(currentLine+0x1)+_0x3619cd(0x2be)+newVarName+'\x20already\x20exists.<br>',newVarSuccess=0x0);securityCheck(newVarValue)?newVarValue=evaluateString(newVarValue):newVarSuccess=0x0;if(newVarSuccess==0x1&&isNaN(newVarValue)){reviewResults+=_0x3619cd(0x14f)+(currentLine+0x1)+_0x3619cd(0x25e)+newVarName+_0x3619cd(0x250),newVarSuccess=0x0;break;}newVarSuccess>0x0?(variableArray[_0x3619cd(0x20c)]({'varName':newVarName,'varValue':newVarValue,'varType':'U'}),variableArray=variableArray[_0x3619cd(0x334)]((_0x36c119,_0x1d0864)=>_0x1d0864[_0x3619cd(0x338)][_0x3619cd(0x173)]-_0x36c119[_0x3619cd(0x338)]['length'])):console[_0x3619cd(0x271)](_0x3619cd(0x14f)+currentLine+_0x3619cd(0x1d2)+newVarName+_0x3619cd(0x27c)+newVarValue+'.');}}if(userLines[currentLine][_0x3619cd(0x2e5)](0x0,0x9)[_0x3619cd(0x23a)]()==_0x3619cd(0x20a)){atLeastOneLocation=0x1,figuredThisLineOut=0x1,locationNameString=userLines[currentLine]['substr'](0xa,userLines[currentLine][_0x3619cd(0x173)])[_0x3619cd(0x23a)]();placesWeCanGo[_0x3619cd(0x27f)](locationNameString)>-0x1?(reviewResults+=_0x3619cd(0x25d)+locationNameString+_0x3619cd(0x259),problemsFound++):placesWeCanGo[_0x3619cd(0x20c)](locationNameString);firstLocation==''&&(firstLocation=locationNameString);thisLocation={'type':'l','name':locationNameString,'toDo':[],'html':'','writing':''},newLocationButton=_0x3619cd(0x136),newLocationButton+='\x22'+locationNameString+'\x22',newLocationButton+=_0x3619cd(0x1af)+locationNameString+_0x3619cd(0x221),document[_0x3619cd(0x1a6)](_0x3619cd(0x33c))[_0x3619cd(0x343)]+=newLocationButton;while(currentLine<userLines[_0x3619cd(0x173)]-0x1&&userLines[currentLine+0x1][_0x3619cd(0x2e5)](0x0,0x9)[_0x3619cd(0x23a)]()!=_0x3619cd(0x20a)&&userLines[currentLine+0x1][_0x3619cd(0x2e5)](0x0,0x7)[_0x3619cd(0x23a)]()!=_0x3619cd(0x144)&&userLines[currentLine+0x1][_0x3619cd(0x2e5)](0x0,0x4)['toLowerCase']()!=_0x3619cd(0x23d)){if(userLines[currentLine+0x1][_0x3619cd(0x2e5)](0x0,0x7)['toLowerCase']()==_0x3619cd(0x36c)){buttonDestination=userLines[currentLine+0x1][_0x3619cd(0x2ee)](0x8,userLines[currentLine+0x1][_0x3619cd(0x173)])[_0x3619cd(0x23a)]();if(userLines[_0x3619cd(0x173)]>currentLine+0x2){buttonText=userLines[currentLine+0x2][_0x3619cd(0x2e5)](0x0,0x23);if(userLines[currentLine+0x2][_0x3619cd(0x173)]>0x23)reviewResults+='Button\x20text\x20on\x20line\x20'+(currentLine+0x1)+_0x3619cd(0x255)+buttonText+_0x3619cd(0x259);else buttonText['trim']()[_0x3619cd(0x173)]==0x0&&(reviewResults+=_0x3619cd(0x364)+(currentLine+0x1)+_0x3619cd(0x17d));}buttonText=breakHTML(buttonText),placesWeTryToGo[_0x3619cd(0x20c)]('l^'+thisLocation[_0x3619cd(0x358)]+'^'+buttonDestination),buttonString=_0x3619cd(0x19c),buttonString+='\x22'+buttonDestination+'\x22',buttonString+=_0x3619cd(0x1b8)+buttonText,buttonString+=_0x3619cd(0x31b),thisLocation[_0x3619cd(0x15a)]+=buttonString,currentLine+=0x1;}else{if(userLines[currentLine+0x1][_0x3619cd(0x2e5)](0x0,0x8)[_0x3619cd(0x2c7)]()==_0x3619cd(0x34b))thisLocation[_0x3619cd(0x2ea)]=userLines[currentLine+0x1][_0x3619cd(0x2e5)](0x9,0x270f);else{if(userLines[currentLine+0x1][_0x3619cd(0x2e5)](0x0,0x7)[_0x3619cd(0x2c7)]()==_0x3619cd(0x21e)){parsed=userLines[currentLine+0x1]['split']('\x20');if(parsed[_0x3619cd(0x173)]!=0x3)reviewResults+=_0x3619cd(0x14f)+(currentLine+0x1)+_0x3619cd(0x247),problemsFound++;else _0x3619cd(0x314)[_0x3619cd(0x27f)](whatTypeOfTermIs(parsed[0x1]))<0x0?(reviewResults+=_0x3619cd(0x2a2)+(currentLine+0x1)+_0x3619cd(0x1b2),problemsFound++):(thisLocation[_0x3619cd(0x1e7)]['push'](userLines[currentLine+0x1]),placesWeTryToGo['push']('d^'+thisLocation[_0x3619cd(0x358)]+'^'+parsed[0x2]));}else{if(userLines[currentLine+0x1][_0x3619cd(0x2e5)](0x0,0x5)['toUpperCase']()==_0x3619cd(0x237))isNaN(evaluateComparisonTerm(userLines[currentLine+0x1][_0x3619cd(0x2e5)](0x5,0x270f)))?reviewResults+='The\x20amount\x20of\x20healing\x20on\x20line\x20'+(currentLine+0x1)+_0x3619cd(0x1b2):thisLocation['toDo'][_0x3619cd(0x20c)](userLines[currentLine+0x1]);else{if(userLines[currentLine+0x1][_0x3619cd(0x2e5)](0x0,0xa)[_0x3619cd(0x2c7)]()==_0x3619cd(0x21c))foesWeTryToRemove[_0x3619cd(0x20c)](userLines[currentLine+0x1][_0x3619cd(0x2e5)](0xa,0x3e7));else{if(userLines[currentLine+0x1][_0x3619cd(0x2e5)](0x0,0x1)=='^'&&userLines[currentLine+0x1][_0x3619cd(0x27f)]('=')>-0x1){theVar=userLines[currentLine+0x1]['substr'](0x1,userLines[currentLine+0x1][_0x3619cd(0x27f)]('=')-0x1)[_0x3619cd(0x31f)](/ +/g,''),theExpr=userLines[currentLine+0x1]['substr'](userLines[currentLine+0x1][_0x3619cd(0x27f)]('=')+0x1,0x270f)[_0x3619cd(0x31f)](/ +/g,''),goodVar=0x1;for(let _0x443d50=0x0;_0x443d50<illegalVariableNames['length'];_0x443d50++){theVar[_0x3619cd(0x2c7)]==illegalVariableNames[_0x443d50]&&(reviewResults+='Line\x20'+(currentLine+0x1)+_0x3619cd(0x2c1)+illegalVariableNames[_0x443d50]+'.',goodVar=0x0);}typeof variableArray[_0x3619cd(0x23c)](_0x81621e=>_0x81621e[_0x3619cd(0x338)][_0x3619cd(0x2c7)]()===theVar[_0x3619cd(0x2c7)]())===_0x3619cd(0x308)&&(reviewResults+=_0x3619cd(0x14f)+(currentLine+0x2)+':\x20\x20'+theVar+_0x3619cd(0x32b),goodVar=0x0),secure=securityCheck(theExpr),goodVar>0x0&&secure>0x0&&thisLocation['toDo'][_0x3619cd(0x20c)](userLines[currentLine+0x1]);}else{if(userLines[currentLine+0x1]['indexOf']('^')>-0x1){fixedLine=userLines[currentLine+0x1],fixedLineWords=fixedLine[_0x3619cd(0x2a3)]('\x20');for(wordCounter=0x0;wordCounter<fixedLineWords[_0x3619cd(0x173)];wordCounter++){if(fixedLineWords[wordCounter][_0x3619cd(0x2e5)](0x0,0x1)=='^'){fixedLine=fixedLine[_0x3619cd(0x31f)](fixedLineWords[wordCounter],fixedLineWords[wordCounter][_0x3619cd(0x2c7)]()),thisLocation[_0x3619cd(0x15a)]+=breakHTML(fixedLine)+_0x3619cd(0x137);break;}}}else thisLocation['html']+=breakHTML(userLines[currentLine+0x1])+_0x3619cd(0x137);}}}}}}currentLine+=0x1;}thisLocation[_0x3619cd(0x15a)]==''&&(reviewResults+=_0x3619cd(0x1a4)+locationNameString+'\x20has\x20no\x20description.<br>',problemsFound++),adventureArray[_0x3619cd(0x20c)](thisLocation);}if(userLines[currentLine]['substr'](0x0,0x7)['toLowerCase']()=='@branch'){figuredThisLineOut=0x1,locationNameString=userLines[currentLine][_0x3619cd(0x2e5)](0x8,userLines[currentLine]['length'])[_0x3619cd(0x23a)]();placesWeCanGo[_0x3619cd(0x27f)](locationNameString)>-0x1?(reviewResults+=_0x3619cd(0x2f5)+locationNameString+'\x27.<br>',problemsFound++):placesWeCanGo[_0x3619cd(0x20c)](locationNameString);thisLocation={'type':'b','name':locationNameString,'toDo':[],'bonuses':[],'firstExpression':'','secondExpression':'','comparator':'','successDestination':'','failDestination':''},newLocationButton=_0x3619cd(0x136),newLocationButton+='\x22'+locationNameString+'\x22',newLocationButton+=')\x27\x27>(branch)'+locationNameString+_0x3619cd(0x221),document[_0x3619cd(0x1a6)]('locationsDiv')[_0x3619cd(0x343)]+=newLocationButton;while(currentLine<userLines[_0x3619cd(0x173)]-0x1&&userLines[currentLine+0x1][_0x3619cd(0x2e5)](0x0,0x9)[_0x3619cd(0x23a)]()!=_0x3619cd(0x20a)&&userLines[currentLine+0x1][_0x3619cd(0x2e5)](0x0,0x7)['toLowerCase']()!=_0x3619cd(0x144)&&userLines[currentLine+0x1][_0x3619cd(0x2e5)](0x0,0x4)[_0x3619cd(0x23a)]()!=_0x3619cd(0x23d)){if(userLines[currentLine+0x1][_0x3619cd(0x2e5)](0x0,0x6)[_0x3619cd(0x23a)]()==_0x3619cd(0x35d))usefulPart=userLines[currentLine+0x1]['substr'](0x7,0x3e7),breakingSpace=usefulPart[_0x3619cd(0x27f)]('\x20'),breakingSpace<0x1?reviewResults+='The\x20@bonus\x20on\x20line:\x20'+(currentLine+0x1)+_0x3619cd(0x165):(theEffect=usefulPart[_0x3619cd(0x2e5)](0x0,breakingSpace),theCondition=usefulPart['substr'](breakingSpace+0x1,0x3e7)[_0x3619cd(0x156)](),looksGood=!![],typeof variableArray[_0x3619cd(0x23c)](_0x23f455=>_0x23f455['varName'][_0x3619cd(0x2c7)]()===theCondition[_0x3619cd(0x2c7)]())==='undefined'&&(reviewResults+=_0x3619cd(0x1d8)+(currentLine+0x1)+'\x20seems\x20incorrect.\x20The\x20condition\x20should\x20be\x20a\x20talent\x20or\x20spell.<br>',looksGood=![]),isNaN(theEffect)&&(reviewResults+='The\x20@bonus\x20on\x20line:\x20'+(currentLine+0x1)+_0x3619cd(0x14e),looksGood=![]),looksGood&&thisLocation[_0x3619cd(0x2d2)][_0x3619cd(0x20c)]({'theCondition':theCondition,'theEffect':theEffect}));else{if(userLines[currentLine+0x1][_0x3619cd(0x2e5)](0x0,0x13)['toLowerCase']()=='@successdestination')thisLocation[_0x3619cd(0x372)]==''?(thisLocation[_0x3619cd(0x372)]=userLines[currentLine+0x1][_0x3619cd(0x2e5)](0x14,0x3e7)[_0x3619cd(0x23a)](),placesWeTryToGo[_0x3619cd(0x20c)]('b^'+thisLocation[_0x3619cd(0x358)]+'^'+thisLocation[_0x3619cd(0x372)])):reviewResults+=_0x3619cd(0x2de)+locationNameString+_0x3619cd(0x1cf);else{if(userLines[currentLine+0x1]['substr'](0x0,0x10)[_0x3619cd(0x23a)]()==_0x3619cd(0x213))thisLocation[_0x3619cd(0x16c)]==''?(thisLocation[_0x3619cd(0x16c)]=userLines[currentLine+0x1][_0x3619cd(0x2e5)](0x11,0x3e7)[_0x3619cd(0x23a)](),placesWeTryToGo[_0x3619cd(0x20c)]('b^'+thisLocation[_0x3619cd(0x358)]+'^'+thisLocation['failDestination'])):reviewResults+=_0x3619cd(0x2de)+locationNameString+_0x3619cd(0x1bc);else{if(thisLocation[_0x3619cd(0x177)]+thisLocation[_0x3619cd(0x20f)]+thisLocation['comparator']=='')for(let _0xda5843=0x0;_0xda5843<comparators[_0x3619cd(0x173)];_0xda5843++){whereIsIt=userLines[currentLine+0x1][_0x3619cd(0x27f)](comparators[_0xda5843]);if(whereIsIt>-0x1){if(comparators[_0xda5843]=='vs')thisLocation[_0x3619cd(0x2dd)]='<=';else comparators[_0xda5843]=='<\x20='?thisLocation[_0x3619cd(0x2dd)]='<=':thisLocation['comparator']=comparators[_0xda5843];thisLocation['firstExpression']=userLines[currentLine+0x1][_0x3619cd(0x2e5)](0x0,whereIsIt)['trim'](),thisLocation[_0x3619cd(0x20f)]=userLines[currentLine+0x1][_0x3619cd(0x2e5)](whereIsIt+comparators[_0xda5843][_0x3619cd(0x173)],0x3e7)['trim']();evaluateComparisonTerm(thisLocation['firstExpression'])==_0x3619cd(0x16a)&&(problemsFound++,reviewResults+='In\x20the\x20branch\x20named\x20'+locationNameString+_0x3619cd(0x276)+thisLocation[_0x3619cd(0x177)]+_0x3619cd(0x1c8));evaluateComparisonTerm(thisLocation[_0x3619cd(0x20f)])=='gibberish'&&(problemsFound++,reviewResults+='In\x20the\x20branch\x20named\x20'+locationNameString+'\x20the\x20second\x20term\x20in\x20the\x20comparison\x20-\x20'+thisLocation[_0x3619cd(0x20f)]+_0x3619cd(0x1c8));break;}}else userLines[currentLine+0x1][_0x3619cd(0x156)]()['length']>0x0&&(thisLocation[_0x3619cd(0x311)]==''?thisLocation[_0x3619cd(0x311)]=userLines[currentLine+0x1]:reviewResults+=_0x3619cd(0x2de)+locationNameString+'\x20has\x20an\x20extraneous\x20line\x20(\x22'+userLines[currentLine+0x1]+_0x3619cd(0x20e));}}}currentLine+=0x1;}thisLocation[_0x3619cd(0x372)]==''&&(reviewResults+=_0x3619cd(0x282)+locationNameString+_0x3619cd(0x28f),problemsFound++),thisLocation[_0x3619cd(0x16c)]==''&&(reviewResults+=_0x3619cd(0x282)+locationNameString+_0x3619cd(0x1a2),problemsFound++),thisLocation['failDestination']==thisLocation['successDestination']&&(reviewResults+=_0x3619cd(0x2de)+locationNameString+_0x3619cd(0x172),problemsFound++),thisLocation[_0x3619cd(0x177)]+thisLocation[_0x3619cd(0x20f)]+thisLocation[_0x3619cd(0x2dd)]==''&&(reviewResults+=_0x3619cd(0x282)+locationNameString+_0x3619cd(0x1e1),problemsFound++),(thisLocation[_0x3619cd(0x177)]==''||thisLocation[_0x3619cd(0x20f)]==''||thisLocation[_0x3619cd(0x2dd)]=='')&&(reviewResults+=_0x3619cd(0x282)+locationNameString+_0x3619cd(0x329),problemsFound++),adventureArray[_0x3619cd(0x20c)](thisLocation);}if(userLines[currentLine][_0x3619cd(0x2e5)](0x0,0x4)[_0x3619cd(0x23a)]()==_0x3619cd(0x23d)){figuredThisLineOut=0x1,locationNameString=userLines[currentLine][_0x3619cd(0x2e5)](0x5,userLines[currentLine][_0x3619cd(0x173)])['toLowerCase']();placesWeCanGo['indexOf'](locationNameString)>-0x1?(reviewResults+=_0x3619cd(0x25d)+locationNameString+_0x3619cd(0x259),problemsFound++):placesWeCanGo[_0x3619cd(0x20c)](locationNameString);foesThatExist[_0x3619cd(0x20c)](locationNameString),thisLocation={'type':'f','name':locationNameString,'foeName':'','combatIntro':'','toDo':[],'st':0x0,'dx':0x0,'iq':0x0,'ma':0x0,'armor':0x0,'damage':'','damage2':'','foeType':0x0,'winDestination':'','loseDestination':'','noFoe':''},newLocationButton='<span\x20onclick=\x27adventureGo(',newLocationButton+='\x22'+locationNameString+'\x22',newLocationButton+=_0x3619cd(0x171)+locationNameString+_0x3619cd(0x221),document['getElementById'](_0x3619cd(0x33c))[_0x3619cd(0x343)]+=newLocationButton;while(currentLine<userLines['length']-0x1&&userLines[currentLine+0x1][_0x3619cd(0x2e5)](0x0,0x9)['toLowerCase']()!=_0x3619cd(0x20a)&&userLines[currentLine+0x1][_0x3619cd(0x2e5)](0x0,0x7)[_0x3619cd(0x23a)]()!=_0x3619cd(0x144)&&userLines[currentLine+0x1]['substr'](0x0,0x4)['toLowerCase']()!=_0x3619cd(0x23d)){if(userLines[currentLine+0x1][_0x3619cd(0x2e5)](0x0,0xf)[_0x3619cd(0x23a)]()==_0x3619cd(0x349))thisLocation[_0x3619cd(0x29e)]==''?(thisLocation['winDestination']=userLines[currentLine+0x1][_0x3619cd(0x2e5)](0x10,0x3e7)[_0x3619cd(0x23a)](),placesWeTryToGo[_0x3619cd(0x20c)]('f^'+thisLocation['name']+'^'+thisLocation[_0x3619cd(0x29e)])):reviewResults+=_0x3619cd(0x332)+locationNameString+_0x3619cd(0x268);else{if(userLines[currentLine+0x1]['substr'](0x0,0x10)['toLowerCase']()==_0x3619cd(0x2b7))thisLocation[_0x3619cd(0x281)]==''?(thisLocation[_0x3619cd(0x281)]=userLines[currentLine+0x1][_0x3619cd(0x2e5)](0x11,0x3e7)[_0x3619cd(0x23a)](),placesWeTryToGo[_0x3619cd(0x20c)]('b^'+thisLocation['name']+'^'+thisLocation[_0x3619cd(0x281)])):reviewResults+=_0x3619cd(0x332)+locationNameString+'\x20has\x20more\x20than\x20one\x20loseDestination;\x20only\x20the\x20first\x20will\x20be\x20used.<br>';else{if(userLines[currentLine+0x1][_0x3619cd(0x2e5)](0x0,0x6)['toLowerCase']()==_0x3619cd(0x18c))thisLocation[_0x3619cd(0x326)]==''?(thisLocation['noFoe']=userLines[currentLine+0x1][_0x3619cd(0x2e5)](0x7,0x3e7)[_0x3619cd(0x23a)](),placesWeTryToGo[_0x3619cd(0x20c)]('b^'+thisLocation[_0x3619cd(0x358)]+'^'+thisLocation[_0x3619cd(0x326)])):reviewResults+='The\x20foe\x20named\x20'+locationNameString+_0x3619cd(0x345);else{if(userLines[currentLine+0x1][_0x3619cd(0x2e5)](0x0,0x5)['toLowerCase']()=='@type')thisLocation[_0x3619cd(0x238)]==0x0?(thisLocation[_0x3619cd(0x238)]=parseInt(userLines[currentLine+0x1]['substr'](0x6,0x8)),thisLocation[_0x3619cd(0x2c0)]=userLines[currentLine+0x2][_0x3619cd(0x2e5)](0x0,0xf),currentLine++):reviewResults+=_0x3619cd(0x332)+locationNameString+_0x3619cd(0x360);else{if(thisLocation['st']==0x0&&userLines[currentLine+0x1][_0x3619cd(0x2e5)](0x0,0x2)['toLowerCase']()=='st'&&userLines[currentLine+0x1][_0x3619cd(0x23a)]()[_0x3619cd(0x27f)](_0x3619cd(0x163))>0x0)statArray=userLines[currentLine+0x1][_0x3619cd(0x2a3)](','),thisLocation['st']=parseInt(statArray[0x0][_0x3619cd(0x2e5)](0x3,0x63)),thisLocation['dx']=parseInt(statArray[0x1]['substr'](0x3,0x63)),thisLocation['iq']=parseInt(statArray[0x2][_0x3619cd(0x2e5)](0x3,0x63)),thisLocation['ma']=parseInt(statArray[0x3]['substr'](0x3,0x63)),(thisLocation['st']<0x1||thisLocation['st']>0x13)&&(reviewResults+=_0x3619cd(0x332)+locationNameString+_0x3619cd(0x1c5),thisLocation['st']<0x0&&(thisLocation['st']=0x0)),(thisLocation['dx']<0x1||thisLocation['dx']>0x13)&&(reviewResults+=_0x3619cd(0x332)+locationNameString+_0x3619cd(0x153),thisLocation['dx']<0x0&&(thisLocation['dx']=0x0)),(thisLocation['iq']<0x1||thisLocation['iq']>0x13)&&(reviewResults+=_0x3619cd(0x332)+locationNameString+_0x3619cd(0x2f3),thisLocation['iq']<0x0&&(thisLocation['iq']=0x0)),(thisLocation['ma']<0x1||thisLocation['ma']>0x13)&&(reviewResults+=_0x3619cd(0x332)+locationNameString+_0x3619cd(0x34f),thisLocation['ma']<0x0&&(thisLocation['ma']=0x0));else{if(userLines[currentLine+0x1][_0x3619cd(0x2e5)](0x0,0x6)[_0x3619cd(0x23a)]()=='armor:'){thisArmor=userLines[currentLine+0x1]['substr'](0x7,0x63)[_0x3619cd(0x23a)]();if(thisArmor[_0x3619cd(0x156)]()[_0x3619cd(0x173)]==0x0)thisLocation[_0x3619cd(0x182)]=0x0;else{armorFound=armorTypes['indexOf'](thisArmor),armorValue=parseInt(thisArmor);if(armorFound>-0x1)thisLocation['armor']=armorFound;else isNaN(armorValue)?(reviewResults+='Problem:\x20The\x20foe\x20named\x20'+locationNameString+_0x3619cd(0x189)+thisArmor+_0x3619cd(0x24f),problemsFound++):(thisLocation[_0x3619cd(0x182)]=armorValue,(armorValue<0x0||armorValue>0xa)&&(reviewResults+=_0x3619cd(0x332)+locationNameString+'\x20has\x20an\x20unexpected\x20value\x20for\x20Amror.\x20Consider\x20using\x200-10.<br>',armorValue<0x0&&(thisLocation[_0x3619cd(0x182)]=0x0)));}}else{if(userLines[currentLine+0x1]['substr'](0x0,0x8)[_0x3619cd(0x23a)]()==_0x3619cd(0x2e0))thisLocation[_0x3619cd(0x2a0)]!=''?reviewResults+=_0x3619cd(0x332)+locationNameString+'\x20seems\x20to\x20have\x20an\x20extra\x20Weapons\x20line(\x27'+userLines[currentLine+0x1]+_0x3619cd(0x24f):(weaponsDamageMaybe=userLines[currentLine+0x1]['split']('('),weaponsDamageMaybe['length']>0x1&&(thisLocation[_0x3619cd(0x2a0)]=weaponsDamageMaybe[0x1]['split'](')')[0x0],weaponsDamageMaybe[_0x3619cd(0x173)]>0x2&&(thisLocation[_0x3619cd(0x33a)]=weaponsDamageMaybe[0x2][_0x3619cd(0x2a3)](')')[0x0])));else{if(userLines[currentLine+0x1][_0x3619cd(0x2e5)](0x0,0x13)[_0x3619cd(0x23a)]()==_0x3619cd(0x1c0)){if(thisLocation[_0x3619cd(0x2a0)]!=''){}else weaponsDamageMaybe=userLines[currentLine+0x1][_0x3619cd(0x2a3)]('('),weaponsDamageMaybe[_0x3619cd(0x173)]>0x1?(thisLocation[_0x3619cd(0x2a0)]=weaponsDamageMaybe[0x1]['split'](')')[0x0],weaponsDamageMaybe[_0x3619cd(0x173)]>0x2&&(thisLocation[_0x3619cd(0x33a)]=weaponsDamageMaybe[0x2][_0x3619cd(0x2a3)](')')[0x0])):reviewResults+=_0x3619cd(0x332)+locationNameString+_0x3619cd(0x205);}else{if(userLines[currentLine+0x1]['indexOf'](_0x3619cd(0x2ef))>-0x1||userLines[currentLine+0x1][_0x3619cd(0x2e5)](0x0,0x8)[_0x3619cd(0x23a)]()==_0x3619cd(0x2cf)||userLines[currentLine+0x1][_0x3619cd(0x2e5)](0x0,0x7)[_0x3619cd(0x23a)]()==_0x3619cd(0x1a0)||userLines[currentLine+0x1]['substr'](0x0,0xa)[_0x3619cd(0x23a)]()==_0x3619cd(0x2fc)||userLines[currentLine+0x1]['substr'](0x0,0xd)[_0x3619cd(0x23a)]()==_0x3619cd(0x29f)){}else{if(userLines[currentLine][_0x3619cd(0x2e5)](0x0,0x4)[_0x3619cd(0x23a)]()=='@foe')thisLocation[_0x3619cd(0x2f1)]=userLines[currentLine+0x1];else userLines[currentLine+0x1][_0x3619cd(0x156)]()[_0x3619cd(0x173)]>0x0&&(reviewResults+=_0x3619cd(0x332)+locationNameString+_0x3619cd(0x354)+userLines[currentLine+0x1]+_0x3619cd(0x24f));}}}}}}}}}currentLine+=0x1;}adventureArray['push'](thisLocation);}figuredThisLineOut==0x0&&userLines[currentLine][_0x3619cd(0x156)]()[_0x3619cd(0x173)]>0x0&&(reviewResults+=_0x3619cd(0x303)+(currentLine+0x1)+'\x20doesn\x27t\x20seem\x20to\x20make\x20sense.\x20Possibly\x20a\x20key\x20word\x20is\x20misspelled\x20or\x20another\x20line\x20is\x20out\x20of\x20place.\x20('+userLines[currentLine]+_0x3619cd(0x267));}titleStr==''&&(reviewResults+=_0x3619cd(0x2da),problemsFound++);creatorStr==''&&(reviewResults+='Problem:\x20You\x20need\x20a\x20@creator\x20line\x20for\x20your\x20adventure.<br>',problemsFound++);descriptionStr==''&&(reviewResults+=_0x3619cd(0x1da),problemsFound++);maxLevel==0x0&&(reviewResults+='You\x20didn\x27t\x20specify\x20a\x20@maxlevel\x20for\x20this\x20adventure,\x20so\x20we\x27ll\x20assume\x20the\x20adventure\x20is\x20for\x20starting\x20characters\x20(32\x20attribute\x20points).<br>',maxLevel=0x20);nodeNames=[];for(let _0x3b93b8=0x0;_0x3b93b8<foesWeTryToRemove;_0x3b93b8++){foesThatExist[_0x3619cd(0x27f)](foesWeTryToRemove[_0x3b93b8])==-0x1&&(reviewResults+=_0x3619cd(0x371)+foesWeTryToRemove[_0x3b93b8]+'\x20but\x20no\x20such\x20foe\x20can\x20be\x20found.<br>');}for(i=0x0;i<placesWeTryToGo[_0x3619cd(0x173)];i++){destinationArray=placesWeTryToGo[i][_0x3619cd(0x2a3)]('^'),nodeNames[_0x3619cd(0x20c)](destinationArray[0x2]);if(placesWeCanGo['indexOf'](destinationArray[0x2])<0x0){reviewResults+='Problem:\x20There\x20is\x20a\x20';switch(destinationArray[0x0]){case'l':reviewResults+=_0x3619cd(0x170);break;case'b':reviewResults+=_0x3619cd(0x215);break;case'f':reviewResults+=_0x3619cd(0x1f3);break;case'd':reviewResults+=_0x3619cd(0x1dd);break;}reviewResults+=_0x3619cd(0x1b7)+destinationArray[0x1],reviewResults+='\x27\x20that\x20should\x20lead\x20to\x20\x27',reviewResults+=destinationArray[0x2],reviewResults+=_0x3619cd(0x142),problemsFound++;}}for(i=0x0;i<placesWeCanGo[_0x3619cd(0x173)];i++){nodeNames['indexOf'](placesWeCanGo[i])<0x0&&placesWeCanGo[i]!=firstLocation&&(reviewResults+=_0x3619cd(0x143)+placesWeCanGo[i]+'\x27\x27\x20but\x20nothing\x20leads\x20to\x20that\x20location.<br>');}document[_0x3619cd(0x1a6)](_0x3619cd(0x1ed))['innerHTML']=reviewResults,document['getElementById'](_0x3619cd(0x2ac))['innerHTML']=_0x3619cd(0x2b9)+problemsFound+_0x3619cd(0x137),problemsFound>0x0?document[_0x3619cd(0x1a6)](_0x3619cd(0x2ac))['innerHTML']+=_0x3619cd(0x24c):document[_0x3619cd(0x1a6)](_0x3619cd(0x2ac))[_0x3619cd(0x343)]+=_0x3619cd(0x137),testMode==0x1?document[_0x3619cd(0x1a6)]('testModeWarningDiv')[_0x3619cd(0x321)]['display']=_0x3619cd(0x2dc):document['getElementById'](_0x3619cd(0x36f))[_0x3619cd(0x321)][_0x3619cd(0x1ef)]='none',problemsFound==0x0?(adventureGo(firstLocation),displayVariables(),document[_0x3619cd(0x1a6)](_0x3619cd(0x274))[_0x3619cd(0x343)]=generateExportable()):document[_0x3619cd(0x1a6)](_0x3619cd(0x34c))['innerHTML']=_0x3619cd(0x2f6),console[_0x3619cd(0x271)]('End\x20of\x20reviewUserInput():\x20adventureArray.length\x20=\x20'+adventureArray[_0x3619cd(0x173)]);}function breakHTML(_0x1354f2){return _0x1354f2['replace'](/</g,'<\x20');}function securityCheck(_0x250aa0){const _0x3a0e47=_0x5294;badChars=_0x3a0e47(0x283);for(let _0x395ddf=0x0;_0x395ddf<badChars[_0x3a0e47(0x173)];_0x395ddf++){if(_0x250aa0[_0x3a0e47(0x27f)](badChars[_0x3a0e47(0x2e5)](_0x395ddf,0x1))>-0x1)return reviewResults+='Line\x20'+(currentLine+0x1)+_0x3a0e47(0x362)+badChars[_0x3a0e47(0x2e5)](_0x395ddf,0x1)+_0x3a0e47(0x137),0x0;}return 0x1;}function evaluateString(_0x30cb6f){const _0x7c893f=_0x5294;theExpression=_0x30cb6f['toUpperCase'](),variableArray[_0x7c893f(0x23c)](_0x2750ea=>_0x2750ea[_0x7c893f(0x338)]['toUpperCase']()==='ST')['varValue']=charStrValue,variableArray['find'](_0x864cfe=>_0x864cfe[_0x7c893f(0x338)]['toUpperCase']()==='DX')[_0x7c893f(0x159)]=charDexValue,variableArray[_0x7c893f(0x23c)](_0x360738=>_0x360738[_0x7c893f(0x338)]['toUpperCase']()===_0x7c893f(0x224))[_0x7c893f(0x159)]=charAdjDexValue,variableArray['find'](_0x583e35=>_0x583e35[_0x7c893f(0x338)]['toUpperCase']()==='IQ')[_0x7c893f(0x159)]=charIntValue,variableArray[_0x7c893f(0x23c)](_0x460ec0=>_0x460ec0['varName'][_0x7c893f(0x2c7)]()==='MA')[_0x7c893f(0x159)]=charMAValue,variableArray[_0x7c893f(0x23c)](_0x8c4a08=>_0x8c4a08[_0x7c893f(0x338)][_0x7c893f(0x2c7)]()===_0x7c893f(0x204))[_0x7c893f(0x159)]=charArmor,variableArray[_0x7c893f(0x23c)](_0x32f6b4=>_0x32f6b4['varName']['toUpperCase']()===_0x7c893f(0x36b))['varValue']=charInjuryValue,variableArray[_0x7c893f(0x23c)](_0x2b505a=>_0x2b505a[_0x7c893f(0x338)][_0x7c893f(0x2c7)]()===_0x7c893f(0x266))['varValue']=charFatigueValue,variableArray['find'](_0x432bb0=>_0x432bb0[_0x7c893f(0x338)][_0x7c893f(0x2c7)]()===_0x7c893f(0x2bd))['varValue']=charRace;for(let _0x400d41=0x0;_0x400d41<variableArray[_0x7c893f(0x173)];_0x400d41++){while(theExpression['indexOf'](variableArray[_0x400d41]['varName'][_0x7c893f(0x2c7)]())>-0x1){theExpression=theExpression[_0x7c893f(0x31f)](variableArray[_0x400d41][_0x7c893f(0x338)][_0x7c893f(0x2c7)](),variableArray[_0x400d41][_0x7c893f(0x159)]);}}itWorked=0x1;try{eval(theExpression);}catch(_0x581b80){reviewResults+='Line\x20'+(currentLine+0x1)+_0x7c893f(0x1c9)+theExpression+_0x7c893f(0x310),itWorked=0x0,console[_0x7c893f(0x271)](_0x7c893f(0x15f));}return itWorked>0x0&&(finalValue=eval(theExpression)),isNaN(finalValue)&&(finalValue=0x0,console[_0x7c893f(0x271)](theExpresion+_0x7c893f(0x26d))),displayVariables(),finalValue;}function variableReassignment(_0x31bad6){const _0x478d0e=_0x5294;theVar=_0x31bad6['substr'](0x0,_0x31bad6[_0x478d0e(0x27f)]('='))[_0x478d0e(0x2c7)]()[_0x478d0e(0x31f)](/ +/g,''),theExpr=_0x31bad6[_0x478d0e(0x2e5)](_0x31bad6['indexOf']('=')+0x1,0x270f)[_0x478d0e(0x2c7)]()['replace'](/ +/g,''),variableArray[_0x478d0e(0x23c)](_0x25fd68=>_0x25fd68[_0x478d0e(0x338)]['toUpperCase']()===theVar[_0x478d0e(0x2c7)]())[_0x478d0e(0x159)]=evaluateString(theExpr),displayVariables();}function displayVariables(){const _0x404608=_0x5294;userVarArray=[],attrVarArray=[],talentVarArray=[],spellVarArray=[],userVarStr='',attrVarStr='',talentVarStr='',spellVarStr='';for(let _0x387474=0x0;_0x387474<variableArray[_0x404608(0x173)];_0x387474++){switch(variableArray[_0x387474][_0x404608(0x234)]){case'U':userVarArray[_0x404608(0x20c)](variableArray[_0x387474][_0x404608(0x338)]+_0x404608(0x15d)+variableArray[_0x387474][_0x404608(0x159)]);break;case'A':break;case'T':talentVarArray[_0x404608(0x20c)](variableArray[_0x387474]['varName']+_0x404608(0x15d)+variableArray[_0x387474][_0x404608(0x159)]);break;case'S':spellVarArray['push'](variableArray[_0x387474][_0x404608(0x338)]+_0x404608(0x15d)+variableArray[_0x387474][_0x404608(0x159)]);break;}}attrVarArray[_0x404608(0x20c)]('ST\x20=\x20'+variableArray[_0x404608(0x23c)](_0x1e5f14=>_0x1e5f14[_0x404608(0x338)][_0x404608(0x2c7)]()==='ST')[_0x404608(0x159)]),attrVarArray[_0x404608(0x20c)](_0x404608(0x197)+variableArray[_0x404608(0x23c)](_0x5b1cd3=>_0x5b1cd3[_0x404608(0x338)][_0x404608(0x2c7)]()==='DX')[_0x404608(0x159)]),attrVarArray['push'](_0x404608(0x14b)+variableArray[_0x404608(0x23c)](_0x48449c=>_0x48449c[_0x404608(0x338)][_0x404608(0x2c7)]()==='ADJDX')[_0x404608(0x159)]),attrVarArray[_0x404608(0x20c)](_0x404608(0x304)+variableArray[_0x404608(0x23c)](_0x5dad72=>_0x5dad72[_0x404608(0x338)]['toUpperCase']()==='IQ')[_0x404608(0x159)]),attrVarArray[_0x404608(0x20c)](_0x404608(0x132)+variableArray[_0x404608(0x23c)](_0x2e8943=>_0x2e8943[_0x404608(0x338)][_0x404608(0x2c7)]()==='MA')['varValue']),attrVarArray['push']('Armor\x20=\x20'+variableArray['find'](_0x175f69=>_0x175f69[_0x404608(0x338)][_0x404608(0x2c7)]()===_0x404608(0x204))[_0x404608(0x159)]),attrVarArray[_0x404608(0x20c)](_0x404608(0x21a)+variableArray['find'](_0x2b8f0d=>_0x2b8f0d[_0x404608(0x338)][_0x404608(0x2c7)]()===_0x404608(0x36b))[_0x404608(0x159)]),attrVarArray[_0x404608(0x20c)]('Fatigue\x20=\x20'+variableArray[_0x404608(0x23c)](_0x1956ce=>_0x1956ce[_0x404608(0x338)][_0x404608(0x2c7)]()===_0x404608(0x266))['varValue']),attrVarArray['push'](_0x404608(0x1fe)+variableArray[_0x404608(0x23c)](_0x472c5b=>_0x472c5b[_0x404608(0x338)]['toUpperCase']()===_0x404608(0x2bd))[_0x404608(0x159)]+'\x20('+raceArray[variableArray[_0x404608(0x23c)](_0x29a2e1=>_0x29a2e1[_0x404608(0x338)][_0x404608(0x2c7)]()==='CHARRACE')[_0x404608(0x159)]]+')'),userVarArray['sort'](),talentVarArray[_0x404608(0x334)](),spellVarArray['sort']();for(let _0x1ffedd=0x0;_0x1ffedd<userVarArray[_0x404608(0x173)];_0x1ffedd++){theVar=userVarArray[_0x1ffedd]['substr'](0x0,userVarArray[_0x1ffedd][_0x404608(0x27f)]('='))[_0x404608(0x31f)](/ +/g,''),newVarButton='<span\x20onclick=\x27changeVar(',newVarButton+='\x22'+theVar+'\x22',newVarButton+=_0x404608(0x1b8)+userVarArray[_0x1ffedd]+'</span><br>',userVarStr+=newVarButton;}for(let _0x340604=0x0;_0x340604<attrVarArray[_0x404608(0x173)];_0x340604++){theVar=attrVarArray[_0x340604][_0x404608(0x2e5)](0x0,attrVarArray[_0x340604][_0x404608(0x27f)]('='))[_0x404608(0x31f)](/ +/g,''),newVarButton=_0x404608(0x1f9),newVarButton+='\x22'+theVar+'\x22',newVarButton+=_0x404608(0x1b8)+attrVarArray[_0x340604]+_0x404608(0x221),attrVarStr+=newVarButton;}for(let _0x26384b=0x0;_0x26384b<talentVarArray['length'];_0x26384b++){theVar=talentVarArray[_0x26384b][_0x404608(0x2e5)](0x0,talentVarArray[_0x26384b][_0x404608(0x27f)]('='))['replace'](/ +/g,''),newVarButton=_0x404608(0x1f9),newVarButton+='\x22'+theVar+'\x22',newVarButton+=_0x404608(0x1b8)+talentVarArray[_0x26384b]+_0x404608(0x221),talentVarStr+=newVarButton;}for(let _0x3471d5=0x4;_0x3471d5<spellVarArray['length'];_0x3471d5++){theVar=spellVarArray[_0x3471d5]['substr'](0x0,spellVarArray[_0x3471d5][_0x404608(0x27f)]('='))['replace'](/ +/g,''),newVarButton=_0x404608(0x1f9),newVarButton+='\x22'+theVar+'\x22',newVarButton+=_0x404608(0x1b8)+spellVarArray[_0x3471d5]+'</span><br>',spellVarStr+=newVarButton;}document['getElementById'](_0x404608(0x1e8))[_0x404608(0x343)]=userVarStr,document[_0x404608(0x1a6)](_0x404608(0x262))['innerHTML']=attrVarStr,document[_0x404608(0x1a6)](_0x404608(0x13e))[_0x404608(0x343)]=talentVarStr,document[_0x404608(0x1a6)](_0x404608(0x17f))['innerHTML']=spellVarStr,document[_0x404608(0x1a6)](_0x404608(0x24e))['innerHTML']='ST:\x20'+variableArray[_0x404608(0x23c)](_0x311d8b=>_0x311d8b['varName']['toUpperCase']()==='ST')[_0x404608(0x159)],document[_0x404608(0x1a6)](_0x404608(0x1d9))['innerHTML']=_0x404608(0x28e)+variableArray[_0x404608(0x23c)](_0x123321=>_0x123321['varName'][_0x404608(0x2c7)]()===_0x404608(0x36b))[_0x404608(0x159)],document[_0x404608(0x1a6)](_0x404608(0x233))[_0x404608(0x343)]='DX:\x20'+variableArray[_0x404608(0x23c)](_0x46836b=>_0x46836b[_0x404608(0x338)][_0x404608(0x2c7)]()==='DX')[_0x404608(0x159)]+_0x404608(0x158)+variableArray[_0x404608(0x23c)](_0x5ab442=>_0x5ab442[_0x404608(0x338)][_0x404608(0x2c7)]()===_0x404608(0x224))[_0x404608(0x159)],document['getElementById']('charL2R')['innerHTML']='Fatigue:\x20'+variableArray['find'](_0x449ddc=>_0x449ddc[_0x404608(0x338)][_0x404608(0x2c7)]()===_0x404608(0x266))[_0x404608(0x159)],document[_0x404608(0x1a6)](_0x404608(0x253))['innerHTML']=_0x404608(0x22d)+variableArray[_0x404608(0x23c)](_0x4f97f5=>_0x4f97f5[_0x404608(0x338)][_0x404608(0x2c7)]()==='IQ')[_0x404608(0x159)],document[_0x404608(0x1a6)](_0x404608(0x139))[_0x404608(0x343)]=_0x404608(0x1df)+variableArray[_0x404608(0x23c)](_0x3e9962=>_0x3e9962['varName'][_0x404608(0x2c7)]()==='MA')['varValue'],document[_0x404608(0x1a6)](_0x404608(0x208))[_0x404608(0x343)]=_0x404608(0x333)+(variableArray[_0x404608(0x23c)](_0x5dc7e0=>_0x5dc7e0[_0x404608(0x338)][_0x404608(0x2c7)]()==='ST')['varValue']-variableArray[_0x404608(0x23c)](_0x2a5569=>_0x2a5569['varName'][_0x404608(0x2c7)]()===_0x404608(0x36b))['varValue']-variableArray[_0x404608(0x23c)](_0x51e841=>_0x51e841['varName']['toUpperCase']()===_0x404608(0x266))[_0x404608(0x159)]),document[_0x404608(0x1a6)]('charL4L')[_0x404608(0x343)]='XP\x20Earned:\x20'+variableArray[_0x404608(0x23c)](_0x3ea0e3=>_0x3ea0e3[_0x404608(0x338)][_0x404608(0x2c7)]()===_0x404608(0x1c1))['varValue'],charKnowledge=[];for(let _0x1f9021=0x0;_0x1f9021<variableArray[_0x404608(0x173)];_0x1f9021++){(variableArray[_0x1f9021]['varType']=='T'||variableArray[_0x1f9021][_0x404608(0x234)]=='S')&&variableArray[_0x1f9021][_0x404608(0x159)]>0x0&&charKnowledge[_0x404608(0x20c)](variableArray[_0x1f9021]['varName']),charKnowledge=charKnowledge['sort']();}document[_0x404608(0x1a6)](_0x404608(0x297))[_0x404608(0x343)]=charKnowledge[_0x404608(0x198)](',\x20');}function changeVar(_0x1ebd24){const _0x597273=_0x5294;console['log'](_0x597273(0x2d1)+_0x1ebd24+')'),varType=variableArray[_0x597273(0x23c)](_0x1d89c8=>_0x1d89c8[_0x597273(0x338)][_0x597273(0x2c7)]()===_0x1ebd24[_0x597273(0x2c7)]())['varType'],document[_0x597273(0x1a6)]('currentValueSpan')[_0x597273(0x343)]=variableArray[_0x597273(0x23c)](_0x5d86df=>_0x5d86df[_0x597273(0x338)][_0x597273(0x2c7)]()===_0x1ebd24[_0x597273(0x2c7)]())[_0x597273(0x159)];if(varType=='T')document[_0x597273(0x1a6)]('varChangeInfoDiv')[_0x597273(0x343)]=_0x597273(0x13a);else{if(varType=='S')document[_0x597273(0x1a6)](_0x597273(0x275))[_0x597273(0x343)]=_0x597273(0x181);else{if(varType=='U')document[_0x597273(0x1a6)](_0x597273(0x275))['innerHTML']=_0x597273(0x1e6);else{if(_0x597273(0x322)[_0x597273(0x27f)](variableArray[_0x597273(0x23c)](_0x195376=>_0x195376['varName'][_0x597273(0x2c7)]()===_0x1ebd24[_0x597273(0x2c7)]())[_0x597273(0x338)]['toUpperCase']())>-0x1)document[_0x597273(0x1a6)](_0x597273(0x275))['innerHTML']='Character\x20attributes\x20should\x20be\x20between\x206\x20and\x2016.';else{if(_0x597273(0x204)==variableArray['find'](_0x3ac330=>_0x3ac330[_0x597273(0x338)][_0x597273(0x2c7)]()===_0x1ebd24[_0x597273(0x2c7)]())['varName'][_0x597273(0x2c7)]())document[_0x597273(0x1a6)](_0x597273(0x275))[_0x597273(0x343)]='Armor\x20should\x20be\x20between\x200\x20and\x206.';else{if(_0x597273(0x2bd)==variableArray[_0x597273(0x23c)](_0x41b438=>_0x41b438[_0x597273(0x338)][_0x597273(0x2c7)]()===_0x1ebd24[_0x597273(0x2c7)]())[_0x597273(0x338)]['toUpperCase']())document[_0x597273(0x1a6)](_0x597273(0x275))['innerHTML']=_0x597273(0x231);else{if(_0x597273(0x1c1)==variableArray['find'](_0x40dda1=>_0x40dda1['varName'][_0x597273(0x2c7)]()===_0x1ebd24['toUpperCase']())['varName'][_0x597273(0x2c7)]())document['getElementById'](_0x597273(0x275))[_0x597273(0x343)]=_0x597273(0x1f2);else'INJURYFATIGUE'['indexOf'](variableArray[_0x597273(0x23c)](_0x5824c4=>_0x5824c4[_0x597273(0x338)][_0x597273(0x2c7)]()===_0x1ebd24[_0x597273(0x2c7)]())[_0x597273(0x338)][_0x597273(0x2c7)]())>-0x1?document['getElementById']('varChangeInfoDiv')[_0x597273(0x343)]=_0x597273(0x154):document[_0x597273(0x1a6)](_0x597273(0x275))[_0x597273(0x343)]=_0x597273(0x2fe);}}}}}}document[_0x597273(0x1a6)](_0x597273(0x212))[_0x597273(0x23f)]=variableArray[_0x597273(0x23c)](_0x3e0eda=>_0x3e0eda[_0x597273(0x338)][_0x597273(0x2c7)]()===_0x1ebd24[_0x597273(0x2c7)]())['varValue'],document[_0x597273(0x1a6)]('successButton')[_0x597273(0x336)]=function(){checkAndStoreVar(_0x1ebd24);},document['getElementById'](_0x597273(0x344))[_0x597273(0x321)]['display']=_0x597273(0x2dc);}function checkAndStoreVar(_0x5ac815){const _0x367cac=_0x5294;document[_0x367cac(0x1a6)](_0x367cac(0x344))['style']['display']='none',proposedValue=document['getElementById'](_0x367cac(0x212))['value'],newValue=evaluateComparisonTerm(proposedValue);if(isNaN(proposedValue)){generalFault('Only\x20numerical\x20values\x20are\x20possible.');return;}variableArray[_0x367cac(0x23c)](_0x40c6f8=>_0x40c6f8[_0x367cac(0x338)][_0x367cac(0x2c7)]()===_0x5ac815['toUpperCase']())[_0x367cac(0x159)]=newValue,variableArray[_0x367cac(0x23c)](_0xca0a76=>_0xca0a76['varName'][_0x367cac(0x2c7)]()===_0x5ac815[_0x367cac(0x2c7)]())['varType']=='A'&&(charStrValue=variableArray['find'](_0x11381b=>_0x11381b[_0x367cac(0x338)][_0x367cac(0x2c7)]()==='ST')['varValue'],charDexValue=variableArray[_0x367cac(0x23c)](_0x1b4507=>_0x1b4507[_0x367cac(0x338)][_0x367cac(0x2c7)]()==='DX')[_0x367cac(0x159)],charAdjDexValue=variableArray[_0x367cac(0x23c)](_0x5691c4=>_0x5691c4[_0x367cac(0x338)][_0x367cac(0x2c7)]()===_0x367cac(0x224))[_0x367cac(0x159)],charIntValue=variableArray[_0x367cac(0x23c)](_0x30da3e=>_0x30da3e[_0x367cac(0x338)][_0x367cac(0x2c7)]()==='IQ')['varValue'],charMAValue=variableArray['find'](_0x2c16ea=>_0x2c16ea[_0x367cac(0x338)][_0x367cac(0x2c7)]()==='MA')[_0x367cac(0x159)],charArmor=variableArray[_0x367cac(0x23c)](_0x4a468d=>_0x4a468d[_0x367cac(0x338)]['toUpperCase']()===_0x367cac(0x204))[_0x367cac(0x159)],charInjuryValue=variableArray[_0x367cac(0x23c)](_0x5342d1=>_0x5342d1[_0x367cac(0x338)]['toUpperCase']()===_0x367cac(0x36b))[_0x367cac(0x159)],charFatigueValue=variableArray[_0x367cac(0x23c)](_0xd09bcb=>_0xd09bcb[_0x367cac(0x338)][_0x367cac(0x2c7)]()===_0x367cac(0x266))[_0x367cac(0x159)],charRace=variableArray['find'](_0x4a6066=>_0x4a6066[_0x367cac(0x338)]['toUpperCase']()==='CHARRACE')[_0x367cac(0x159)]),displayVariables();}function generalFault(_0x2c3f75){const _0x4a096c=_0x5294;document['getElementById'](_0x4a096c(0x2b3))[_0x4a096c(0x343)]=_0x2c3f75,document[_0x4a096c(0x1a6)](_0x4a096c(0x2d9))[_0x4a096c(0x321)][_0x4a096c(0x1ef)]='block';}function adventureGo(_0x5747c0){const _0x5cfd94=_0x5294;if(problemsFound>0x0)return;newLoc=adventureArray[_0x5cfd94(0x23c)](_0x3de8fa=>_0x3de8fa[_0x5cfd94(0x358)]===_0x5747c0);if(newLoc[_0x5cfd94(0x1e7)][_0x5cfd94(0x173)]>0x0)for(let _0x5a868c=0x0;_0x5a868c<newLoc[_0x5cfd94(0x1e7)][_0x5cfd94(0x173)];_0x5a868c++){if(newLoc[_0x5cfd94(0x1e7)][_0x5a868c]['substr'](0x0,0x1)=='^')variableReassignment(newLoc[_0x5cfd94(0x1e7)][_0x5a868c][_0x5cfd94(0x2e5)](0x1,0x270f));else{if(newLoc['toDo'][_0x5a868c][_0x5cfd94(0x2e5)](0x0,0x5)==_0x5cfd94(0x2cb))hps=evaluateComparisonTerm(newLoc[_0x5cfd94(0x1e7)][_0x5a868c][_0x5cfd94(0x2e5)](0x5,0x3e7)),(isNaN(hps)||hps<0x0)&&(hps=0x0),charInjuryValue-=hps,charInjuryValue<0x0&&(charInjuryValue=0x0),variableArray['find'](_0x5f3ff1=>_0x5f3ff1[_0x5cfd94(0x338)][_0x5cfd94(0x2c7)]()==='INJURY')[_0x5cfd94(0x159)]=charInjuryValue,displayVariables();else newLoc[_0x5cfd94(0x1e7)][_0x5a868c][_0x5cfd94(0x2e5)](0x0,0x7)=='@damage'&&(parsed=newLoc[_0x5cfd94(0x1e7)][_0x5a868c]['split']('\x20'),hps=evaluateComparisonTerm(parsed[0x1]),hps-=charArmor,(isNaN(hps)||parsed[0x1]<0x0)&&(hps=0x0),charInjuryValue+=hps,variableArray[_0x5cfd94(0x23c)](_0x2f95c9=>_0x2f95c9[_0x5cfd94(0x338)][_0x5cfd94(0x2c7)]()===_0x5cfd94(0x36b))[_0x5cfd94(0x159)]=charInjuryValue,displayVariables(),charStrValue-charFatigueValue-charInjuryValue<0x0&&adventureGo(parsed[0x2]));}}switch(newLoc[_0x5cfd94(0x2b8)]){case'l':newLoc[_0x5cfd94(0x2ea)]!=''&&variableArray['find'](_0x3accc7=>_0x3accc7[_0x5cfd94(0x338)][_0x5cfd94(0x2c7)]()==='LITERACY')[_0x5cfd94(0x159)]>0x0?(newHTML=newLoc['html'][_0x5cfd94(0x2e5)](0x0,newLoc[_0x5cfd94(0x15a)][_0x5cfd94(0x27f)](_0x5cfd94(0x191))),newHTML+='The\x20writing\x20says,\x20\x22'+newLoc[_0x5cfd94(0x2ea)]+'\x22',newHTML+=newLoc[_0x5cfd94(0x15a)][_0x5cfd94(0x2e5)](newLoc[_0x5cfd94(0x15a)][_0x5cfd94(0x27f)](_0x5cfd94(0x191)),0x270f)):newHTML=newLoc[_0x5cfd94(0x15a)];for(variableCounter=0x0;variableCounter<variableArray[_0x5cfd94(0x173)];variableCounter++){counter=0x0;while(newHTML[_0x5cfd94(0x2c7)]()[_0x5cfd94(0x27f)]('^'+variableArray[variableCounter]['varName'][_0x5cfd94(0x2c7)]())>-0x1&&counter<0x3e7){counter++,varPosition=newHTML[_0x5cfd94(0x2c7)]()[_0x5cfd94(0x27f)]('^'+variableArray[variableCounter][_0x5cfd94(0x338)][_0x5cfd94(0x2c7)]()),newHTML=newHTML[_0x5cfd94(0x31f)](newHTML['substr'](varPosition,variableArray[variableCounter][_0x5cfd94(0x338)][_0x5cfd94(0x173)]+0x1),variableArray[variableCounter][_0x5cfd94(0x159)]);}counter>0x384&&console[_0x5cfd94(0x271)](varPosition+'-'+newHTML[_0x5cfd94(0x2e5)](varPosition,variableArray[variableCounter]['varName'][_0x5cfd94(0x173)]));}document[_0x5cfd94(0x1a6)](_0x5cfd94(0x34c))[_0x5cfd94(0x343)]=newHTML;break;case'b':firstTerm=evaluateComparisonTerm(newLoc[_0x5cfd94(0x177)]),secondTerm=evaluateComparisonTerm(newLoc[_0x5cfd94(0x20f)]),comparisonString=firstTerm+newLoc[_0x5cfd94(0x2dd)]+secondTerm,successDestination=newLoc[_0x5cfd94(0x372)],failDestination=newLoc[_0x5cfd94(0x16c)];whatTypeOfTermIs(newLoc[_0x5cfd94(0x177)])=='D'||whatTypeOfTermIs(newLoc[_0x5cfd94(0x20f)])=='D'?(document['getElementById'](_0x5cfd94(0x293))[_0x5cfd94(0x321)][_0x5cfd94(0x1ef)]=_0x5cfd94(0x2dc),document[_0x5cfd94(0x1a6)]('dryrunInfoDiv')[_0x5cfd94(0x343)]=_0x5cfd94(0x248),document[_0x5cfd94(0x1a6)](_0x5cfd94(0x2ae))['innerHTML']+=_0x5cfd94(0x2a9)+newLoc[_0x5cfd94(0x177)]+_0x5cfd94(0x235),document[_0x5cfd94(0x1a6)]('dryrunInfoDiv')[_0x5cfd94(0x343)]+='<span\x20style=\x27background-color:\x20ghostwhite;\x20border:\x20solid\x20thin;\x20padding:\x204px;\x27>'+newLoc[_0x5cfd94(0x2dd)]+_0x5cfd94(0x235),document[_0x5cfd94(0x1a6)](_0x5cfd94(0x2ae))['innerHTML']+=_0x5cfd94(0x2a9)+newLoc[_0x5cfd94(0x20f)]+_0x5cfd94(0x249),document['getElementById'](_0x5cfd94(0x2ae))[_0x5cfd94(0x343)]+=_0x5cfd94(0x20b),document[_0x5cfd94(0x1a6)]('dryrunInfoDiv')[_0x5cfd94(0x343)]+='<br><br><br>'):eval(comparisonString)?adventureGo(newLoc[_0x5cfd94(0x372)]):adventureGo(newLoc[_0x5cfd94(0x16c)]);break;case'f':successDestination=newLoc[_0x5cfd94(0x29e)],failDestination=newLoc[_0x5cfd94(0x281)],document[_0x5cfd94(0x1a6)]('combatDiv')['style'][_0x5cfd94(0x1ef)]='block',document[_0x5cfd94(0x1a6)](_0x5cfd94(0x1c6))[_0x5cfd94(0x343)]='\x22'+newLoc[_0x5cfd94(0x2f1)]+'\x22<br><br>',document[_0x5cfd94(0x1a6)](_0x5cfd94(0x1c6))['innerHTML']+=_0x5cfd94(0x34d),document[_0x5cfd94(0x1a6)](_0x5cfd94(0x1c6))[_0x5cfd94(0x343)]+=_0x5cfd94(0x1e9)+newLoc[_0x5cfd94(0x2c0)]+_0x5cfd94(0x137),document['getElementById']('combatInfoDiv')[_0x5cfd94(0x343)]+=_0x5cfd94(0x1aa)+newLoc['st']+_0x5cfd94(0x1a8)+newLoc['dx']+_0x5cfd94(0x22f)+newLoc['iq']+',\x20MA\x20'+newLoc['ma']+_0x5cfd94(0x137),document[_0x5cfd94(0x1a6)](_0x5cfd94(0x1c6))['innerHTML']+=_0x5cfd94(0x2e7)+newLoc[_0x5cfd94(0x238)]+_0x5cfd94(0x368)+newLoc[_0x5cfd94(0x182)]+',\x20Damage:\x20'+newLoc[_0x5cfd94(0x2a0)];newLoc[_0x5cfd94(0x33a)]!=''&&(document[_0x5cfd94(0x1a6)](_0x5cfd94(0x1c6))[_0x5cfd94(0x343)]+='/'+newLoc[_0x5cfd94(0x33a)]);document['getElementById'](_0x5cfd94(0x1c6))[_0x5cfd94(0x343)]+=_0x5cfd94(0x137),document[_0x5cfd94(0x1a6)](_0x5cfd94(0x1c6))[_0x5cfd94(0x343)]+=_0x5cfd94(0x2ab),document[_0x5cfd94(0x1a6)]('combatInfoDiv')[_0x5cfd94(0x343)]+=_0x5cfd94(0x217);break;}}function successGo(){const _0x4ca343=_0x5294;document[_0x4ca343(0x1a6)]('dryrunDiv')[_0x4ca343(0x321)][_0x4ca343(0x1ef)]=_0x4ca343(0x374),document['getElementById']('combatDiv')['style'][_0x4ca343(0x1ef)]=_0x4ca343(0x374),adventureGo(successDestination);}function failureGo(){const _0x1ff39c=_0x5294;document[_0x1ff39c(0x1a6)](_0x1ff39c(0x293))['style'][_0x1ff39c(0x1ef)]=_0x1ff39c(0x374),document['getElementById']('combatDiv')[_0x1ff39c(0x321)][_0x1ff39c(0x1ef)]='none',adventureGo(failDestination);}function whatTypeOfTermIs(_0x2af272){const _0x4408b4=_0x5294;_0x2af272=_0x2af272[_0x4408b4(0x31f)](/ +/g,'');if(!isNaN(_0x2af272))return'N';for(let _0x202d64=0x0;_0x202d64<variableArray['length'];_0x202d64++){if(variableArray[_0x202d64]['varName'][_0x4408b4(0x2c7)]()==_0x2af272[_0x4408b4(0x2c7)]())return'V';}if(_0x2af272[_0x4408b4(0x27f)]('d')>-0x1){numDice=_0x2af272[_0x4408b4(0x2e5)](0x0,_0x2af272[_0x4408b4(0x27f)]('d'));if(isNaN(numDice)||numDice<0x1)return'G';if(_0x2af272[_0x4408b4(0x173)]>_0x2af272['indexOf']('d')+0x1){operator=_0x2af272[_0x4408b4(0x2e5)](_0x2af272['indexOf']('d')+0x1,0x1);if('+-*/'[_0x4408b4(0x27f)](operator)==-0x1)return'G';return!isNaN(_0x2af272[_0x4408b4(0x2e5)](_0x2af272[_0x4408b4(0x27f)]('d')+0x2,0x270f))?'D':'G';}else return'D';}return'G+';}function evaluateComparisonTerm(_0x3db9b4){const _0x47c4cf=_0x5294;if(!isNaN(_0x3db9b4))return _0x3db9b4;_0x3db9b4=_0x3db9b4[_0x47c4cf(0x31f)](/ +/g,'');for(let _0x3f978b=0x0;_0x3f978b<variableArray['length'];_0x3f978b++){if(variableArray[_0x3f978b][_0x47c4cf(0x338)][_0x47c4cf(0x2c7)]()==_0x3db9b4['toUpperCase']())return variableArray[_0x3f978b]['varValue'];}if(_0x3db9b4[_0x47c4cf(0x27f)]('d')>-0x1){numDice=_0x3db9b4['substr'](0x0,_0x3db9b4['indexOf']('d'));if(isNaN(numDice)||numDice<0x1)return _0x47c4cf(0x16a);dieRoll=0x0;for(let _0x752930=0x0;_0x752930<numDice;_0x752930++){dieRoll+=Math[_0x47c4cf(0x28b)](Math[_0x47c4cf(0x18e)]()*0x6);}if(_0x3db9b4[_0x47c4cf(0x173)]>_0x3db9b4[_0x47c4cf(0x27f)]('d')+0x1){operator=_0x3db9b4[_0x47c4cf(0x2e5)](_0x3db9b4[_0x47c4cf(0x27f)]('d')+0x1,0x1);if(_0x47c4cf(0x356)[_0x47c4cf(0x27f)](operator)==-0x1)return'gibberish';return!isNaN(_0x3db9b4[_0x47c4cf(0x2e5)](_0x3db9b4[_0x47c4cf(0x27f)]('d')+0x2,0x270f))?eval(dieRoll+_0x3db9b4[_0x47c4cf(0x2e5)](_0x3db9b4['indexOf']('d')+0x1,0x1)+_0x3db9b4[_0x47c4cf(0x2e5)](_0x3db9b4[_0x47c4cf(0x27f)]('d')+0x2,0x270f)):'gibberish';}else return dieRoll;}return _0x47c4cf(0x16a);}function setCurrentTime(){const _0xe2894=_0x5294;var _0x1b96c7=new Date();hours=_0x1b96c7['getHours'](),hours>0xc?(hours-=0xc,meridian='PM'):meridian='AM',minutes=_0x1b96c7['getMinutes'](),minutes<0xa&&(minutes='0'+minutes),document[_0xe2894(0x1a6)](_0xe2894(0x210))['innerHTML']=hours+':'+minutes+'\x20'+meridian;}function saveLocal(){const _0xbd10d=_0x5294;localStorage[_0xbd10d(0x2b1)]==0x1&&localStorage['setItem'](_0xbd10d(0x261),document['getElementById'](_0xbd10d(0x13d))['value']);}function loadLocal(){const _0x585ab5=_0x5294;localStorage['allowCookies']==0x1&&(document[_0x585ab5(0x1a6)]('userInputTextArea')[_0x585ab5(0x23f)]=localStorage[_0x585ab5(0x23e)](_0x585ab5(0x261)));}function overwriteFunction(){const _0x5d8d91=_0x5294;switch(overwrite){case'loadLocal':loadLocal();break;case _0x5d8d91(0x21b):enterTemplate();break;case _0x5d8d91(0x17a):enterBetterTemplate();break;}reviewUserInput();}function saveToDownloads(){const _0x1ed85b=_0x5294,_0x4a92a3=document[_0x1ed85b(0x272)]('a'),_0x4f1bd3=new Blob([document[_0x1ed85b(0x1a6)](_0x1ed85b(0x13d))['value']],{'type':_0x1ed85b(0x22c)});var _0x6e1d02=new Date();dateString=_0x6e1d02[_0x1ed85b(0x187)]()+'-'+_0x6e1d02['getDate']()+'-'+_0x6e1d02[_0x1ed85b(0x20d)]()+'\x20'+_0x6e1d02[_0x1ed85b(0x2ca)]()+'\x20'+_0x6e1d02['getMinutes'](),_0x4a92a3[_0x1ed85b(0x1cd)]=URL[_0x1ed85b(0x2f0)](_0x4f1bd3),_0x4a92a3[_0x1ed85b(0x337)]=titleStr+'\x20'+dateString,_0x4a92a3[_0x1ed85b(0x313)](),URL[_0x1ed85b(0x328)](_0x4a92a3[_0x1ed85b(0x1cd)]);}function generateExportable(){const _0x151cb3=_0x5294;return theFnord=fnord(),exportableString='<><><><><><><><><><><><><><><><><><><><><><><><>\x0a',exportableString+=titleStr+'\x0a',exportableString+=_0x151cb3(0x16b)+creatorStr+'\x0a',exportableString+='An\x20adventure\x20for\x20TFT\x20Helper\x20and\x20The\x20Fantasy\x20Trip\x0a',exportableString+=descriptionStr+'\x0a',exportableString+=theFnord+'\x0a',exportableString+=JSON['stringify'](adventureArray)[_0x151cb3(0x173)]+'\x0a',exportableString+=_0x151cb3(0x2c6),exportableString+=scramble(titleStr,theFnord)+'\x0a',exportableString+=scramble(creatorStr,theFnord)+'\x0a',exportableString+=scramble(descriptionStr,theFnord)+'\x0a',exportableString+=scramble(maxLevel['toString'](),theFnord)+'\x0a',exportableString+=scramble(testMode[_0x151cb3(0x1ce)](),theFnord)+'\x0a',exportableString+=scramble(JSON[_0x151cb3(0x1ff)](variableArray['filter'](_0x408a05=>_0x408a05[_0x151cb3(0x234)]=='U')),theFnord)+'\x0a',exportableString+=scramble(JSON['stringify'](adventureArray),theFnord)+'\x0a',exportableString+='<><><><><><><><><><><><><><><><><><><><><><><><>\x0a',exportableString;}function scramble(_0x100032,_0x3c89c4){const _0x12a1cb=_0x5294;cypherText='';for(let _0x436d0e=0x0;_0x436d0e<_0x100032[_0x12a1cb(0x173)];_0x436d0e++){_0x100032[_0x12a1cb(0x164)](_0x436d0e)=='\x0a'?cypherText+='\x0a':(codeToScramble=(_0x100032[_0x12a1cb(0x216)](_0x436d0e)+_0x3c89c4[_0x12a1cb(0x216)](_0x436d0e%_0x3c89c4[_0x12a1cb(0x173)])-0x40)%(0x7f-0x20),codeToScramble>0x7f&&console[_0x12a1cb(0x271)](_0x12a1cb(0x27a)),codeToScramble=codeToScramble+0x20,cypherText+=String[_0x12a1cb(0x300)](codeToScramble));}return cypherText;}function cookies(_0x23b2aa){const _0x264e9b=_0x5294;localStorage[_0x264e9b(0x167)](_0x264e9b(0x2b1),_0x23b2aa),_0x23b2aa==0x1?document[_0x264e9b(0x1a6)](_0x264e9b(0x18a))[_0x264e9b(0x2fa)]='Cookies\x20are\x20currently\x20enabled.':document[_0x264e9b(0x1a6)](_0x264e9b(0x18a))['innerText']=_0x264e9b(0x168);}
     </script>
 
     <style>
@@ -1244,8 +104,8 @@ if ( userLines[currentLine].substr(0,4).toLowerCase() == "@foe" ) {
         .watermark {
           position: absolute;
           z-index: 10;
-          opacity: 30%;
-          top: 150px;
+          opacity: 15%;
+          top: 500px;
           right: 0;
           color:red;
           font-size:120px;
@@ -1265,6 +125,34 @@ if ( userLines[currentLine].substr(0,4).toLowerCase() == "@foe" ) {
 
     <body onLoad="initializeApp()" onClick="hideAll();" style = "overflow: scroll;" onbeforeunload="saveLocal()">
 
+      <div id='cookieBox' style="position: fixed; width: 40%; top: 20%; left:30%; border: solid thick darkGrey; background:lightgrey">
+
+        <br>
+        <br>
+        <br>
+
+        <p style='text-align: center'>
+          Allow cookies?
+        </p>
+        <br>
+        <br>
+
+        <p style='text-align: center'>
+          <span class='adventureButton' onclick='document.getElementById("cookieBox").style.display="none";cookies(1)'>
+            Yes!
+          </span>
+          <span class='adventureButton' onclick='document.getElementById("cookieBox").style.display="none";showPage(7)'>
+            Wait, what, maybe no? Explain please...
+          </span>
+        </p>
+
+        <br>
+        <br>
+        <br>
+        <br>
+
+      </div>
+
         <div id="tabs">
 
             <span class="tabButton" id="tab1" onclick="showPage(1)">Overview</span>
@@ -1273,23 +161,28 @@ if ( userLines[currentLine].substr(0,4).toLowerCase() == "@foe" ) {
             <span class="tabButton" id="tab4" onclick="showPage(4)">Simulator</span>
             <span class="tabButton" id="tab5" onclick="showPage(5)">Exportable</span>
             <span class="tabButton" id="tab6" onclick="showPage(6)">Examples</span>
+            <span class="tabButton" id="tab7" onclick="showPage(7)">Settings and Cookies</span>
 
         </div>
 
-        <div style="position: fixed; bottom: 5px; right: 5px; border: solid thin; background-color: lightgrey; padding: 7px; " onclick="window.scrollTo( 0, 0 );">
+        <!-- <div style="position: fixed; bottom: 5px; right: 5px; border: solid thin; background-color: lightgrey; padding: 7px; " onclick="window.scrollTo( 0, 0 );">
           Back to Top
-        </div>
+        </div> -->
 
         <div id="page1" class="page">
 
-<span class="watermark">Preview</span>
+<span class="watermark">Alpha</span>
+
+          <div style="overflow: scroll; height: 90vh;">
 
             <p>
                 Welcome to the TFT Helper Adventure Creator! It's designed to make creating an adventure for TFT Helper as easy as possible. Thanks for checking it out!
             </p>
+            <h3>Overview</h3>
             <p>
-                You should see six tabs at the top of the screen. This first gives this overview of the process and some general guidance. The second tab explains how to write your adventure so the software can present it to the player. The third is where you write you adventure. The software will give you feedback about what you have written, pointing out problems that prevent the software from understanding what you wrote. The fourth tab is a simulator, that will let you make a dry run through your adventure to make sure it flows the way you intended. The fifth tab gives you scrambled adventure  you can paste into TFT Helper your mobile device for real testing. This is also the block of text that you will ultimately share with the world. The sixth tab includes some examples of more involved adventure mechanics to clarify and inspire.
+                You should see six tabs at the top of the screen. This first gives this overview of the process and some general guidance. The second tab explains how to write your adventure so the software can present it to the player. The third is where you write you adventure. The software will give you feedback about what you have written, pointing out problems that prevent the software from understanding what you wrote. The fourth tab is a simulator, that will let you make a dry run through your adventure to make sure it flows the way you intended. The fifth tab presents your adventure prepared and scrambled you can paste into TFT Helper your mobile device for real testing. This is also the block of text that you will ultimately share with the world. The sixth tab includes some examples of more involved adventure mechanics to clarify and inspire.
             </p>
+            <h3>Writing Standards</h3>
             <p>
                 You should strive for a high level of professionalism in an adventure you plan to share. While you are not writing for SJ Games, you are writing for the customers of SJ Games and they are accustomed to quality writing. Keep it PG, no hate. The SJ Games writer's guidelines will be very helpful.
             </p>
@@ -1303,10 +196,16 @@ if ( userLines[currentLine].substr(0,4).toLowerCase() == "@foe" ) {
                 Have fun!
             </p>
 
-            <h2>Tips for Writing Solo Adventures</h2>
+            <h3>What is "Alpha"?</h3>
+            <p>
+              In this case it means that the Adventure Creator is "feature complete" but has not been thoroughly tested. It is very unlikely anything will change in how adventures are written, so you can play around with it, learn, and start writing that ultimate adventure. Bug reports are welcome (tfthelper@gmail.com). The Adventure creator will get bug fixes and some cosmetic improvements. Meanwhile, we start adding to the TFT Helper Mobile App the capability to import and run these adventures. Then things get *really* fun.
+            </p>
+
+            <h3>Tips for Writing Solo Adventures</h3>
             <p>
               Much GMing and narrative construction advice carries over, and we don't need to go over that here. But here are some guidelines to keep in mind.
             </p>
+
             <p>
               Don't make it too easy. If players complete the adventure on the first run through they are likely to feel disappointed and not revisit your adventure.
             </p>
@@ -1317,7 +216,7 @@ if ( userLines[currentLine].substr(0,4).toLowerCase() == "@foe" ) {
               There should be a clear goal expressed early, perhaps even in the description. It's also fun to learn more about the goal in the first part of the adventure. Foreshadowing makes things great.
             </p>
             <p>
-              You can achieve replayability by providing multiple paths to victory and degrees of success. The player should finish the game wanting to try again and achieve a better result or to try the paths not taken.
+              You can achieve replayability by providing multiple paths to victory and degrees of success. The player should finish the game wanting to try again and achieve a better result or to try the paths not taken. Perhaps you can hint to players that characters with particular talents (eg Naturalist, Courtly Graces) will have opportunities to see other parts of the adventure and succeed via a differet path.
             </p>
             <p>
               Variables can create a lot of depth in the world, but they also create work for you. Lean towards fewer rather than many, but make them meaningful.
@@ -1332,34 +231,39 @@ if ( userLines[currentLine].substr(0,4).toLowerCase() == "@foe" ) {
               Beware of paths that become boring or frustrating. If the player makes choices that make winning impossible, wrap things up. Write a destination that explains that they lost, or introduce an unbeatable foe. Either way they get to try again and make different choices.
             </p>
             <p>
-              It's very rewarding to players to receive goodies because their characters have particular particular Talents. These should be extras, however; an adventure that can only be won though knowledge of Courtly Graces will be frustrating.
+              It's very rewarding to players to receive goodies because their characters have particular particular Talents. These should be extras, however; an adventure that can only be won though knowledge of Courtly Graces will be frustrating if this is not made clear early on (hopefully in the description).
             </p>
+
+          </div>
+
         </div>
 
 
         <div id="page2" class="page" style="display: none;">
 
-          <span class="watermark">Preview</span>
+          <span class="watermark">Alpha</span>
 
 
           <div id = "nittyButton" style="position: fixed; right: 20px; border: solid thin; background-color: lightblue; padding: 7px;" onclick="toggleNitty()">
             Show Nitty Gritty Details
           </div>
 
+          <div style="overflow: scroll; height: 90vh">
+
           <div style="display: flex;">
 
-            <div style="width: 20%; text-align: right; padding: 1%;">
-              <a href="#basics">Basics</a> <br><br>
+            <div style="width: 5%; text-align: right; padding: 1%;">
+              <a href="#basics">Basics</a> <br>
 
-              <a href="#extras">Extras</a><br><br>
+              <a href="#extras">Extras</a><br>
 
               <a href="#variables">Variables</a>
             </div>
 
             <div style = " padding: 1%;">
-              The Essentials: Locations, Foes, and Branches<br><br>
+              The Essentials: Locations, Foes, and Branches<br>
 
-              Handy tools that will make things easier for you<br><br>
+              Handy tools that will make things easier for you<br>
 
               Add depth to your world by tracking things
             </div>
@@ -1372,12 +276,11 @@ if ( userLines[currentLine].substr(0,4).toLowerCase() == "@foe" ) {
 
           <a href="#variables">Variables</a> Variables! Adding depth to the world<br><br> -->
 
-
-          <h1>Basics</h1><a id="basics"></a>
+          <h3>Basics</h3><a id="basics"></a>
 
             <div>
               <P class="howto">
-A printed solo adventure has numbered paragraphs. These adventures will have three type of virtual paragraphs: locations, foes, and branches. A location could be a physical place, or another type of decision point such as within a conversation. A location has text describing the situation to the player, and buttons offering choices. A foe is just that, someone or something the character will fight. A branch is not presented to the player, it's a choice the virtual GM makes based on conditions or a die roll.</p>
+A printed solo adventure has numbered paragraphs. These adventures will have three type of virtual paragraphs: locations, foes, and branches. A location could be a physical place, or another type of decision point such as within a conversation. A location has text describing the situation to the player, and buttons offering choices. A foe is just that, someone or something the character will fight. A branch is not presented to the player, it's a choice the virtual GM makes based on conditions or a die roll; the condition determines where the player ends up next.</p>
               <P class="howto">
                 You will write your adventure in fairly plain language, but in a specific format so the software can understand what's going on. The @ is used to set apart certain words. Here is a typical location:
 
@@ -1394,7 +297,7 @@ A printed solo adventure has numbered paragraphs. These adventures will have thr
                 </P>
 
                   <P class="howto">
-                    "@location" tells the software you a beginning a new location. After this is the name of the location, in this case "caveEntrance." This is the name buttons and branches will use to bring the player to this location. The next lines are the description presented to the player. This can be several paragraphs. "@button" tells the software you are creating a button, and it is followed by the name of a different location, in this case "firstChamber". If the player clicks this button it will take the character to the @location (or @branch) named "firstChamber". "Enter the Cave" is the text that will appear in the button.
+                    "@location" tells the software you a beginning a new location. After this is the name of the location, in this case "caveEntrance." This is the name buttons and branches will use to bring the player to this location. The next lines are the description presented to the player. This can be several paragraphs.  "@button" tells the software you are creating a button, and it is followed by the name of a different location, in this case "firstChamber". If the player clicks this button it will take the character to the @location (or @branch or @foe) named "firstChamber". "Enter the Cave" is the text that will appear in the button.
 
 
                   </P>
@@ -1413,11 +316,18 @@ Blue sidebars offer nitty-gritty info, they are revealed by the button top right
                 </P>
 
                 <P class="howto">
-                    Don't use the at-sign '@' or caret '^' in the text of your adventure,  in location or branch names, or in button text. You can use all the other special characters on the keyboard, and you can use spaces in the names of locations, branches, and foes, but not in the names of variables.
+                    The first location at the top of the adventure will be the starting location for the adventure. This is the first thing players will see when they start your adventure.
+                </P>
+
+                <P class="howto">
+                    Don't use the at-sign '@' or caret '^' in the text of your adventure,  in location or branch names, or in button text. < and > can be use in branches as part of the conditional expression (eg "IQ > 10") but can't appear in location descriptions. You can use all the other special characters on the keyboard, and you can use spaces in the names of locations, branches, and foes, but not in the names of variables.
                 </P>
 
                 <P class="nitty">
                 Captialization will never be important to this software. "@Title", "@title", "@TITLE", and "tItLe" are equivelent, and the location names "caveEntrance", "CaveEntrance", and "caveentrance" will all be the same place. Fair warning, nearly all modern programming languages care very much about capitalization, so avoid building bad habits. The names of locations and variables must be a continuous string of numbers and letters - no spaces, no special characters. Since many of your location names and variables will be several words stuck together, one programmer's trick you may want to adopt is "camelcase", where you capitalize the first letters of words after the first, such as "bottomOfTheStairs"" or "daysOfFoodLeft".
+                </P>
+                <P class="nitty">
+                Unicode is not supported, if you are wondering. It will probably work in description text and buttons, though it is likely to be very distracting. It will certainly cause unpredictable behavior in location or variable names.
                 </P>
 
                 <!-- <P class="howto">
@@ -1483,7 +393,7 @@ Blue sidebars offer nitty-gritty info, they are revealed by the button top right
                 <p class="nitty">
                         Here are the foe types:<br>
                     <br>
-                        -1 = creature, charges and melees, dropped/broken weapon means damage<br>
+                        -1 = creature, charges and melees, dropped/broken weapon means they take damage<br>
                         0 = melee fighter, charges and melees, drops or breaks weapons as normal<br>
                         1 = melee fighter with pole weapon<br>
                         2 = archer, shoots immediately, then switches to their melee weapon and charges<br>
@@ -1542,8 +452,7 @@ Blue sidebars offer nitty-gritty info, they are revealed by the button top right
                     4d < = DX (a difficult climb, adjDX will be used)<br>
                     ST > 12 (can the character lift that stone?)<br>
                     Naturalist > 0 (does the character have a particular talent?)
-                    Elf > 0 (is the character an Elf?)
-                    Wizard > 0 (is the character a wizard?)
+                    charRace (0=human, 1=elf, 2=dwarf, )
                     armor > 2 (is the character wearing metal armor?)
 
                 </P>
@@ -1552,9 +461,10 @@ Blue sidebars offer nitty-gritty info, they are revealed by the button top right
                     The two numbers can be any of these:<br>
                     <br>
                     3, 99, any fixed number<br>
-                    ST, DX (adjDX will be used), IQ, MA<br>
+                    ST, DX, adjDX, IQ, MA, Injury, Fatigue<br>
                     Armor (this will be the type of armor, useful for swimming, etc)<br>
                     1d, 2d+1, 3d-2, etc (up to six dice)<br>
+                    Any Talent or Spell <br>
                     ^variable, see the third section <br>
                   </P>
 
@@ -1577,7 +487,7 @@ Blue sidebars offer nitty-gritty info, they are revealed by the button top right
 
                 <a id="extras"></a>
 
-                <h1>Extras</h1>
+                <h3>Extras</h3>
 
                   <P class="howto">
                     There are some other keywords that create more possibilities:
@@ -1594,7 +504,7 @@ Blue sidebars offer nitty-gritty info, they are revealed by the button top right
                   Continue to the Next Room<br>
                 </P>
                 <P class="howto">
-                  The @damage line follows a @location line; the character will take the damage when they arrive at this location. "@damage" is followed by an amount, either a fixed number or a die roll. Armor will protect against this damage. After that is the name of a location to go to if the character dies from this damage.
+                  The @damage line follows a @location line; the character will take the damage when they arrive at this location. "@damage" is followed by an amount, either a fixed number or a die roll. Armor will protect against this damage. After that is the name of a location to go to if the character dies from this damage. An @damage line needs a space between "@damage" and the expression for the amount of damage and another space between that expression and the location name. The expression can't have any spaces in it.
               </P>
               <P class="howto">
                 <b>@heal</b> also follows a @location line, and will heal the character by the specified amount (fixed or die roll). It will not take a character above their starting hit points, of course. The description of the location should let them know that they have been healed.
@@ -1635,7 +545,7 @@ Blue sidebars offer nitty-gritty info, they are revealed by the button top right
 
               <a id="variables"></a>
 
-                <h1>Variables</h1>
+                <h3>Variables</h3>
 
 
                 <P class="howto">
@@ -1647,11 +557,11 @@ Blue sidebars offer nitty-gritty info, they are revealed by the button top right
                 </P>
 
                 <P class="howto">
-                    You can name them any string of letters and numbers from 1 to 20 characters long, no special characters, no spaces, capitalization irrelevant. Even if you're not going to use a variable until much later, initialize it to zero here.
+                    You can name them any string of letters and numbers from 1 to 20 characters long, no special characters, no spaces, capitalization irrelevant. Even if you're not going to use a variable until much later, initialize it to some value here.
                 </P>
 
                 <P class="howto">
-                    Variables are altered by buttons. So when a player takes an action you can change one or more variables by describing the change after the "@button destination" line and before the next button or location. It will look something like these:
+                    When a player takes an action you can change one or more variables by describing the change after the "@location destination" line and before the description. It will look something like these:
                 </P>
 
                 <P class="example">
@@ -1669,7 +579,7 @@ Blue sidebars offer nitty-gritty info, they are revealed by the button top right
 
 
                 <P class="howto">
-                    So you will create the variable with a value at the beginning of your text, modify then when players take particular actions, and check them with branches to create the effect of a dynamic game world.
+                    So you will create the variable with a value at the beginning of your text, modify them when players take particular actions, and check them with branches to create the effect of a dynamic game world.
                   </P>
 
 
@@ -1743,21 +653,18 @@ Blue sidebars offer nitty-gritty info, they are revealed by the button top right
                     That's it. Give it a try, you cannot break anything.
                 </P>
 
+                <h3>
+                  Cookies, Etc
+                </h3>
 
+                <p>
+                  TFT Helper Adventure Creator does not use cookies. Web servers store cookies on your computer and then accesses those later to keep track of information about you, your browser, and your activities.
+                  TFT Helper Adventure Creator stores the adventure you are working on on your computer, but it is never transmitted to the server. Everything you do is local until you decide to share the "Exportable".
+                  The adventure you're working on is stored interally for convenience, but it's easily overwritten. Thus, you should copy the contents of the editing field and paste it into a document somewhere to save it.
+                </p>
 
-<!--
-
-                <P class="nitty">
-                </P>
-
-                <P class="example">
-                </P>
-
-                <P class="howto">
-
-                </P>
-
--->
+</div>
+<!-- End of scrolling DIV -->
             </div>
 
 
@@ -1767,7 +674,7 @@ Blue sidebars offer nitty-gritty info, they are revealed by the button top right
 
         <div id="page3" class="page" style="display: none;">
 
-          <span class="watermark">Preview</span>
+          <span class="watermark">Alpha</span>
 
           <div style="display: flex">
 
@@ -1784,7 +691,7 @@ Blue sidebars offer nitty-gritty info, they are revealed by the button top right
               Be sure to save your work in a text file somewhere!<br>
               </div>
 <br>
-              <textarea id="userInputTextArea" rows="40" cols="60" oninput="reviewUserInput();"></textarea>
+              <textarea id="userInputTextArea" rows="40" cols="80" oninput="reviewUserInput();"></textarea>
             </div>
 
             <div style="margin-left: 20px">
@@ -1793,7 +700,10 @@ Blue sidebars offer nitty-gritty info, they are revealed by the button top right
               <span class="niftyButton" onclick="overwrite='enterTemplate';overwriteFunction()">Paste Template</span>
 
               <span class="niftyButton" onclick="overwrite='enterBetterTemplate';overwriteFunction()">Paste Example</span><br>
-              <h2>Reference</h2>
+              <br>
+<div id="refDiv" style="height: 70%; overflow: scroll; border: solid thin;">
+              <span style="font-size: large; font-weight: bold;">Reference</span>
+              <br>
               <span style="font-size: small;">You can copy and paste these as templates, or just refer to them.</span>
               <div style="font-family: arial; font-size:small; border: solid thin; padding: 5px;">
 <span class="niftyButton" style="float: right" onClick="event.stopPropagation();showSpecials();">Special Effects</span>                @location locationName<br>
@@ -1808,7 +718,7 @@ Blue sidebars offer nitty-gritty info, they are revealed by the button top right
 <span class="niftyButton" style="float: right" onClick="event.stopPropagation();showComparisons()">Branch Comparisons</span>
                 @branch branchName<br>
                 3d <= IQ <br>
-                @bonus talent (or spell)<br>
+                @bonus amount talent/spell<br>
                 @successDestination destinationIfTrue<br>
                 @failDestination destinationIfFalise<br>
               </div>
@@ -1841,12 +751,14 @@ Blue sidebars offer nitty-gritty info, they are revealed by the button top right
                 @noFoe emptyGateway<br>
             </div>
 
+          </div>
+
             </div>
 
           </div>
 
 
-          <div id="feedbackTextArea" style="border: solid thin; overflow: scroll;">
+          <div id="feedbackTextArea" rows="10" style="border: solid thin; overflow: scroll;">
 
             When you start writing your adventure the feedback will go here.
 
@@ -1867,17 +779,34 @@ Blue sidebars offer nitty-gritty info, they are revealed by the button top right
 
         <div id="page4" class="page" style="display: none;">
 
-          <span class="watermark">Preview</span>
+          <span class="watermark">Alpha</span>
 
           <div style="display: flex;">
 
               <div style="flex-grow: 1">
 
-                  Variable values:
+                User Variable values:
 
-                  <div id="variablesDiv" style="border: solid thin; ">
-variables
-                  </div>
+                <div id="userVariablesDiv" style="border: solid thin; overflow: auto; width: 100%; height: 20vh">
+                </div>
+
+                <br>
+                Attribute values:
+
+                <div id="attributeVariablesDiv" style="border: solid thin;  overflow: auto; width: 100%; height: 18vh">
+                </div>
+
+                <br>
+                Talent values:
+
+                <div id="talentVariablesDiv" style="border: solid thin;  overflow: auto; width: 100%; height: 15vh">
+                </div>
+
+                <br>
+                Spell values:
+
+                <div id="spellVariablesDiv" style="border: solid thin;  overflow: auto; width: 100%; height: 15vh">
+                </div>
 
 
 
@@ -1892,8 +821,10 @@ variables
                   <div style="position: absolute; top: 18px; left:180px; margin: auto; background-color: #444444; border-radius: 5px; height: 7px; font-size:5px; width: 80px;">
 
                   </div>
+<div style = "background-color: white; position: relative; top: 20px; margin-bottom: 0; margin-top: 0; margin-left: auto; margin-right:auto; width: 350px; height: 620px; ">
+                  <!-- <div  style="position: relative; top:20px; text-align: center;  background-color: white; color: black; margin: auto; width: 350px; height: 20px; font-family: Arial, sans-serif; font-size: smaller; "> -->
+                    <div  style="text-align: center;  background-color: white; color: black; margin-bottom: 0; margin-top: 0; margin-left: auto; margin-right:auto; width: 350px; height: 20px; font-family: Arial, sans-serif; font-size: smaller; ">
 
-                  <div  style="position: relative; top:20px; text-align: center;  background-color: white; color: black; margin: auto; width: 350px; height: 20px; font-family: Arial, sans-serif; font-size: smaller; ">
                     <img src="art/signalBars.png" height="20px" style="float: left;" onclick="event.stopPropagation();showEgg('signalDiv')">
                     <span style="float: left; position: relative; top: 3px;" onclick="event.stopPropagation();gimmeFnord();showEgg('illuminatiDiv')">illuminati</span>
                     <img src="art/WiFi.png" height="20px" style="float: left;" onclick="event.stopPropagation();showEgg('signalDiv')">
@@ -1903,14 +834,50 @@ variables
                     <img src="art/locator.png" height="20px" style="float: right;" onclick="event.stopPropagation();showEgg('locatorDiv')">
                   </div>
 
-                  <div  style="position: relative; top:20px; text-align: center;  margin: auto; width: 350px; ">
-                    <img src="art/charSheet.png" width="350px">
+                  <div  style=" text-align: center; background-color: white;  margin: auto; width: 350px; margin-bottom: 0; ">
+                    <!-- <img src="art/charSheet.png" width="350px"> -->
+                    <img src="art/menuIconWide.png" width="350px">
+                    <!-- <img src="art/menuBlank.png" width="350px"> -->
+                  <!-- </div>
+<div style="background-color: pink; color: black; margin: auto; ; width: 350px; height: 150px"> -->
+  <!-- <div id="littleCharSheet" style="background-color: lightgrey; margin: auto; width: 80%; height: 90%; border: solid thin;"> -->
+  <!-- <div id="littleCharSheet" style="height 114px; position: static; padding-left: 8px; padding-right: 8px; padding-top: 10px; padding-bottom: 10px; background-color: lightgrey; margin-bottom: 15px; margin-top: 15px; margin-left: auto; margin-right:auto; width: 80%;  border: solid thin;"> -->
+    <div id="littleCharSheet" style="height: 120px; position: static; padding-left: 8px; padding-right: 8px; padding-top: 10px; padding-bottom: 10px; background-color: lightgrey; margin-bottom: 1px; margin-top: 15px; margin-left: auto; margin-right:auto; width: 80%;  border: solid thin;">
 
-                  </div>
-                  <div id="simulatedScreen" style="position: relative; top:16px;  background-color: white; color: black; margin: auto; ; width: 350px; height: 410px">
+<span style="fontSize: larger; font-weight: bold">Test Char</span>
+<br>
+
+<span id="charL1L" style="float: left" onclick="changeVar('ST')">ST: 12</span>
+<span id="charL1R" style="float: right" onclick="changeVar('INJURY')">Injury: 0</span>
+<br>
+
+<span id="charL2L" style="float: left" onclick="changeVar('DX')">ST: 12</span>
+<span id="charL2R" style="float: right" onclick="changeVar('FATIGUE')">Injury: 0</span>
+<br>
+
+<span id="charL3La" style="float: left" onclick="changeVar('IQ')">ST: 12</span>
+&nbsp;&nbsp;
+<span id="charL3Lb" style="float: left" onclick="changeVar('MA')">OOOO</span>
+
+<span id="charL3R" style="float: right">Injury: 0</span>
+<br>
+
+<span id="charL4L" style="float: left" onclick="changeVar('XPEARNED')">ST: 12</span>
+
+<br>
+
+<span id="charL5" style="float: left; fontSize: small;">Talents:</span>
+
+
+</div>
+</div>
+
+                  <!-- <div id="simulatedScreen" style="position: relative; top:16px;  background-color: white; color: black; margin: auto; ; width: 350px; height: 410px"> -->
+                    <div id="simulatedScreen" style="padding-left: 15px; padding-right: 15px; background-color: white; color: black; margin-bottom: 25px; margin-top: 15px; margin-left: auto; margin-right:auto; height: 377px">
 test
                   </div>
-
+</div>
+<!-- This next bit is the home button -->
                   <div style="position: absolute; top: 680px; left:190px;  border: solid thin; border-color: #444444; background-color: black; border-radius: 25px; height: 50px;  width: 50px;">&nbsp;
                   </div>
 
@@ -1922,6 +889,10 @@ test
 
               <div style="flex-grow: 1; ">
 
+                <span class="niftyButton"  onclick = "setHero(0);reviewUserInput();" >Restart with Fighter</span><br><br>
+                <span class="niftyButton"  onclick = "setHero(1);reviewUserInput();" >Restart with Wizard</span><br><br>
+                <span class="niftyButton"  onclick = "setHero(2);reviewUserInput();" >Restart with Other Hero</span><br><br>
+
                 Click to Jump to a Location:
 
                 <div id="locationsDiv" style="border: solid thin; ">
@@ -1930,12 +901,37 @@ locations
 
 
 
+
+
               </div>
 
 
           </div>
 
-          <div id="dryrunDiv"   style="display: none; position: fixed; top: 30%; left: 30%; right: 30%; border: solid thick; background-color: lightgrey; color:navy; padding: 3.5vh; overflow: auto; z-index: 999;">
+          <div id="varChangeDiv"   style="display: none; position: fixed; top: 30%; left: 30%; right: 30%; border: double thick; background-color: lightgrey; color:black; padding: 3.5vh; overflow: auto; z-index: 999;">
+            <div id="varChangeInfoDiv">
+
+              <p>
+                  This should not show up.
+              </p>
+            </div>
+<br>
+Current value: <span id="currentValueSpan"></span><br>
+
+<br>
+New value:
+<textarea id="newVarValue" rows="1" cols="10" oninput=";" style="vertical-align: middle;"></textarea>
+<br>
+
+          <div style="text-align: center;">
+            <span class="niftyButton" id="successButton" onclick = "checkAndStoreVar()" >Apply</span>
+            <span class="niftyButton" id="failureButton" onclick = "document.getElementById('varChangeDiv').style.display='none';" >Cancel</span>
+
+          </div>
+          </div>
+
+
+          <div id="dryrunDiv"   style="display: none; position: fixed; top: 30%; left: 30%; right: 30%; border: solid thick; background-color: lightgrey; color:black; padding: 3.5vh; overflow: auto; z-index: 999;">
             <div id="dryrunInfoDiv">
 
               <p>
@@ -1970,10 +966,10 @@ locations
 
         <div id="page5" class="page" style="display: none; ">
 
-          <span class="watermark">Preview</span>
+          <span class="watermark">Alpha</span>
 
           <p>
-            Here is your adventure, prepared to paste into TFT Helper and scrambled to prevent spoilers. Be sure and copy the *entire* contents of this text field, from the seemingly meaningless secret message to the line of "==========".
+            Here is your adventure, prepared to paste into TFT Helper and scrambled to prevent spoilers. Be sure and copy the *entire* contents of this text field, including all the "<><>..." lines.
           </p>
 
 
@@ -1987,24 +983,14 @@ locations
 
           </div>
 
-          <!-- original<br>
-          <textarea id="exportableTextArea" readonly rows=15 style="margin: auto; width: 60%; ">Nothing has been ready to export yet!</textarea> -->
-
-          <!-- <br>scrambled<br> -->
-          <textarea id="exportableTextArea2"  rows=15 style="margin: auto; width: 60%; ">Nothing has been ready to export yet!</textarea>
-
-          <!-- <br>recovered<br>
-          <textarea id="exportableTextArea3" readonly rows=15 style="margin: auto; width: 60%; ">Nothing has been ready to export yet!</textarea>
-
-          <br>math<br>
-          <textarea id="exportableTextArea4" readonly rows=15 style="margin: auto; width: 60%; ">Nothing has been ready to export yet!</textarea> -->
+          <textarea id="exportableTextArea"  rows=15 style="margin: auto; width: 60%; ">Nothing has been ready to export yet!</textarea>
 
 
         </div>
 
         <div id="page6" class="page" style="display: none;">
 
-          <span class="watermark">Preview</span>
+          <span class="watermark">Alpha</span>
 
           <P class="howto">
             The character is about to exit the forest and cross an open patch of ground to the entrance of the abandoned watch tower. The character doesn't know it yet, but there's a goblin at a window on the second story with a horse bow. If the character makes a 3d vs IQ roll they will see the goblin in time to make this a Dodge move. Alertness gives a bonus of 2. And of course, if the character ever returns to this spot they will definitely know about the goblin. How do we write this?
@@ -2109,6 +1095,41 @@ locations
           </P>
 
         </div>
+
+        <div id="page7" class="page" style="display: none;">
+
+          <span class="watermark">Alpha</span>
+
+          <P class="howto">
+            The TFT Helper Adventure Creator does not use cookies. It does use a feature of HTML 5 called localStorage to retain the adventure you are working on. The difference between Cookies and localStorage is that a web server leaves cookies on your computer and then requests your browser to send the cookie back to the server later. This allows the server to keep track of who you are and what you have been up to, giving a better user experience at the cost of some degree of privacy. In contrast, as you use TFT Helper your browser will store your work on your computer and it will not be sent anywhere by the web app. Unless and until you purposefully copy the Exportable and share it with the world, no one else has access to it. Thus there is no privacy issue associated with the TFT Helper Adventure Creator's use of localStorage.
+
+          </P>
+          <P class="howto">
+            Unfortunately, much of the legislation in various places around the world does not distinguish between cookies and localStorage. It's impossible for the small developer to keep track of laws and regulations in various jurisdictions, so we just have to avoid any possible trouble. Thus if you disable cookies your work on your adventure will not be saved between sessions; you will need to copy your project and paste it somewhere it will be saved.
+          </P>
+
+          <p id='cookieStatus'>
+            Cookies are not currently enabled.
+          </p>
+
+          <br>
+          <br>
+          <br>
+
+
+          <p>
+
+            <span class='adventureButton' onclick='cookies(1)'>
+              Use localStorage for my convenience!
+            </span>
+            <span class='adventureButton' onclick='cookies(0)'>
+              Disable Cookies
+            </span>
+
+          </p>
+
+        </div>
+
 
 
         <div id="helpDiv" class="hideMe"  style="display: none; position: fixed; top: 20%;  left: 20%; right: 20%; border: solid thick; background-color: BlanchedAlmond; color:SaddleBrown; padding: 3.5vh; overflow: auto; z-index: 999;">
@@ -2224,7 +1245,8 @@ locations
 
 
 
-        <div id="basicTemplate" style="display: none;">@title Not Much of an Adventure
+        <div id="basicTemplate" style="display: none;">
+@title Not Much of an Adventure
 @creator Jane the GM
 @description Two safe, unoccupied rooms
 @maxlevel 32
@@ -2246,6 +1268,7 @@ Go Back To The First Room</div>
 @creator Jane the GM
 @description Abandoned, but is it empty?
 @maxlevel 33
+^spottedTrapDoor = 0
 
 @location startLocation
 A couple hours off the main road sits an old watchtower. No one remembers why it was built, and everyone "knows" it's empty. Seems like it's worth an afternoon to check it out.
@@ -2282,12 +1305,17 @@ The door and hinges are long gone. There's enough daylight inside to see the flo
 
 @button roadcheck
 Circle Around to the North Side
-@button groundfloorcheck
+@button alreadySpottedTrapDoor
 Enter The Tower
+
+@branch alreadySpottedTrapDoor
+spottedTrapDoor > 0
+@successDestination groundfloorwithTRAPDOOR
+@failDestination groundfloorcheck
 
 @branch groundfloorcheck
 3d <= IQ
-@bonus alertness
+@bonus 2 alertness
 @successDestination groundfloorwithTRAPDOOR
 @failDestination groundfloor
 
@@ -2302,6 +1330,7 @@ Try To Climb the Stairs
 
 
 @location groundfloorwithTRAPDOOR
+^spottedTrapDoor = 1
 The ground inside the tower is littered with rotting wood, loose dirt, and some barrel hoops. The wooden treads of the stairs have been scavenged, but enough of the frame remains that you could attempt to climb to the second floor.
 
 You spot a rectangular outline in the detritus, and lift up a trapdoor to reveal stairs going down into a basement.
@@ -2317,13 +1346,13 @@ Try To Climb the Stairs
 
 @branch trytoclimb
 3d vs DX
-@bonus climbing 3
+@bonus 3 climbing
 @successDestination secondfloor
 @failDestination ouchwefell
 
 @branch ouchwefell
 3d vs DX
-@bonus acrobatics 3
+@bonus 3 acrobatics
 @successDestination safelanding
 @failDestination takedamage
 
@@ -2371,11 +1400,23 @@ The second floor is in surprisingly good shape. From this platform you can look 
 Someone has carved something in the floor.
 @writing Jared, I searched for the amulet but it's not here.
 
-@button groundfloorcheck
+@button alreadySpottedTrapDoor
 Back Down The Stairs
+
+@location diedfromfall
+The fall was more than you could take.
+
 
 </div>
 
+
+<div id="generalFaultDiv" style="display: none; position: fixed; top: 30%; left: 30%; right: 30%; border: solid thick; background-color: lightgrey; color:black; padding: 3.5vh; overflow: auto; z-index: 999;">
+  <div id="generalFaultMessage">
+  </div>
+
+  <span class="niftyButton" onclick = "document.getElementById('generalFaultDiv').style.display='none';" >Argh, Okay</span>
+
+</div>
 
     </body>
 <script>
