@@ -13,15 +13,10 @@
       <script src="badWords.js"></script>
       <script src="scrambler.js"></script>
 
-    <!-- <script src="https://unpkg.com/mermaid@8.7.0/dist/mermaid.min.js"></script> -->
 
     <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
     <script>mermaid.initialize({startOnLoad:true, "theme":"forest"});</script>
 
-    <!-- <script type="module">
-      import mermaid from 'https://unpkg.com/mermaid@9/dist/mermaid.esm.min.mjs';
-      mermaid.initialize({ startOnLoad: true });
-    </script> -->
 
 
     <script>
@@ -32,9 +27,6 @@
     // document.designMode = 'on';
 
 
-    // mermaid.initialize({
-    //   startOnLoad:true
-    // });
 
     //        Establish Variables
 
@@ -2790,6 +2782,15 @@
               rememberedLocation = firstLocation;
               lastLocation = firstLocation;
 
+              document.getElementById('destinationList').innerHTML='';
+
+              placesWeCanGo.forEach(place => {
+                const option = document.createElement('option');
+                option.value = place;
+                document.getElementById('destinationList').appendChild(option);
+              });
+
+
 //              generateTextEditorShortcuts();
 
 //              console.log( 'userInputTextArea is ' + $('userInputTextArea').value.split('\n').length + " lines long.");
@@ -2888,21 +2889,6 @@
 
 
 
-            // function generateTextEditorShortcuts {
-            //
-            //   newShortCuts = '';
-            //
-            //   for let i = 0; i < placesWeCanGo.length; i++ ) {
-            //
-            //
-            //
-            //
-            //   }
-            //
-            //
-            //
-            // }
-
 
 
             function nodeShortcutsAlpha() {
@@ -2941,34 +2927,6 @@
 
             }
 
-
-            // function nodeContainerClick( theEvent ) {
-            //
-            //   console.log(' saw a click ');
-            //   lastNodeContainerEvent = 'click';
-            //
-            // }
-
-
-            // function nodeContainerKeyDown( theEvent ) {
-            //
-            //   console.log(' saw a keypress ');
-            //   lastNodeContainerEvent = 'key';
-            //
-            //   eventHolder = theEvent;
-            //   lastNodeContainerKey = theEvent.key;
-            //   lastNodeContainerModifier = theEvent.shift;
-            //   console.log( theEvent );
-            //
-            // }
-
-
-            // function nodeContainerBlur( theEvent ) {
-            //
-            //   console.log(' saw a blur ');
-            //   lastNodeContainerEvent = 'blur';
-            //
-            // }
 
             function normalizeBlankLines() {
                 // Get the textarea element
@@ -3081,108 +3039,6 @@
 
               convertArrayToVisual();
 
-              // changeableElements = $('nodeContainerDiv').querySelectorAll('textarea, select');
-              //
-              // if ( lastNodeContainerKey == 'Tab' ) {
-              //   if ( lastNodeContainerModifier == 'shiftKey') {
-              //     currentIndex--;
-              //   } else {
-              //     currentIndex++;
-              //   }
-              // }
-              //
-              // changeableElements[ currentIndex ].focus();
-              //
-              // if (activeElement && activeElement.tagName.toLowerCase() === 'textarea') {
-              //   // Select all text within the textarea
-              //   activeElement.select();
-              // }
-
-
-//               if ( typeof( theEvent )!= 'undefined' ) {
-//
-//                 console.log( '!undefined' );
-//
-// //                console.log( theEvent );
-//
-//                 currentlyActiveItem = theEvent.target;
-//
-//                 let direction=0;
-//                 if ( theEvent.shiftKey ) {
-//                   direction=-1;
-//                 } else {
-//                   direction=1;
-//                 }
-//
-//                 let changeableElements = $('nodeContainerDiv').querySelectorAll('textarea, select');
-//                 let currentIndex = Array.from(changeableElements).indexOf(currentlyActiveItem);
-// //                console.log(currentIndex);
-//
-//                 convertVisualEditorToString();
-//
-//                 reviewUserInput();
-//
-//                 convertArrayToVisual();
-//
-//                 changeableElements = $('nodeContainerDiv').querySelectorAll('textarea, select');
-//
-//                 if ( currentIndex + direction < 0 || currentIndex + direction > changeableElements.length ) {
-//                   direction = 0;
-//                 }
-//
-//                 // if ( lastNodeContainerEvent == 'click' ) {
-//                 //
-//                 //   console.log( 'click, we will not fiddle with ()' );
-//                 //
-//                 //   return;
-//                 //
-//                 // }
-//
-//                 if (typeof changeableElements[ currentIndex + direction ] !== 'undefined') {
-//
-// //                  console.log(changeableElements[ currentIndex + direction ]);
-//
-//                   changeableElements[ currentIndex + direction ].focus();
-//                   // 8/18/23
-// //                  changeableElements[ currentIndex + direction ].select();
-//                   if ( changeableElements[ currentIndex + direction ].tagName == 'TEXTAREA' ) {
-//
-//                     changeableElements[ currentIndex + direction ].select();
-//
-//                   }
-//
-//
-//
-//                 }
-//
-//                 if ( currentScroll != -1 ) {
-//                   $('nodeContainerDiv').scrollTop = currentScroll;
-//                   currentScroll = -1;
-//                 }
-//
-//               } else {
-//
-//                 console.log( 'no event' );
-//                 currentlyActiveItem = $('nodeContainer').children[ currentLocationEdited ];
-//
-//                 convertVisualEditorToString();
-//
-//                 reviewUserInput();
-//
-//                 convertArrayToVisual();
-//
-//                 if ( typeof currentlyActiveItem !== 'undefined' ) {
-//
-//                     currentlyActiveItem.focus();
-//                     // 8/18/23
-//                     if ( currentlyActiveItem.tagName == 'TEXTAREA' ) {
-//
-//                       currentlyActiveItem.select();
-//
-//                     }
-//                 }
-//
-//               }
 
             }
 
@@ -3315,9 +3171,9 @@
                 newLocName = 'newLocation';
               }
 
-              newNodeStr = '<div class="locationNode" id="editorNodenewLocation"><span style="vertical-align: middle;">Location: </span><textarea rows="1" cols="30" style="vertical-align: middle;">' + newLocName + '</textarea><span style="float: right;">';
+              newNodeStr = '<div class="locationNode" id="editorNodenewLocation"><span style="vertical-align: middle;" onchange="visualEditorUpdate()">Location: </span><textarea rows="1" cols="30" style="vertical-align: middle;">' + newLocName + '</textarea><span style="float: right;">';
               newNodeStr += $('nodeContainer').children.length;
-              newNodeStr += '</span><br><br><span class="niftyButton">Add an Action</span><br><br>Adventure Text: <br><textarea rows="8" cols="80" class="adventureText">description</textarea><br><br>Button Text:&nbsp;<textarea rows="1" cols="20" style="vertical-align: middle;"></textarea>Button Destination:&nbsp;<textarea rows="1" cols="20" style="vertical-align: middle;"></textarea> View that node:&nbsp;<a href="#editorNodebottomnorope" style="text-decoration: none; color: black;"><button type="button" class="adventureButtonE"></button></a><button type="button" class="niftyButton" onclick="visDeleteButton(' + $("nodeContainer").children.length + '\"Go To Locaion\")">Delete This Button</button><br><br><span class="niftyButton">Add Button</span><span class="niftyButton">Add Text</span><br><br><span class="niftyButton" style="float: right; position: relative; top: -4vh" onclick="deleteEditorNode(';
+              newNodeStr += '</span><br><br><span class="niftyButton">Add an Action</span><br><br>Adventure Text: <br><textarea rows="8" cols="80" class="adventureText">description</textarea><br><br>Button Text:&nbsp;<textarea rows="1" cols="20" style="vertical-align: middle;"></textarea>Button Destination:&nbsp;<input list="destinationList" style="vertical-align: middle;" onchange="visualEditorUpdate()"></input> View that node:&nbsp;<a href="#editorNodebottomnorope" style="text-decoration: none; color: black;"><button type="button" class="adventureButtonE"></button></a><button type="button" class="niftyButton" onclick="visDeleteButton(' + $("nodeContainer").children.length + '\"Go To Locaion\")">Delete This Button</button><br><br><span class="niftyButton">Add Button</span><span class="niftyButton">Add Text</span><br><br><span class="niftyButton" style="float: right; position: relative; top: -4vh" onclick="deleteEditorNode(';
               newNodeStr += $('nodeContainer').children.length;
               newNodeStr += ')">Delete This Location</span></div>';
 
@@ -3457,7 +3313,7 @@
               newNodeStr += '<textarea rows="1" cols="20" style="vertical-align: middle;">' + newFirstLaterName+ 'Visited</textarea>';
               newNodeStr += " starts at ";
               newNodeStr += '<textarea rows="1" cols="8" style="vertical-align: middle;">0</textarea> ';
-              newNodeStr += '<span class="niftyButton" style="font-size: 60%; position: relative; top: -1vh; vertical-align: bottom">Delete This Variable</span></span><br>';
+              newNodeStr += '<span class="niftyButton" style="font-size: 60%; vertical-align: middle">Delete This Variable</span></span><br>';
 
 //              console.log("new variable = "+newNodeStr);
               // add new variable nameVisited to visEd
@@ -3465,7 +3321,7 @@
 
               // create location nameFirst
 
-              newNodeStr = '<div class="locationNode" id="editorNode' + newFirstLaterName + 'First"><span style="vertical-align: middle;">Location: </span><textarea rows="1" cols="30" style="vertical-align: middle;">' + newFirstLaterName + 'First</textarea><span style="float: right;">';
+              newNodeStr = '<div class="locationNode" id="editorNode' + newFirstLaterName + 'First"><span style="vertical-align: middle;">Location: </span><textarea rows="1" cols="30" style="vertical-align: middle;" onchange="visualEditorUpdate()">' + newFirstLaterName + 'First</textarea><span style="float: right;">';
               newNodeStr += $('nodeContainer').children.length;
               newNodeStr += '</span><br>';
 
@@ -3491,7 +3347,7 @@
 
               // create location nameLater
 
-              newNodeStr = '<div class="locationNode" id="editorNode' + newFirstLaterName + 'Later"><span style="vertical-align: middle;">Location: </span><textarea rows="1" cols="30" style="vertical-align: middle;">' + newFirstLaterName + 'Later</textarea><span style="float: right;">';
+              newNodeStr = '<div class="locationNode" id="editorNode' + newFirstLaterName + 'Later"><span style="vertical-align: middle;">Location: </span><textarea rows="1" cols="30" style="vertical-align: middle;"> onchange="visualEditorUpdate()"' + newFirstLaterName + 'Later</textarea><span style="float: right;">';
               newNodeStr += $('nodeContainer').children.length;
               newNodeStr += '</span><br><br><span class="niftyButton">Add an Action</span><br><br>Adventure Text: <br><textarea rows="8" cols="80" class="adventureText">description for later vists to ' + newFirstLaterName + '</textarea><br><br><br><span class="niftyButton" onclick="addButton(' + $('nodeContainer').children.length + ')">Add Button</span><span class="niftyButton">Add Text</span><br><br><span class="niftyButton" style="float: right; position: relative; top: -4vh" onclick="deleteEditorNode(';
               newNodeStr += $('nodeContainer').children.length;
@@ -3514,10 +3370,13 @@
 
 //              newNodeStr += "<br><span class='niftyButton'onclick='addBonus("+$('nodeContainer').children.length+")'>Add a Bonus</span><br><br>";
 
-              newNodeStr += "<span style='vertical-align: middle;'>True Destination:&nbsp;</span><textArea rows='1' cols='30' style='vertical-align: middle;' oninput = 'suggestDestination(event)'>" + newFirstLaterName + "Later</textArea>  go there now: <a href='#editorNode" + newFirstLaterName + "Later'>" + newFirstLaterName + "Later</a><br>";
+              // newNodeStr += "<span style='vertical-align: middle;'>True Destination:&nbsp;</span><textArea rows='1' cols='30' style='vertical-align: middle;' oninput = 'suggestDestination(event)'>" + newFirstLaterName + "Later</textArea>  go there now: <a href='#editorNode" + newFirstLaterName + "Later'>" + newFirstLaterName + "Later</a><br>";
 
-              newNodeStr += "<span style='vertical-align: middle;'>False Destination:&nbsp;</span><textArea rows='1' cols='30' style='vertical-align: middle;' oninput = 'suggestDestination(event)'>" + newFirstLaterName + "First</textArea> go there now: <a href='#editorNode" + newFirstLaterName + "First'>" + newFirstLaterName + "First</a><br>";
+              newNodeStr += "<span style='vertical-align: middle;'>True Destination:&nbsp;</span><input list='destinationList' style='vertical-align: middle;' value='" + newFirstLaterName + "Later'></input>  go there now: <a href='#editorNode" + newFirstLaterName + "Later'>" + newFirstLaterName + "Later</a><br>";
 
+              // newNodeStr += "<span style='vertical-align: middle;'>False Destination:&nbsp;</span><textArea rows='1' cols='30' style='vertical-align: middle;' oninput = 'suggestDestination(event)'>" + newFirstLaterName + "First</textArea> go there now: <a href='#editorNode" + newFirstLaterName + "First'>" + newFirstLaterName + "First</a><br>";
+
+              newNodeStr += "<span style='vertical-align: middle;'>False Destination:&nbsp;</span><input list='destinationList style='vertical-align: middle;' value='" + newFirstLaterName + "First'></input> go there now: <a href='#editorNode" + newFirstLaterName + "First'>" + newFirstLaterName + "First</a><br>";
 
                 newNodeStr += "<span class='niftyButton' style='float: right; position: relative; top: -4vh' onclick='deleteEditorNode(" + $('nodeContainer').children.length + ")'>Delete This Branch</span>";
 
@@ -3550,8 +3409,9 @@
               newNodeStr += " starts at ";
               newNodeStr += '<textarea rows="1" cols="8" style="vertical-align: middle;">0</textarea> ';
               newNodeStr += ' zero destination (optional):';
-              newNodeStr += " <textArea rows='1' cols='16' style='vertical-align: middle;' oninput='suggestDestination(event)'></textarea>";
-              newNodeStr += '<span class="niftyButton" style="font-size: 60%; position: relative; top: -1vh; vertical-align: bottom">Delete This Variable</span></span><br>';
+              // newNodeStr += " <textArea rows='1' cols='16' style='vertical-align: middle;' oninput='suggestDestination(event)'></textarea>";
+              newNodeStr += " <input list='destinationList' style='vertical-align: middle;'></input>";
+              newNodeStr += '<span class="niftyButton" style="font-size: 60%; vertical-align: middle">Delete This Variable</span></span><br>';
 
               $('editorVariableBox').innerHTML += newNodeStr;
 
@@ -3611,9 +3471,9 @@
 
 //              newNodeStr += "<br><span class='niftyButton' onclick='addBonus("+$('nodeContainer').children.length+")'>Add a Bonus</span><br><br>";
 
-              newNodeStr += "<span style='vertical-align: middle;'>True Destination:&nbsp;</span><textArea rows='1' cols='30' style='vertical-align: middle;' oninput = 'suggestDestination(event)'>trueDestination</textArea>  go there now: <a href='#editorNodetrueDestination'>trueDestination</a><br>";
+              newNodeStr += "<span style='vertical-align: middle;'>True Destination:&nbsp;</span><input list='destinationList' style='vertical-align: middle;' value='trueDestination'></input>  go there now: <a href='#editorNodetrueDestination'>trueDestination</a><br>";
 
-              newNodeStr += "<span style='vertical-align: middle;'>False Destination:&nbsp;</span><textArea rows='1' cols='30' style='vertical-align: middle;' oninput='suggestDestination(event)'>falseDestination</textArea> go there now: <a href='#editorNodefalseDestination'>falseDestination</a><br>";
+              newNodeStr += "<span style='vertical-align: middle;'>False Destination:&nbsp;</span><input list='destinationList' style='vertical-align: middle;' value='falseDestination'></textArea> go there now: <a href='#editorNodefalseDestination'>falseDestination</a><br>";
 
 
                 newNodeStr += "<span class='niftyButton' style='float: right; position: relative; top: -4vh' onclick='deleteEditorNode(" + $('nodeContainer').children.length + ")'>Delete This Branch</span>";
@@ -3980,10 +3840,16 @@
                     //     "</textarea> starts at <textArea rows='1' cols='8' style='vertical-align: middle;'>" + visualVariableArray[i].varValue + '</textarea> ' +
                     //     "<span class='niftyButton' style='font-size: 60%; position: relative; top: -1vh; vertical-align: bottom;' onclick='deleteVariable(" + i + ")'>Delete This Variable</span></span><br>";
 
+                    // $("editorVariableBox").innerHTML += "<span id='variableNumber" + i + "'><textArea rows='1' cols='20' style='vertical-align: middle;'>" + visualVariableArray[i].varName +
+                    //     "</textarea> starts at <textArea rows='1' cols='8' style='vertical-align: middle;'>" + visualVariableArray[i].varInitiator + '</textarea> ' +
+                    //     " zero destination (optional): <textArea rows='1' cols='16' style='vertical-align: middle;' oninput='suggestDestination(event)'>" + visualVariableArray[i].varZeroDestination + '</textarea>' +
+                    //     "<span class='nodeEditorButton' style='font-size: 60%; position: relative; top: -1vh; vertical-align: bottom;' onclick='deleteVariable(" + i + ")'>Delete This Variable</span></span><br>";
+
                     $("editorVariableBox").innerHTML += "<span id='variableNumber" + i + "'><textArea rows='1' cols='20' style='vertical-align: middle;'>" + visualVariableArray[i].varName +
                         "</textarea> starts at <textArea rows='1' cols='8' style='vertical-align: middle;'>" + visualVariableArray[i].varInitiator + '</textarea> ' +
-                        " zero destination (optional): <textArea rows='1' cols='16' style='vertical-align: middle;' oninput='suggestDestination(event)'>" + visualVariableArray[i].varZeroDestination + '</textarea>' +
-                        "<span class='nodeEditorButton' style='font-size: 60%; position: relative; top: -1vh; vertical-align: bottom;' onclick='deleteVariable(" + i + ")'>Delete This Variable</span></span><br>";
+                        " zero destination (optional): <input list='destinationList' style='vertical-align: middle;' value='" + visualVariableArray[i].varZeroDestination +"'>"+ '</input>' +
+                        "<span class='nodeEditorButton' style='font-size: 60%; vertical-align: middle;' onclick='deleteVariable(" + i + ")'>Delete This Variable</span></span><br>";
+
 
                 }
               }
@@ -3995,7 +3861,7 @@
 
                 switch (adventureArray[i].type) {
                   case 'l':
-                    newNodeStr += "<div class='locationNode' id='editorNode" + adventureArray[i].name + "'><span style='vertical-align: middle;'>Location: </span>";
+                    newNodeStr += "<div class='locationNode' id='editorNode" + adventureArray[i].name + "'><span style='vertical-align: middle;' onchange='visualEditorUpdate()'>Location: </span>";
                     newNodeStr += "<textArea rows='1' cols='30' style='vertical-align: middle;'>" + adventureArray[i].name + "</textArea>";
                     newNodeStr += "<span style='float: right;'>"+i+"</span><br>";
 
@@ -4229,10 +4095,14 @@
                     newNodeStr += "<textArea rows='1' cols='70'>" + adventureArray[i].comparisonExpression + "</textArea>" + "<br>";
 
 
-                    newNodeStr += "<span style='vertical-align: middle;'>True Destination:&nbsp;</span><textArea rows='1' cols='30' style='vertical-align: middle;' oninput='suggestDestination(event)'>" + adventureArray[i].destinationTrue + "</textArea>  go there now: <a href='#editorNode" + adventureArray[i].destinationTrue + "'>" + adventureArray[i].destinationTrue + "</a><br>";
+                    // newNodeStr += "<span style='vertical-align: middle;'>True Destination:&nbsp;</span><textArea rows='1' cols='30' style='vertical-align: middle;' oninput='suggestDestination(event)'>" + adventureArray[i].destinationTrue + "</textArea>  go there now: <a href='#editorNode" + adventureArray[i].destinationTrue + "'>" + adventureArray[i].destinationTrue + "</a><br>";
+                    //
+                    // newNodeStr += "<span style='vertical-align: middle;'>False Destination:&nbsp;</span><textArea rows='1' cols='30' style='vertical-align: middle;' oninput='suggestDestination(event)'>" + adventureArray[i].destinationFalse + "</textArea> go there now: <a href='#editorNode" + adventureArray[i].destinationFalse + "'>" + adventureArray[i].destinationFalse + "</a><br>";
+                    //
 
-                    newNodeStr += "<span style='vertical-align: middle;'>False Destination:&nbsp;</span><textArea rows='1' cols='30' style='vertical-align: middle;' oninput='suggestDestination(event)'>" + adventureArray[i].destinationFalse + "</textArea> go there now: <a href='#editorNode" + adventureArray[i].destinationFalse + "'>" + adventureArray[i].destinationFalse + "</a><br>";
+                    newNodeStr += "<span style='vertical-align: middle;'>True Destination:&nbsp;</span><input list='destinationList' style='vertical-align: middle;' value='" + adventureArray[i].destinationTrue + "'></input>  go there now: <a href='#editorNode" + adventureArray[i].destinationTrue + "'>" + adventureArray[i].destinationTrue + "</a><br>";
 
+                    newNodeStr += "<span style='vertical-align: middle;'>False Destination:&nbsp;</span><input list='destinationList' style='vertical-align: middle;' value='" + adventureArray[i].destinationFalse + "'></input> go there now: <a href='#editorNode" + adventureArray[i].destinationFalse + "'>" + adventureArray[i].destinationFalse + "</a><br>";
 
                     if ( i > 0 ) {
                       newNodeStr += "<span class='nodeEditorButton' style='float: right; position: relative; top: -4vh' onclick='deleteEditorNode(" + i + ")'>Delete This Branch</span>";
@@ -4261,9 +4131,9 @@
                     newNodeStr += "<span style='vertical-align: middle;'>Damage:&nbsp;</span><textArea rows='1' cols='3' style='vertical-align: middle;'>" + adventureArray[i].damage2 + '</textArea> secondary weapon<br>';
                     newNodeStr += "<span style='vertical-align: middle;'>Range:&nbsp;</span><textArea rows='1' cols='3' style='vertical-align: middle;'>" + adventureArray[i].range + '</textArea><br>';
                     newNodeStr += "<span style='vertical-align: middle;'>XP:&nbsp;</span><textArea rows='1' cols='3' style='vertical-align: middle;'>" + adventureArray[i].xp + '</textArea><br>';
-                    newNodeStr += "<span style='vertical-align: middle;'>Win Destination:&nbsp;</span><textArea rows='1' cols='30' style='vertical-align: middle;' oninput = 'suggestDestination(event)'>" + adventureArray[i].winDestination + '</textArea> go there now: ' + "<a href='#editorNode" + adventureArray[i].winDestination + "'>" + adventureArray[i].winDestination + "</a><br>";
-                    newNodeStr += "<span style='vertical-align: middle;'>Lose Destination:&nbsp;</span><textArea rows='1' cols='30' style='vertical-align: middle;' oninput = 'suggestDestination(event)'>" + adventureArray[i].loseDestination + '</textArea> go there now: ' + "<a href='#editorNode" + adventureArray[i].loseDestination + "'>" + adventureArray[i].loseDestination + "</a><br>";
-                    newNodeStr += "<span style='vertical-align: middle;'>No Foe:&nbsp;</span><textArea rows='1' cols='30' style='vertical-align: middle;' oninput = 'suggestDestination(event)'>" + adventureArray[i].noFoe + '</textArea> go there now: ' + "<a href='#editorNode" + adventureArray[i].noFoe + "'>" + adventureArray[i].noFoe + "</a><br>";
+                    newNodeStr += "<span style='vertical-align: middle;'>Win Destination:&nbsp;</span><input list='destinationList' style='vertical-align: middle;' value='"+adventureArray[i].winDestination+"'>" + '</input> go there now: ' + "<a href='#editorNode" + adventureArray[i].winDestination + "'>" + adventureArray[i].winDestination + "</a><br>";
+                    newNodeStr += "<span style='vertical-align: middle;'>Lose Destination:&nbsp;</span><input list='destinationList' style='vertical-align: middle;' value='"+adventureArray[i].loseDestination+"'>" + '</input> go there now: ' + "<a href='#editorNode" + adventureArray[i].loseDestination + "'>" + adventureArray[i].loseDestination + "</a><br>";
+                    newNodeStr += "<span style='vertical-align: middle;'>No Foe:&nbsp;</span><input list='destinationList' style='vertical-align: middle;' value='" + adventureArray[i].noFoe + "'>" + '</input> go there now: ' + "<a href='#editorNode" + adventureArray[i].noFoe + "'>" + adventureArray[i].noFoe + "</a><br>";
 
                     if ( i > 0 ) {
                       newNodeStr += "<span class='nodeEditorButton' style='float: right; position: relative; top: -4vh' onclick='deleteEditorNode(" + i + ")'>Delete This Foe</span><span class='nodeEditorButton' style='float: right; position: relative; top: -4vh' onclick='deleteEditorNode(" + i + ",1)'>Delete This Foe & Outcome Nodes</span>";
@@ -4280,15 +4150,17 @@
 
 
               } // next i - looping adventureArray
+
+
               $('nodeContainer').innerHTML = newNodeStr;
 
               // console.log(adventureArray[6].comparisonExpression);
               // console.log(getEditorNode(6).children[3].value);
 
-              destinationAreas = document.querySelectorAll('.destinationTextArea');
-
-              destinationAreas.forEach( (textarea) => { textarea.addEventListener( 'input', suggestDestination ) } );
-
+              // destinationAreas = document.querySelectorAll('.destinationTextArea');
+              //
+              // destinationAreas.forEach( (textarea) => { textarea.addEventListener( 'input', suggestDestination ) } );
+              //
               ncSelects = $('nodeContainerDiv').querySelectorAll('select');
 
               ncSelects.forEach( element  => element.addEventListener( 'change', visualEditorUpdate ) );
@@ -4331,11 +4203,13 @@
               nextButtonString += buttonLabel;
               nextButtonString += "</textarea>";
 
-              nextButtonString += " Button Destination:&nbsp;<textarea rows='1' cols='20' style='vertical-align: middle;' oninput = 'suggestDestination(event)'>";
+              nextButtonString += " Button Destination:&nbsp;<input list='destinationList' style='vertical-align: middle;' value='" + buttonDestination + "' onchange='visualEditorUpdate()'>";
 //              nextButtonString += " Button Destination:&nbsp;<textarea rows='1' cols='20' style='vertical-align: middle;' class='destinationTextArea'>";
 //              nextButtonString += " Button Destination:&nbsp;<textarea rows='1' cols='20' style='vertical-align: middle;' class='destinationTextArea'>";
-              nextButtonString += buttonDestination;
-              nextButtonString += "</textarea>";
+//              nextButtonString += buttonDestination;
+              nextButtonString += "</input>";
+
+//              console.log( theNode + ": " + buttonDestination );
 
               nextButtonString += " View that node:&nbsp;";
               nextButtonString += "<a href='#editorNode";
@@ -4390,79 +4264,80 @@
 
             }
 
-            function suggestDestination( theEvent ) {
+//             function suggestDestination( theEvent ) {
+//
+// //             console.log(theEvent);
+// //              console.log( theEvent.target.value );
+//
+// //              console.log(theEvent.target.id);
+//
+// //              console.log( getDomPath( theEvent.target ) );
+//
+//                 if ( theEvent.inputType == 'insertLineBreak' ) {
+//                   query = query.slice(0,-1);
+//                 }
+//
+//
+//               targetTextArea = getDomPath( theEvent.target );
+//
+//               query = theEvent.target.value.toLowerCase();
+//
+//               if ( theEvent.inputType == 'insertLineBreak' ) {
+//                 query = query.slice(0,-1);
+//               }
+//
+//               const suggestions = placesWeCanGo.filter(x=>x.startsWith( query ));
+//
+//               if ( theEvent.inputType == 'insertLineBreak' && suggestions.length == 1 ) {
+//
+//                 theEvent.target.value = suggestions[0];
+//                 suggestionsBox.style.display = 'none';
+//
+//                 postDestinationScroll = $('nodeContainerDiv').scrollTop;
+//                 focusedElement = document.activeElement;
+//
+//                 visualEditorUpdate();
+//
+//
+//                 setTimeout(function() {
+//                     $('nodeContainerDiv').scrollTop = postDestinationScroll;
+//                     focusedElement.focus();
+//                 }, 10);
+//
+//                 return;
+//
+//               } else {
+//
+//               }
+//
+//               suggestionsBox = $('nodeNameSuggestions');
+//
+//               suggestionsBox.innerHTML = '';
+//               if (suggestions.length > 0 && query.length > 0) {
+//
+//                   suggestionsBox.style.display = 'block';
+//                   // document.addEventListener('click', hideDestinationSuggestionBox);
+//                   // console.log('Event listener added');
+//
+//                   suggestions.forEach(function(suggestion) {
+//                       const suggestionItem = document.createElement('div');
+//                       suggestionItem.textContent = suggestion;
+//                       suggestionsBox.appendChild(suggestionItem);
+//
+//                       suggestionItem.addEventListener('click',function() { changeDestination( targetTextArea, suggestion ) } );
+//
+//                   });
+//
+//                   suggestionsBox.style.left = theEvent.target.getBoundingClientRect().right + 'px';
+//                   suggestionsBox.style.top = theEvent.target.getBoundingClientRect().top + theEvent.target.getBoundingClientRect().height / 2 - suggestionsBox.getBoundingClientRect().height / 2 + 'px';
+//
+//               } else {
+//                   suggestionsBox.style.display = 'none';
+//               }
+//
+//
+//             }
 
-//             console.log(theEvent);
-//              console.log( theEvent.target.value );
-
-//              console.log(theEvent.target.id);
-
-//              console.log( getDomPath( theEvent.target ) );
-
-                if ( theEvent.inputType == 'insertLineBreak' ) {
-                  query = query.slice(0,-1);
-                }
-
-
-              targetTextArea = getDomPath( theEvent.target );
-
-              query = theEvent.target.value.toLowerCase();
-
-              if ( theEvent.inputType == 'insertLineBreak' ) {
-                query = query.slice(0,-1);
-              }
-
-              const suggestions = placesWeCanGo.filter(x=>x.startsWith( query ));
-
-              if ( theEvent.inputType == 'insertLineBreak' && suggestions.length == 1 ) {
-
-                theEvent.target.value = suggestions[0];
-                suggestionsBox.style.display = 'none';
-
-                postDestinationScroll = $('nodeContainerDiv').scrollTop;
-                focusedElement = document.activeElement;
-
-                visualEditorUpdate();
-
-
-                setTimeout(function() {
-                    $('nodeContainerDiv').scrollTop = postDestinationScroll;
-                    focusedElement.focus();
-                }, 10);
-
-                return;
-
-              } else {
-
-              }
-
-              suggestionsBox = $('nodeNameSuggestions');
-
-              suggestionsBox.innerHTML = '';
-              if (suggestions.length > 0 && query.length > 0) {
-
-                  suggestionsBox.style.display = 'block';
-                  // document.addEventListener('click', hideDestinationSuggestionBox);
-                  // console.log('Event listener added');
-
-                  suggestions.forEach(function(suggestion) {
-                      const suggestionItem = document.createElement('div');
-                      suggestionItem.textContent = suggestion;
-                      suggestionsBox.appendChild(suggestionItem);
-
-                      suggestionItem.addEventListener('click',function() { changeDestination( targetTextArea, suggestion ) } );
-
-                  });
-
-                  suggestionsBox.style.left = theEvent.target.getBoundingClientRect().right + 'px';
-                  suggestionsBox.style.top = theEvent.target.getBoundingClientRect().top + theEvent.target.getBoundingClientRect().height / 2 - suggestionsBox.getBoundingClientRect().height / 2 + 'px';
-
-              } else {
-                  suggestionsBox.style.display = 'none';
-              }
-
-
-            }
 
             function changeDestination( theTA, theNewValue ) {
 
@@ -4608,7 +4483,8 @@
 
               //  Variables
 
-              arrayOfVariableTAs = $('editorVariableBox').getElementsByTagName('textarea');
+//              arrayOfVariableTAs = $('editorVariableBox').getElementsByTagName('textarea, input');
+              arrayOfVariableTAs = $('editorVariableBox').querySelectorAll('textarea, input');
 
               for ( currentVariable = 0; currentVariable < arrayOfVariableTAs.length; currentVariable += 3 ) {
 
@@ -4761,7 +4637,7 @@
                         // if ( arrayOfNodeDivs[ currentNode ].children[ nextAction ].id.substring(0,1) == 'N' && arrayOfNodeDivs[ currentNode ].children[ nextAction ].id.substring(2,3) == 'B' ) {
                         if ( buttonDivRegEx.test( arrayOfNodeDivs[ currentNode ].children[ nextAction ].id ) ) {
 
-                          arrayOfTextAreasForThisButton = arrayOfNodeDivs[ currentNode ].children[ nextAction ].querySelectorAll('textArea');
+                          arrayOfTextAreasForThisButton = arrayOfNodeDivs[ currentNode ].children[ nextAction ].querySelectorAll('textArea, input');
 
                           if ( arrayOfTextAreasForThisButton.length == 3 ) {
 
@@ -6404,104 +6280,28 @@
               document.documentElement.style.setProperty('--pageColor', '#444444');
               document.documentElement.style.setProperty('--textColor', '#cccccc');
               document.documentElement.style.setProperty('--selectedColor', '#ffffff');
-              document.documentElement.style.setProperty('--textAreaBGColor', '#888888');
-              document.documentElement.style.setProperty('----lineNumberColor', '#333333');
-              document.documentElement.style.setProperty('--niftyButtonTextColor', '#bbbbbb');
+              document.documentElement.style.setProperty('--textAreaBGColor', '#aaaaaa');
+              document.documentElement.style.setProperty('--lineNumberColor', '#444444');
+              document.documentElement.style.setProperty('--niftyButtonTextColor', '#333333');
               document.documentElement.style.setProperty('--niftyButtonBorderColor', '#000000');
-              document.documentElement.style.setProperty('--niftyButtonShadowColor', '0.2vh 0.4vh #111111');
+              document.documentElement.style.setProperty('--niftyButtonBGColor', '#eeeeee');
+              document.documentElement.style.setProperty('--niftyButtonShadowColor', '#111111');
 
               break;
 
-              case 'light':
+            case 'light':
 
-                document.documentElement.style.setProperty('--link-color', '#0000ff');
-                document.documentElement.style.setProperty('--bgColor', '#dddddd');
-                document.documentElement.style.setProperty('--pageColor', '#ffffff');
-                document.documentElement.style.setProperty('--textColor', '#000000');
-                document.documentElement.style.setProperty('--selectedColor', 'darkred');
-                document.documentElement.style.setProperty('--textAreaBGColor', '#ffffff');
-                document.documentElement.style.setProperty('----lineNumberColor', 'grey');
-                document.documentElement.style.setProperty('--niftyButtonTextColor', '#000000');
-                document.documentElement.style.setProperty('--niftyButtonBorderColor', '#000000');
-                document.documentElement.style.setProperty('--niftyButtonShadowColor', '0.2vh 0.4vh #111111');
-
-
-
-
-            //   document.body.style.backgroundColor = "#ffffff";
-            //
-            //   elements = document.getElementsByClassName("page");
-            //   for (let element of elements) {
-            //     element.style.backgroundColor = "#ffffff";
-            //     element.style.color = "#000000";
-            //   }
-            //
-            //   elements = document.getElementsByClassName("howto");
-            //   for (let element of elements) {
-            //     element.style.backgroundColor = "#ffffff";
-            //     element.style.color = "#000000";
-            //   }
-            //
-            //   elements = document.getElementsByClassName("niftyButton");
-            //   for (let element of elements) {
-            //     element.style.backgroundColor = "#ffffff";
-            //     element.style.color = "#000000";
-            //     element.style.border = 'solid thin #000000';
-            //     element.style.boxShadow = '0.2vh 0.4vh #000000' ;
-            //   }
-            //
-            //   document.documentElement.style.setProperty('--link-color', 'blue');
-            //
-            //   document.getElementById('userInputTextArea').style.backgroundColor = 'white';
-            //   document.getElementById('lineNumbers').style.backgroundColor = 'white';
-            //   document.getElementById('lineNumbers').style.color = 'grey';
-            //   document.body.style.scrollbarColor='grey white';
-            //   break;
-            //
-            //   tabButtons = document.querySelectorAll('.tabButton');
-            //   tabButtons.forEach(button => {
-            //     button.style.borderBottom = 'white';
-            //   });
-            //
-            // case 'dark':
-            //   document.body.style.backgroundColor = "#1A1A2E";
-            //
-            //   elements = document.getElementsByClassName("page");
-            //   for (let element of elements) {
-            //     element.style.backgroundColor = "#213350";
-            //     element.style.color = "#D2B48C";
-            //
-            //   }
-            //
-            //   elements = document.getElementsByClassName("howto");
-            //   for (let element of elements) {
-            //     element.style.backgroundColor = "#213350";
-            //     element.style.color = "#D2B48C";
-            //   }
-            //
-            //   elements = document.getElementsByClassName("niftyButton");
-            //   for (let element of elements) {
-            //     element.style.backgroundColor = "#213350";
-            //     element.style.color = "#D2B48C";
-            //     element.style.border = 'solid thin #90724A';
-            //     element.style.boxShadow = '0.2vh 0.4vh #90724A' ;
-            //   }
-            //
-            //   document.documentElement.style.setProperty('--link-color', 'lightblue');
-            //
-            //   document.getElementById('userInputTextArea').style.backgroundColor = 'lightgrey';
-            //   document.getElementById('lineNumbers').style.backgroundColor = 'lightgrey';
-            //   document.getElementById('lineNumbers').style.color = 'black';
-            //
-            //   document.body.style.scrollbarColor='lightgrey #444444';
-            //
-            //   document.getElementById('nodeContainerDiv').style.color='black';
-            //
-            //   tabButtons = document.querySelectorAll('.tabButton');
-            //   tabButtons.forEach(button => {
-            //     button.style.borderBottom = '#213350';
-            //   });
-
+              document.documentElement.style.setProperty('--link-color', '#0000ff');
+              document.documentElement.style.setProperty('--bgColor', '#dddddd');
+              document.documentElement.style.setProperty('--pageColor', '#ffffff');
+              document.documentElement.style.setProperty('--textColor', '#000000');
+              document.documentElement.style.setProperty('--selectedColor', 'darkred');
+              document.documentElement.style.setProperty('--textAreaBGColor', '#ffffff');
+              document.documentElement.style.setProperty('--lineNumberColor', 'grey');
+              document.documentElement.style.setProperty('--niftyButtonTextColor', '#000000');
+              document.documentElement.style.setProperty('--niftyButtonBorderColor', '#000000');
+              document.documentElement.style.setProperty('--niftyButtonBGColor', '#cccccc');
+              document.documentElement.style.setProperty('--niftyButtonShadowColor', '#111111');
 
               break;
 
@@ -6512,50 +6312,12 @@
                 document.documentElement.style.setProperty('--pageColor', '#880000');
                 document.documentElement.style.setProperty('--textColor', '#D2c58C');
                 document.documentElement.style.setProperty('--selectedColor', 'darkorange');
-                document.documentElement.style.setProperty('--textAreaBGColor', '#f0a0a0');
-                document.documentElement.style.setProperty('----lineNumberColor', 'darkgrey');
+                document.documentElement.style.setProperty('--textAreaBGColor', '#e0bbaa');
+                document.documentElement.style.setProperty('--lineNumberColor', '#3a3a3a');
                 document.documentElement.style.setProperty('--niftyButtonTextColor', '#D2c58C');
                 document.documentElement.style.setProperty('--niftyButtonBorderColor', '#D2c58C');
-                document.documentElement.style.setProperty('--niftyButtonShadowColor', '0.2vh 0.4vh #D2c58C');
-
-
-                // document.body.style.backgroundColor = "firebrick";
-                //
-                // elements = document.getElementsByClassName("page");
-                // for (let element of elements) {
-                //   element.style.backgroundColor = "darkred";
-                //   element.style.color = "#D2B48C";
-                //
-                // }
-                //
-                // elements = document.getElementsByClassName("howto");
-                // for (let element of elements) {
-                //   element.style.backgroundColor = "darkred";
-                //   element.style.color = "#D2B48C";
-                // }
-                //
-                // elements = document.getElementsByClassName("niftyButton");
-                // for (let element of elements) {
-                //   element.style.backgroundColor = "maroon";
-                //   element.style.color = "peachpuff";
-                //   element.style.border = 'solid thin #90724A';
-                //   element.style.boxShadow = '0.2vh 0.4vh #90724A' ;
-                // }
-                //
-                // document.documentElement.style.setProperty('--link-color', 'lightblue');
-                //
-                // document.getElementById('userInputTextArea').style.backgroundColor = 'lightsalmon';
-                // document.getElementById('lineNumbers').style.backgroundColor = 'lightsalmon';
-                // document.getElementById('lineNumbers').style.color = 'black';
-                //
-                // document.body.style.scrollbarColor='lightsalmon #444444';
-                //
-                // document.getElementById('nodeContainerDiv').style.color='black';
-                //
-                // tabButtons = document.querySelectorAll('.tabButton');
-                // tabButtons.forEach(button => {
-                //   button.style.borderBottom = 'darkred';
-                // });
+                document.documentElement.style.setProperty('--niftyButtonBGColor', '#552222');
+                document.documentElement.style.setProperty('--niftyButtonShadowColor', '#D2c58C');
 
                 break;
 
@@ -6566,57 +6328,17 @@
                 document.documentElement.style.setProperty('--bgColor', 'indigo');
                 document.documentElement.style.setProperty('--pageColor', 'darkslateblue');
                 document.documentElement.style.setProperty('--textColor', '#ffffff');
-                document.documentElement.style.setProperty('--selectedColor', 'aa00aa');
+                document.documentElement.style.setProperty('--selectedColor', '#aa00aa');
                 document.documentElement.style.setProperty('--textAreaBGColor', 'skyblue');
-                document.documentElement.style.setProperty('----lineNumberColor', 'darkgrey');
+                document.documentElement.style.setProperty('--lineNumberColor', '#444444');
                 document.documentElement.style.setProperty('--niftyButtonTextColor', '#99ccff');
                 document.documentElement.style.setProperty('--niftyButtonBorderColor', 'black');
-                document.documentElement.style.setProperty('--niftyButtonShadowColor', '0.2vh 0.4vh #000000');
-
-
-                //
-                //
-                // document.body.style.backgroundColor = "indigo";
-                //
-                // elements = document.getElementsByClassName("page");
-                // for (let element of elements) {
-                //   element.style.backgroundColor = "darkslateblue";
-                //   element.style.color = "#D2B48C";
-                //
-                // }
-                //
-                // elements = document.getElementsByClassName("howto");
-                // for (let element of elements) {
-                //   element.style.backgroundColor = "#darkslateblue";
-                //   element.style.color = "#dodgerblue";
-                // }
-                //
-                // elements = document.getElementsByClassName("niftyButton");
-                // for (let element of elements) {
-                //   element.style.backgroundColor = "#darkslateblue";
-                //   element.style.color = "#dodgerblue";
-                //   element.style.border = 'solid thin #90724A';
-                //   element.style.boxShadow = '0.2vh 0.4vh #90724A' ;
-                // }
-                //
-                // document.documentElement.style.setProperty('--link-color', 'lightblue');
-                //
-                // document.getElementById('userInputTextArea').style.backgroundColor = 'skyblue';
-                // document.getElementById('lineNumbers').style.backgroundColor = 'skyblue';
-                // document.getElementById('lineNumbers').style.color = 'black';
-                //
-                // document.body.style.scrollbarColor='lightgrey #444444';
-                //
-                // document.getElementById('nodeContainerDiv').style.color='black';
-                //
-                // tabButtons = document.querySelectorAll('.tabButton');
-                // tabButtons.forEach(button => {
-                //   button.style.borderBottom = 'darkslateblue';
-                // });
+                document.documentElement.style.setProperty('--niftyButtonBGColor', '#660000');
+                document.documentElement.style.setProperty('--niftyButtonShadowColor', '#000000');
 
                 break;
 
-                case 'blue':
+              case 'blue':
 
                 document.documentElement.style.setProperty('--link-color', '#aaddff');
                 document.documentElement.style.setProperty('--bgColor', '#1A1A2E');
@@ -6624,155 +6346,44 @@
                 document.documentElement.style.setProperty('--textColor', '#ffffff');
                 document.documentElement.style.setProperty('--selectedColor', 'aa00aa');
                 document.documentElement.style.setProperty('--textAreaBGColor', 'skyblue');
-                document.documentElement.style.setProperty('----lineNumberColor', 'darkgrey');
-                document.documentElement.style.setProperty('--niftyButtonTextColor', '#99ccff');
+                document.documentElement.style.setProperty('--lineNumberColor', '#333333');
+                document.documentElement.style.setProperty('--niftyButtonTextColor', '#000066');
                 document.documentElement.style.setProperty('--niftyButtonBorderColor', 'black');
-                document.documentElement.style.setProperty('--niftyButtonShadowColor', '0.2vh 0.4vh #000000');
-                  //
-                  //
-                  // document.body.style.backgroundColor = "#1A1A2E";
-                  //
-                  // elements = document.getElementsByClassName("page");
-                  // for (let element of elements) {
-                  //   element.style.backgroundColor = "#213350";
-                  //   element.style.color = "#D2B48C";
-                  //
-                  // }
-                  //
-                  // elements = document.getElementsByClassName("howto");
-                  // for (let element of elements) {
-                  //   element.style.backgroundColor = "#213350";
-                  //   element.style.color = "#D2B48C";
-                  // }
-                  //
-                  // elements = document.getElementsByClassName("niftyButton");
-                  // for (let element of elements) {
-                  //   element.style.backgroundColor = "#213350";
-                  //   element.style.color = "#D2B48C";
-                  //   element.style.border = 'solid thin #90724A';
-                  //   element.style.boxShadow = '0.2vh 0.4vh #90724A' ;
-                  // }
-                  //
-                  // document.documentElement.style.setProperty('--link-color', 'lightblue');
-                  //
-                  // document.getElementById('userInputTextArea').style.backgroundColor = 'lightgrey';
-                  // document.getElementById('lineNumbers').style.backgroundColor = 'lightgrey';
-                  // document.getElementById('lineNumbers').style.color = 'black';
-                  //
-                  // document.body.style.scrollbarColor='lightgrey #444444';
-                  //
-                  // document.getElementById('nodeContainerDiv').style.color='black';
-                  //
-                  // tabButtons = document.querySelectorAll('.tabButton');
-                  // tabButtons.forEach(button => {
-                  //   button.style.borderBottom = '#213350';
-                  // });
-                  //
+                document.documentElement.style.setProperty('--niftyButtonBGColor', '#88aabb');
+                document.documentElement.style.setProperty('--niftyButtonShadowColor', '#000000');
 
-
-                  break;
+                break;
 
               case 'elvish':
 
-              document.documentElement.style.setProperty('--link-color', '#00ff00');
-              document.documentElement.style.setProperty('--bgColor', 'darkgreen');
-              document.documentElement.style.setProperty('--pageColor', '#168516');
-              document.documentElement.style.setProperty('--textColor', '#D2c58C');
-              document.documentElement.style.setProperty('--selectedColor', 'springgreen');
-              document.documentElement.style.setProperty('--textAreaBGColor', 'palegreen');
-              document.documentElement.style.setProperty('----lineNumberColor', 'darkgrey');
-              document.documentElement.style.setProperty('--niftyButtonTextColor', '#D2c58C');
-              document.documentElement.style.setProperty('--niftyButtonBorderColor', 'darkgreen');
-              document.documentElement.style.setProperty('--niftyButtonShadowColor', '0.2vh 0.4vh darkgreen');
-
-
-                // document.body.style.backgroundColor = "darkgreen";
-                //
-                // elements = document.getElementsByClassName("page");
-                // for (let element of elements) {
-                //   element.style.backgroundColor = "forestgreen";
-                //   element.style.color = "#D2c58C";
-                //
-                // }
-                //
-                // elements = document.getElementsByClassName("howto");
-                // for (let element of elements) {
-                //   element.style.backgroundColor = "forestgreen";
-                //   element.style.color = "#D2B48C";
-                // }
-                //
-                // elements = document.getElementsByClassName("niftyButton");
-                // for (let element of elements) {
-                //   element.style.backgroundColor = "forestgreen";
-                //   element.style.color = "#004800";
-                //   element.style.border = 'solid thin #003200';
-                //   element.style.boxShadow = '0.2vh 0.4vh #004800' ;
-                // }
-                //
-                // document.documentElement.style.setProperty('--link-color', 'lightgreen');
-                //
-                // document.getElementById('userInputTextArea').style.backgroundColor = 'lightgreen';
-                // document.getElementById('lineNumbers').style.backgroundColor = 'lightgreen';
-                // document.getElementById('lineNumbers').style.color = 'black';
-                //
-                // document.body.style.scrollbarColor='lightgrey #444444';
-                //
-                // document.getElementById('nodeContainerDiv').style.color='black';
-                //
-                // tabButtons = document.querySelectorAll('.tabButton');
-                // tabButtons.forEach(button => {
-                //   button.style.borderBottom = '#forestgreen';
-                // });
-
-
+                document.documentElement.style.setProperty('--link-color', '#00ff00');
+                document.documentElement.style.setProperty('--bgColor', '#004400');
+                document.documentElement.style.setProperty('--pageColor', 'darkgreen');
+                document.documentElement.style.setProperty('--textColor', '#D2c58C');
+                document.documentElement.style.setProperty('--selectedColor', 'springgreen');
+                document.documentElement.style.setProperty('--textAreaBGColor', '#9FcC9F');
+                document.documentElement.style.setProperty('--lineNumberColor', 'darkgrey');
+                document.documentElement.style.setProperty('--niftyButtonTextColor', '#002200');
+                document.documentElement.style.setProperty('--niftyButtonBorderColor', '#003300');
+                document.documentElement.style.setProperty('--niftyButtonBGColor', '#77dd77');
+                document.documentElement.style.setProperty('--niftyButtonShadowColor', '#000000');
 
                 break;
 
 
               default:
 
-              document.documentElement.style.setProperty('--link-color', '#bb00bb');
-              document.documentElement.style.setProperty('--bgColor', 'indigo');
-              document.documentElement.style.setProperty('--pageColor', 'darkslateblue');
-              document.documentElement.style.setProperty('--textColor', '#ffffff');
-              document.documentElement.style.setProperty('--selectedColor', 'aa00aa');
-              document.documentElement.style.setProperty('--textAreaBGColor', 'skyblue');
-              document.documentElement.style.setProperty('--niftyButtonTextColor', 'cyan');
-              document.documentElement.style.setProperty('--niftyButtonBorderColor', 'black');
-              document.documentElement.style.setProperty('--niftyButtonShadowColor', '0.2vh 0.4vh #000000');
-                //
-                // document.body.style.backgroundColor = "#1A1A2E";
-                //
-                // elements = document.getElementsByClassName("page");
-                // for (let element of elements) {
-                //   element.style.backgroundColor = "#213350";
-                //   element.style.color = "#D2B48C";
-                //
-                // }
-                //
-                // elements = document.getElementsByClassName("howto");
-                // for (let element of elements) {
-                //   element.style.backgroundColor = "#213350";
-                //   element.style.color = "#D2B48C";
-                // }
-                //
-                // elements = document.getElementsByClassName("niftyButton");
-                // for (let element of elements) {
-                //   element.style.backgroundColor = "#213350";
-                //   element.style.color = "#D2B48C";
-                //   element.style.border = 'solid thin #90724A';
-                //   element.style.boxShadow = '0.2vh 0.4vh #90724A' ;
-                // }
-                //
-                // document.documentElement.style.setProperty('--link-color', 'lightblue');
-                //
-                // document.getElementById('userInputTextArea').style.backgroundColor = 'lightgrey';
-                // document.getElementById('lineNumbers').style.backgroundColor = 'lightgrey';
-                // document.getElementById('lineNumbers').style.color = 'black';
-                //
-                // document.body.style.scrollbarColor='lightgrey #444444';
-                //
-                // document.getElementById('nodeContainerDiv').style.color='black';
+                document.documentElement.style.setProperty('--link-color', '#bb00bb');
+                document.documentElement.style.setProperty('--bgColor', 'indigo');
+                document.documentElement.style.setProperty('--pageColor', 'darkslateblue');
+                document.documentElement.style.setProperty('--textColor', '#ffffff');
+                document.documentElement.style.setProperty('--selectedColor', 'aa00aa');
+                document.documentElement.style.setProperty('--textAreaBGColor', 'skyblue');
+                document.documentElement.style.setProperty('--lineNumberColor', 'darkgrey');
+                document.documentElement.style.setProperty('--niftyButtonTextColor', 'cyan');
+                document.documentElement.style.setProperty('--niftyButtonBorderColor', 'black');
+                document.documentElement.style.setProperty('--niftyButtonBGColor', '#666666');
+                document.documentElement.style.setProperty('--niftyButtonShadowColor', '#000000');
 
           }
 
@@ -6780,79 +6391,6 @@
         }
 
 
-
-//         function switchDarkMode() {
-//
-//             if ( document.getElementById('darkMode').checked ) {
-//
-//               document.body.style.backgroundColor = "#1A1A2E";
-//
-//               let elements = document.getElementsByClassName("page");
-//               for (let element of elements) {
-//                 element.style.backgroundColor = "#213350";
-//                 element.style.color = "#D2B48C";
-//
-//               }
-//
-//               elements = document.getElementsByClassName("howto");
-//               for (let element of elements) {
-//                 element.style.backgroundColor = "#213350";
-//                 element.style.color = "#D2B48C";
-//               }
-//
-//               elements = document.getElementsByClassName("niftyButton");
-//               for (let element of elements) {
-//                 element.style.backgroundColor = "#213350";
-//                 element.style.color = "#D2B48C";
-//                 element.style.border = 'solid thin #90724A';
-//                 element.style.boxShadow = '0.2vh 0.4vh #90724A' ;
-//               }
-//
-//               document.documentElement.style.setProperty('--link-color', 'lightblue');
-//
-//               document.getElementById('userInputTextArea').style.backgroundColor = 'lightgrey';
-//               document.getElementById('lineNumbers').style.backgroundColor = 'lightgrey';
-//               document.getElementById('lineNumbers').style.color = 'black';
-//
-//               document.body.style.scrollbarColor='lightgrey #444444';
-//
-//               document.getElementById('nodeContainerDiv').style.color='black';
-// //              document.getElementById('editorNodeListDiv').style.color='black';
-//
-//             } else {
-//
-//               document.body.style.backgroundColor = "#ffffff";
-//
-//               elements = document.getElementsByClassName("page");
-//               for (let element of elements) {
-//                 element.style.backgroundColor = "#ffffff";
-//                 element.style.color = "#000000";
-//               }
-//
-//               elements = document.getElementsByClassName("howto");
-//               for (let element of elements) {
-//                 element.style.backgroundColor = "#ffffff";
-//                 element.style.color = "#000000";
-//               }
-//
-//               elements = document.getElementsByClassName("niftyButton");
-//               for (let element of elements) {
-//                 element.style.backgroundColor = "#ffffff";
-//                 element.style.color = "#000000";
-//                 element.style.border = 'solid thin #000000';
-//                 element.style.boxShadow = '0.2vh 0.4vh #000000' ;
-//               }
-//
-//               document.documentElement.style.setProperty('--link-color', 'blue');
-//
-//               document.getElementById('userInputTextArea').style.backgroundColor = 'white';
-//               document.getElementById('lineNumbers').style.backgroundColor = 'white';
-//               document.getElementById('lineNumbers').style.color = 'grey';
-//               document.body.style.scrollbarColor='grey white';
-//
-//             }
-//
-//         }
 
             function saveAdventure() {
 
@@ -7002,7 +6540,8 @@
             --lineNumberColor: grey;
             --niftyButtonTextColor: #000000;
             --niftyButtonBorderColor: #000000;
-            --niftyButtonShadowColor: 0.2vh 0.4vh #111111;
+            --niftyButtonBGColor: #888888;
+            --niftyButtonShadowColor: #111111;
 
 
         }
@@ -7035,6 +6574,16 @@
 
         } */
 
+        .hiddenContent {
+            opacity: 0; /* Set opacity to 0 */
+            transition: visibility 0s 0.3s, opacity 0.3s ease; /* Delay visibility change for smooth effect */
+        }
+
+        .hiddenContent:hover {
+            opacity: 1; /* Set opacity to full */
+            transition-delay: 0s; /* Reset transition delay */
+        }
+
         .minorButton {
 
           border: solid thin;
@@ -7059,8 +6608,10 @@
             border-radius: 7px;
             padding: 0.3vh 0.7vh;
             text-align: center;
-            box-shadow: 0.2vh 0.4vh;
+            box-shadow: 0.2vh 0.4vh 0.5vh #111111;
             display: inline-block;
+            background-color: white;
+            /* background-color: var(--niftyButtonBGColor); */
           }
 
           .nodeEditorButton:active {
@@ -7082,7 +6633,8 @@
             color: var(--niftyButtonTextColor);
             border-color: var(--niftyButtonBorderColor);
             background-color: var(--niftyButtonBGColor);
-            box-shadow: var(--niftyButtonShadowColor);
+            /* box-shadow: var(--niftyButtonShadowColor); */
+            box-shadow: 0.2vh 0.4vh 1vh var(--niftyButtonBorderColor);
 
         }
 
@@ -7307,12 +6859,16 @@
             <span class="tabButton" id="tab10" onclick="showPage(10)">Graphic</span>
             <span class="tabButton" id="tab7" onclick="showPage(7)">Settings</span>
 
-            <span onclick='forceColorMode("light")' style='float: right; background-color: white; border: solid thin black; border-radius: 50%;'>L</span>
-            <span onclick='forceColorMode("melee")' style='float: right; background-color: orange; border: solid thin black; border-radius: 50%;'>M</span>
-            <span onclick='forceColorMode("wizard")' style='float: right; background-color: purple; border: solid thin black; border-radius: 50%;'>W</span>
-            <span onclick='forceColorMode("elvish")' style='float: right; background-color: green; border: solid thin black; border-radius: 50%;'>E</span>
-            <span onclick='forceColorMode("blue")' style='float: right; background-color: blue; border: solid thin black; border-radius: 50%;'>B</span>
-            <span onclick='forceColorMode("dark")' style='float: right; background-color: grey; border: solid thin black; border-radius: 50%;'>D</span>
+            <span class='hiddenContent'>
+
+              <span onclick='forceColorMode("light")' style='float: right; background-color: white; border: solid thin black; border-radius: 50%;'>L</span>
+              <span onclick='forceColorMode("melee")' style='float: right; background-color: orange; border: solid thin black; border-radius: 50%;'>M</span>
+              <span onclick='forceColorMode("wizard")' style='float: right; background-color: purple; border: solid thin black; border-radius: 50%;'>W</span>
+              <span onclick='forceColorMode("elvish")' style='float: right; background-color: green; border: solid thin black; border-radius: 50%;'>E</span>
+              <span onclick='forceColorMode("blue")' style='float: right; background-color: blue; border: solid thin black; border-radius: 50%;'>B</span>
+              <span onclick='forceColorMode("dark")' style='float: right; background-color: grey; border: solid thin black; border-radius: 50%;'>D</span>
+
+            </span>
 
         </div>
 
@@ -7606,7 +7162,7 @@
       <p>
         Note that actions are silent, the player won't know that they happened. It is up to you to inform them in the adventure text, or not. Of course, @Damage and @Heal may apply random amounts of damage, and you might want to mention that amount. There is a built-in variable called ^LastAction which will hold the last amount of a @Damage or @Heal action, and you can include that in your text to let the player know what happened.
       </p>
-      <p>Not all characters can read. If there is writing in your adventure - on a scroll, on a wall, etc, the Location description should mention the writing, but not what it says, since the character may not have the Literacy talent. A <span class="emphasized">Writing</span> Action allows you to specify what the writing says, and this will be presented as part of the description *if* the character has literacy. You could do this with a Branch and two versions of the Location or a conditional paragraph, but the Writing Action provides a shortcut since this may happen often. When you want to give extra info to a character with Naturalist, Architect, etc, you will need to use a conditonal paragraph or create a Branch and two versions of the Location.
+      <p>Not all characters can read. If there is writing in your adventure - on a scroll, on a wall, etc, the Location description should mention the writing, but not what it says, since the character may not have the Literacy talent. A <span class="emphasized">Writing</span> Action allows you to specify what the writing says, and this will be presented as part of the description <span class="emphasized">if</span> the character has literacy. You could do this with a Branch and two versions of the Location or a conditional paragraph, but the Writing Action provides a shortcut since this may happen often. When you want to give extra info to a character with Naturalist, Architect, etc, you will need to use a conditonal paragraph or create a Branch and two versions of the Location.
       </p>
       <p>
         The <span class="emphasized">Reassign Variable</span> action allows you to chage the value of one of the variables you set up at the start of the adventure. If the character finds some rope, wins some favor, collects some berries, consumes or spends a resource collected earlier, etc, this action makes it happen. The expression on the right side of the equal sign will be the variable's new value. This can be a numeral, die roll, variable, attribute, etc. You can read more about Varibales in their section.
@@ -7623,9 +7179,6 @@
 
       <div id ='variables' class = 'docTopic'>
 
-        <!-- <p>
-          Variables allow your adventure to keep track of things such as resources collected or expended, places visited, favor won, and so on. You set variables at the outset of the adventure, modify them with Actions, and check them with Branches. You can also include them in the text. Optionally, a variable can have a ZeroDestination - if the variable is ever reduce to or below zero the adventure will immediately jump away to this node. Variables can do a lot, but you can use them simply.
-        </p> -->
         <p>
           Variables let you store a number to keep track of various things to add richness to your adventure. You can keep track of whether or not a particular item has been picked up, how much of a resource is left, how many times something has happened, whether or not a particular event has happend, or how much silver or rope or berries the character has picked up here and there. You give a variable a name and a starting value at the top of the editor. Variables can then be modified by Actions when the character arrives at a Location.
         </p>
@@ -7702,7 +7255,7 @@
  </P>
 
  <P>
-   Below the scrolling list of nodes boxes is a row of buttons that will let you add new nodes of each type. You can read more about First/Later Locations below, but in a nutshell this button quickly creates several nodes such that a location will appear one way when a character first visits it and differently when they return. There's also an Undelete button that will show you a list of deleted of deleted nodes if you want to pick one to bring back from the dead. (The graveyard of deleted nodes is not preserved between sessions.) The Create Missing Nodes button will create Locations for all the names that your buttons and branches try to visit which you have not created yet. This can be handy as you are first sketching out your adventure, but of course if some of those buttons should lead to branches instead of locations you'll want to create those first manually.
+   Below the scrolling list of nodes boxes is a row of buttons that will let you add new nodes of each type. You can read more about First/Later Locations below, but in a nutshell this button quickly creates several nodes such that a location will appear one way when a character first visits it and differently when they return. There's also an Undelete button that will show you a list of deleted nodes if you want to pick one to bring back from the dead. (The graveyard of deleted nodes is not preserved between sessions.) The Create Missing Nodes button will create Locations for all the names that your buttons and branches try to visit which you have not created yet. This can be handy as you are first sketching out your adventure, but of course if some of those buttons should lead to branches instead of locations you'll want to create those first manually.
  </P>
 
  <P>
@@ -7781,8 +7334,8 @@
 <p>
  If you want to get really fancy the condition for the branch can include "and" and "or" in the form or && and ||. Be sure to test carefully with the Simulator to make sure you are writing what you think you're writing. You can use parentheses to group things.<br>
  <br>
- literacy || courtlygraces - will go to @destinationTrue if the character has *either* Literacy or Courtly Graces.<br><br>
- alertness  && armor < 4 - will go to @destinationTrue if the character has Alertness *and* they are wearing chainmail or lighter.<br><br>
+ literacy || courtlygraces - will go to @destinationTrue if the character has <span class="emphasized">either</span> Literacy or Courtly Graces.<br><br>
+ alertness  && armor < 4 - will go to @destinationTrue if the character has Alertness <span class="emphasized">and</span> they are wearing chainmail or lighter.<br><br>
  charRace = 1 && injury = 0 - will go to @destinationTrue if the character is an uninjured elf.
 </p>
 
@@ -7871,7 +7424,7 @@
    Test Mode will be set to 0 for the adventure you will share with others. While you are writing the adventure you can set Test Mode ON and load the adventure into TFT Helper to test it with a couple of advantages. Your character will start with 23 hit points, so they won't die too easily. That means you will survive the combats, the traps, the falls, but it's not too many that you can't test character death. Additionally, you will see two buttons on the character sheet in TFT Helper, a staff of Aesculapius and a skull. The staff of Aesculapius resets injury and fatigue to 0, and the skull sets injury to 23. The latter won't kill the character immediately, but the next time character hit points are checked the character will be considered dead.
  </p>
  <p>
-   The Undelete button will show you a list of the nodes you have deleted. You can select one and restore it to the same position in your adventure. Note that this is *not* stored in LocalStorage so it is volatile - if you refresh your window, close the window and return later, etc, the Undelete window will be empty. This window also only stores whole nodes; if you delete a Button, Action, Variable, etc, it will not be recoverable.
+   The Undelete button will show you a list of the nodes you have deleted. You can select one and restore it to the same position in your adventure. Note that this is <span class="emphasized">not</span> stored in LocalStorage so it is volatile - if you refresh your window, close the window and return later, etc, the Undelete window will be empty. This window also only stores whole nodes; if you delete a Button, Action, Variable, etc, it will not be recoverable.
  </p>
  <p>
    The Create Missing Nodes button will first look for any Remove Foe actions that have no corresponding foe and create corresponding foes, along with locations for their missing, defeated, and victorious nodes. Then it will create locations for any buttons or branches that don't exist. You still have to describe them, but this will save you some clicking.
@@ -7988,13 +7541,13 @@ There are a few things the Visual Editor won't do, and if you need to do these y
           Once you have the text on the clipboard of a mobile device you can launch TFT Helper, then select Go On An Adventure from the main menu. Select a character and then select New Adventures from the adventure menu. In the bottom part of the New Adventures scren is a text area you can paste the exportable into, then tap Import to see that adventure added to the menu of adventures above. Now you can play it for real.
         </p>
         <p>
-          Someone is going to ask why we're using a bespoke format instead of JSON or XML. Those formats use a *lot* of punctuation and extra tags in those formats and they are hard for humans to parse. But if you want to use JSON you can copy the JSON in the textArea below and take it to another editor to edit. When you're done you can bring the result back here, paste it into the JSON window, and click Import JSON to bring it back into the Adventure Creator.
+          Someone is going to ask why we're using a bespoke format instead of JSON or XML. Those formats use a <span class="emphasized">lot</span> of punctuation and extra tags in those formats and they are hard for humans to parse. But if you want to use JSON you can copy the JSON in the textArea below and take it to another editor to edit. When you're done you can bring the result back here, paste it into the JSON window, and click Import JSON to bring it back into the Adventure Creator.
         </p>
         <p>
           If you want to edit your adventure in XML there are many JSON-XML convertors on the web.
         </p>
         <p>
-          Note that these adventures are *scrambled* and not *encrypted*. I don't need the headaches that come along with a mobile app associated with "encryption".
+          Note that these adventures are <span class="emphasized">scrambled</span> and not <span class="emphasized">encrypted</span>. I don't need the headaches that come along with a mobile app associated with "encryption".
         </p>
       </div>
 
@@ -8282,8 +7835,8 @@ Following @foe is the node's name, of course. Then comes the text that will be d
             <div class='TEinput'>
 
               <br>
-              <textarea id='lineNumbers' cols='5' readonly style="height: 90%; padding-right: none; margin-right: none; resize: none; border-right-style: none; border-radius: 0; overflow:hidden; color: grey; text-align:right; background-color: var(--textAreaBGColor);">
-              </textarea><textarea id="userInputTextArea" rows="50" cols="80" style="height: 90%; padding-left: 0; margin-left: 0; resize: none; border-left-style: none; border-radius: 0; outline: none; background-color: var(--textAreaBGColor);" oninput="queueTextUpdate();">
+              <textarea id='lineNumbers' cols='5' readonly style="height: 90%; padding-right: none; margin-right: none; resize: none; border-right-style: none; border-radius: 0; overflow:hidden; color: var(--lineNumberColor); text-align:right; background-color: var(--textAreaBGColor);">
+              </textarea><textarea id="userInputTextArea" rows="50" cols="80" style="height: 90%; padding-left: 0; margin-left: 0; resize: none; border-left-style: none; border-radius: 0; outline: none; scroll-behavior: smooth; background-color: var(--textAreaBGColor);" oninput="queueTextUpdate();">
               </textarea>
 
               <br>
@@ -8294,18 +7847,17 @@ Following @foe is the node's name, of course. Then comes the text that will be d
             <div class='TEreference'>
 
 
-              <span style='line-height: 3' class="nodeEditorButton" onclick="closeDialogBoxes();confirmOverwrite('blank')">Clear&nbsp;Editor</span>
+              <span style='' class="niftyButton" onclick="closeDialogBoxes();confirmOverwrite('blank')">Clear&nbsp;Editor</span>
               <br>
-              <span class="nodeEditorButton" onclick="closeDialogBoxes();saveAdventure()">Save&nbsp;Adventure&nbsp;to&nbsp;Disk</span>
+              <span class="niftyButton" onclick="closeDialogBoxes();saveAdventure()">Save&nbsp;Adventure&nbsp;to&nbsp;Disk</span>
               <br>
-              <br>
-              <span class="nodeEditorButton" style=''  onclick="closeDialogBoxes();loadAdventure()">Load&nbsp;Adventure&nbsp;from&nbsp;Disk</span>
+              <span class="niftyButton" style=''  onclick="closeDialogBoxes();loadAdventure()">Load&nbsp;Adventure&nbsp;from&nbsp;Disk</span>
               <br>
               <input type="file" id="fileInput" style='display: none'>
               <br>
 
-              <span style='line-height: 1; display: inline-block;' class="nodeEditorButton" onclick="showLoc()">Show Locations</span>
-              <span style='line-height: 1; display: inline-block;' class="nodeEditorButton" onclick="showRef()">Show Reference</span>
+              <span style='line-height: 1; display: inline-block;' class="niftyButton" onclick="showLoc()">Show Locations</span>
+              <span style='line-height: 1; display: inline-block;' class="niftyButton" onclick="showRef()">Show Reference</span>
               <br>
               <br>
 
@@ -8647,7 +8199,7 @@ New value:
           <span class="watermark">Beta</span>
 
           <p>
-            Here is your adventure, prepared to paste into TFT Helper and scrambled to prevent spoilers. Be sure and copy the *entire* contents of this text field, including all the "<><>..." lines.
+            Here is your adventure, prepared to paste into TFT Helper and scrambled to prevent spoilers. Be sure and copy the <span class="emphasized">entire</span> contents of this text field, including all the "<><>..." lines.
           </p>
 
 
@@ -8787,7 +8339,7 @@ A basic, one scene adventure with a couple of paths to the end, each with their 
 </div>
 <div class="exColumn exColumnRight">
 
-  The adherents of the newt god have stolen a valuable necklace and tossed it into their sacred pool as an offering to their god. Valuable means there's a reward. Your friends have a plan to distract the acolytes while *you* sneak around, dive into the pool, grab the necklace, and escape to share the loot with them. Great adventure for non-swimmers in heavy armor. This one-scene adventure showcases *two* timers, since you have a limited number of dives and each dive allows a limited time of searching. It uses @remember & return so a complicated swim check sequence can be used in several places. If it helps, the way surfacecheck works like this: first part, swimmers in light armor succeed; second part, swimmers in heavier armor need to roll 2d against ST minus armor; third part non-swimmers in light armor need roll 3d against ST - 2 times armor; fourth part non-swimmers in heavy armor need to roll 4d against ST - 2 times armor. This adventure is going to be tough for characters without swimming, and, spoiler, there are no foes. But there are useful techniques here for producing game efects.
+  The adherents of the newt god have stolen a valuable necklace and tossed it into their sacred pool as an offering to their god. Valuable means there's a reward. Your friends have a plan to distract the acolytes while <span class="emphasized">you</span> sneak around, dive into the pool, grab the necklace, and escape to share the loot with them. Great adventure for non-swimmers in heavy armor. This one-scene adventure showcases <span class="emphasized">two</span> timers, since you have a limited number of dives and each dive allows a limited time of searching. It uses @remember & return so a complicated swim check sequence can be used in several places. If it helps, the way surfacecheck works like this: first part, swimmers in light armor succeed; second part, swimmers in heavier armor need to roll 2d against ST minus armor; third part non-swimmers in light armor need roll 3d against ST - 2 times armor; fourth part non-swimmers in heavy armor need to roll 4d against ST - 2 times armor. This adventure is going to be tough for characters without swimming, and, spoiler, there are no foes. But there are useful techniques here for producing game efects.
 
 </div>
 
@@ -9042,10 +8594,10 @@ A basic, one scene adventure with a couple of paths to the end, each with their 
 
           #editorBasicInfoDiv {
             border: solid thin;
-            margin: 0.5vh;
+            /* margin: 0.5vh; */
             margin: 1vh;
-            padding: 0.5vh
-
+            padding: 0.5vh;
+            box-shadow: rgba(0, 0, 0, 0.5) 0.2vh 0.4vh 1vh;
           }
 
           #editorVariableBox {
@@ -9053,6 +8605,7 @@ A basic, one scene adventure with a couple of paths to the end, each with their 
             margin: 1vh;
             padding: 0.5vh;
             background-color: lightblue;
+            box-shadow: rgba(0, 0, 0, 0.5) 0.2vh 0.4vh 1vh;
           }
 
           .locationNode {
@@ -9060,6 +8613,7 @@ A basic, one scene adventure with a couple of paths to the end, each with their 
             margin: 1vh;
             padding: 0.5vh;
             background-color: #cec;
+            box-shadow: rgba(0, 0, 0, 0.5) 0.2vh 0.4vh 1vh;
           }
 
           .branchNode {
@@ -9074,6 +8628,7 @@ A basic, one scene adventure with a couple of paths to the end, each with their 
             background-position:  10px 0, 10px 0, 0 0, 0 0;
             background-size: 10px 10px;
             background-repeat: repeat;
+            box-shadow: rgba(0, 0, 0, 0.5) 0.2vh 0.4vh 1vh;
           }
 
           .foeNode {
@@ -9088,6 +8643,7 @@ A basic, one scene adventure with a couple of paths to the end, each with their 
             background-position:  10px 0, 10px 0, 0 0, 0 0;
             background-size: 20px 20px;
             background-repeat: repeat;
+            box-shadow: rgba(0, 0, 0, 0.5) 0.2vh 0.4vh 1vh;
            }
 
 
@@ -9128,6 +8684,10 @@ A basic, one scene adventure with a couple of paths to the end, each with their 
 
         <div id="page8" class="page" style="display: none; height: 90vh; overflow: hidden">
           <div style="overflow-y: hidden; overflow-x: hidden; width: 100%; height: 100%; display: flex; flex-wrap: wrap;">
+
+            <datalist id="destinationList">
+            </datalist>
+
 
             <div class='visBox visLeft visTop'>  <!--  top left box -->
 
@@ -9345,7 +8905,7 @@ A basic, one scene adventure with a couple of paths to the end, each with their 
         <div id="testModeAdviceDiv" class="hideMe"  style="display: none; position: fixed; top: 20%; left: 20%; right: 20%; border: solid thick; background-color: BlanchedAlmond; color:SaddleBrown; padding: 3.5vh; overflow: auto; z-index: 999;">
 
           <p>
-              When you set Test Mode On in the Editor or add the line "@testmode" in the Text Editor the exportable created tells the TFT Helper mobile app that you are testing. This means your character will start with 23 hit points, and buttons will appear while playing the adventure that will let you heal and decrease hit points. While very useful for testing, you want to be sure and remove this line before you share this adventure with anyone but collaborators.
+              When you set Test Mode On in the Editor or add the line "@testmode" in the Text Editor, the exportable created tells the TFT Helper mobile app that you are testing. This means your character will start with 23 hit points, and buttons will appear while playing the adventure that will let you heal and decrease hit points. While very useful for testing, you want to be sure and remove this line before you share this adventure with anyone but collaborators.
           </p>
 
 
@@ -10726,7 +10286,7 @@ Continue
   @location behindthetree
   You head off the road as you approach the tower, keeping a particular tree between you and the miscreant. When you reach the tree you can hear him shouting at you. There's some distance between your cover and the tower, he will probably be able to get off more than one shot.
 
-  @if bow
+  @if bow || crossbow
   Grimnash is using the loopholes on the second floor, you won't be able to shoot him.
 
   You see you have three ways to approach him. You can run straight at the front door and hope he misses. You can zig-zag to the door and see if you can make him miss, though he might get off an extra shot, or you can sneak around through the trees and get closer to the tower from the other side.
